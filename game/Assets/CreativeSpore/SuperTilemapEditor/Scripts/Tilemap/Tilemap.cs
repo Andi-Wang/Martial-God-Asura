@@ -113,7 +113,7 @@ namespace CreativeSpore.SuperTilemapEditor
         /// <summary>
         /// Show the tilemap grid
         /// </summary>
-        public bool ShowGrid = true;
+        public bool ShowGrid = true;        
 
         //NOTE: the inner padding fix the zoom imperfection, but as long as zoom is bigger, the bigger this value has to be        
         /// <summary>
@@ -331,6 +331,8 @@ namespace CreativeSpore.SuperTilemapEditor
         void Awake()
         {
             BuildTilechunkDictionary();
+            foreach (TilemapChunk tilemapChunk in m_dicChunkCache.Values)
+                tilemapChunk.gameObject.hideFlags |= HideFlags.HideInHierarchy;
         }
 
         private bool m_applyContactsEmptyFix = false;
@@ -438,7 +440,7 @@ namespace CreativeSpore.SuperTilemapEditor
                 {
 
                     // draw tile cells
-                    Gizmos.color = new Color(1f, 1f, 1f, .2f);
+                    Gizmos.color = EditorGlobalSettings.TilemapGridColor;
 
                     // Horizontal lines
                     for (float i = 1; i < GridWidth; i++)
@@ -458,6 +460,7 @@ namespace CreativeSpore.SuperTilemapEditor
                             );
                     }
                 }                
+                Gizmos.color = Color.white;
             }
 
             //Draw Chunk Colliders
@@ -758,11 +761,22 @@ namespace CreativeSpore.SuperTilemapEditor
             
             Vector2 minTilePos = Vector2.Scale(new Vector2(m_minGridX, m_minGridY), CellSize);
             Vector2 maxTilePos = Vector2.Scale(new Vector2(m_maxGridX, m_maxGridY), CellSize);
+            Vector3 savedSize = m_mapBounds.size;
             m_mapBounds.min = m_mapBounds.max = Vector2.zero;
             m_mapBounds.Encapsulate(minTilePos);
             m_mapBounds.Encapsulate(minTilePos + CellSize);
             m_mapBounds.Encapsulate(maxTilePos);
             m_mapBounds.Encapsulate(maxTilePos + CellSize);
+            if (savedSize != m_mapBounds.size)
+            {
+                foreach (TilemapChunk chunk in m_dicChunkCache.Values)
+                {
+                    if (chunk)
+                    {
+                        chunk.InvalidateBrushes();
+                    }
+                }
+            }
         }
 
         /// <summary>

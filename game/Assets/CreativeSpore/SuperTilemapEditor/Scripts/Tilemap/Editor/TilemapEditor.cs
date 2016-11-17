@@ -78,16 +78,24 @@ namespace CreativeSpore.SuperTilemapEditor
         public static eEditMode EditMode { get { return s_editMode; } }
         static eEditMode s_editMode = eEditMode.Paint;
 
-        private enum eBrushMode
+        public enum eBrushMode
         {
             Paint,
             Erase,
             Fill
         }
-        static eBrushMode s_brushMode = eBrushMode.Paint;
-        static bool s_brushFlipV = false;
-        static bool s_brushFlipH = false;
-        static bool s_brushRot90 = false;
+        public enum eBrushPaintMode
+        {
+            Pencil,
+            Line,
+            Rect,
+            FilledRect,
+            Circle,
+            FilledCircle,
+        }
+        public static eBrushMode s_brushMode = eBrushMode.Paint;
+        //static eBrushPaintMode s_brushPaintMode = eBrushPaintMode.Pencil;
+        public static bool s_displayHelpBox = false;
 
         [SerializeField]
         private bool m_toggleMapBoundsEdit = false;
@@ -361,7 +369,7 @@ namespace CreativeSpore.SuperTilemapEditor
 
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             {
-                EditorGUILayout.LabelField("Gloabl Parameters:", EditorStyles.boldLabel);
+                EditorGUILayout.LabelField("Global Parameters:", EditorStyles.boldLabel);
                 EditorGUI.indentLevel += 2;
                 EditorGlobalSettings.TilemapColliderColor = EditorGUILayout.ColorField("Collider Color", EditorGlobalSettings.TilemapColliderColor);
                 EditorGUI.indentLevel -= 2;
@@ -388,7 +396,15 @@ namespace CreativeSpore.SuperTilemapEditor
                 }
             }
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("m_cellSize"));
+            EditorGUILayout.BeginHorizontal();
+            {
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("m_cellSize"));
+                if(GUILayout.Button("R", GUILayout.Width(20)))
+                {
+                    serializedObject.FindProperty("m_cellSize").vector2Value = m_tilemap.Tileset.TilePxSize / m_tilemap.Tileset.PixelsPerUnit;
+                }
+                EditorGUILayout.EndHorizontal();
+            }
             EditorGUILayout.PropertyField(serializedObject.FindProperty("ShowGrid"), new GUIContent("Show Grid", "Show the tilemap grid."));
             EditorGUILayout.EndVertical();
             EditorGUILayout.Space();
@@ -451,6 +467,14 @@ namespace CreativeSpore.SuperTilemapEditor
                     SetTilemapChunkHideFlag(HideFlags.HideInHierarchy, !isChunksVisible);
                 }
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_enableUndoWhilePainting"), new GUIContent("Enable Undo", "Disable Undo when painting on big maps to improve performance."));
+            }
+            EditorGUILayout.EndVertical();
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            {
+                EditorGUILayout.LabelField("Global Parameters:", EditorStyles.boldLabel);
+                EditorGUI.indentLevel += 2;
+                EditorGlobalSettings.TilemapGridColor = EditorGUILayout.ColorField("Grid Color", EditorGlobalSettings.TilemapGridColor);
+                EditorGUI.indentLevel -= 2;
             }
             EditorGUILayout.EndVertical();
         }
@@ -688,8 +712,25 @@ namespace CreativeSpore.SuperTilemapEditor
                                     if (selectionSize.x <= m_tilemap.CellSize.x && selectionSize.y <= m_tilemap.CellSize.y)
                                     {
                                         uint tileData = m_tilemap.GetTileData(m_localPaintPos);
-                                        if (tileData == Tileset.k_TileData_Empty)
+                                        //Select the first tile not null if any and select the tilemap
+                                        if (e.control && m_tilemap.ParentTilemapGroup)
                                         {
+                                            for (int i = m_tilemap.ParentTilemapGroup.Tilemaps.Count - 1; i >= 0; --i)
+                                            {
+                                                Tilemap tilemap = m_tilemap.ParentTilemapGroup.Tilemaps[i];
+                                                tileData = tilemap.GetTileData(m_localPaintPos);
+                                                if(tileData != Tileset.k_TileData_Empty)
+                                                {
+                                                    tilemap.ParentTilemapGroup.SelectedTilemap = tilemap;
+                                                    if (Selection.activeGameObject == m_tilemap.gameObject)
+                                                        Selection.activeGameObject = tilemap.gameObject;
+                                                    break;
+                                                }
+                                            }
+                                        }
+
+                                        if (tileData == Tileset.k_TileData_Empty)
+                                        {                                            
                                             m_tilemap.Tileset.SelectedTileId = Tileset.k_TileId_Empty;
                                             brush.BrushTilemap.SetTileData(0, 0, Tileset.k_TileData_Empty);
                                         }
@@ -699,7 +740,7 @@ namespace CreativeSpore.SuperTilemapEditor
                                             int tileId = Tileset.GetTileIdFromTileData(tileData);
 
                                             // Select the copied tile in the tileset, alternating between the brush and the tile drawn by the brush
-                                            if (brushId > 0 && brushId != m_tilemap.Tileset.SelectedBrushId)
+                                            if (brushId > 0 /*&& brushId != m_tilemap.Tileset.SelectedBrushId */) //NOTE: alternating between brush and tile disabled because its causing more issues than help
                                             {
                                                 m_tilemap.Tileset.SelectedBrushId = brushId;
                                             }
@@ -1028,44 +1069,31 @@ namespace CreativeSpore.SuperTilemapEditor
             GUILayout.Label("<b> F5 - Refresh Tilemap</b>", Styles.Instance.toolbarBoxStyle);
             GUILayout.EndArea();
 
-            // Display ToolBar
-            int buttonNb = System.Enum.GetValues(typeof(ToolIcons.eToolIcon)).Length;
-            Rect rToolBar = new Rect(rTools.xMax + 4f, rTools.y, buttonNb * 32f, 32f);
-            isMouseInsideToolbar = rToolBar.Contains(Event.current.mousePosition);
-            GUILayout.BeginArea(rToolBar);
-            HandlesEx.DrawRectWithOutline(new Rect(Vector2.zero, rToolBar.size), s_toolbarBoxBgColor, s_toolbarBoxOutlineColor);
-            GUILayout.BeginHorizontal();
-
-            int buttonPadding = 4;
-            Rect rToolBtn = new Rect(buttonPadding, buttonPadding, rToolBar.size.y - 2 * buttonPadding, rToolBar.size.y - 2 * buttonPadding);
-            foreach (ToolIcons.eToolIcon toolIcon in System.Enum.GetValues(typeof(ToolIcons.eToolIcon)))
-            {
-                _DoToolbarButton(rToolBtn, toolIcon);                
-                rToolBtn.x = rToolBtn.xMax + 2*buttonPadding;
-            }            
-            GUI.color = Color.white;
-            GUILayout.EndHorizontal();
-            GUILayout.EndArea();
+            // Display ToolBar           
+            Vector2 toolbarPos = new Vector2(rTools.xMax + 4f, rTools.y);
+            Vector2 toolbarButtonSize = new Vector2(32f, 32f);
+            STEditorToolbars.Instance.brushToolbar.SetHighlight((int)ToolIcons.eToolIcon.Erase, GetBrushMode() == eBrushMode.Erase);
+            STEditorToolbars.Instance.brushToolbar.DoGUI(toolbarPos, toolbarButtonSize, s_toolbarBoxBgColor, s_toolbarBoxOutlineColor);
 
             if (Tools.current != Tool.None && Tools.current != Tool.Rect)
             {
-                Rect rWarningArea = new Rect(rToolBar.x, rToolBar.y + rToolBar.height, 370f, 22f);
+                Rect rWarningArea = new Rect(toolbarPos.x, toolbarPos.y + toolbarButtonSize.y, 370f, 22f);
                 GUILayout.BeginArea(rWarningArea);
                 EditorGUI.HelpBox(new Rect(Vector2.zero, rWarningArea.size), "Select the Rect Tool (T) or press any toolbar button to start painting", MessageType.Warning);
                 GUILayout.EndArea();
             }
-            //---
+            //---            
 
             Handles.EndGUI();
 
-            if(m_displayHelpBox)
+            if(s_displayHelpBox)
             {
                 DisplayHelpBox();
             }
             if (Event.current.type == EventType.KeyDown)
             {
                 if (Event.current.keyCode == KeyCode.F1)
-                    m_displayHelpBox = !m_displayHelpBox;
+                    s_displayHelpBox = !s_displayHelpBox;
                 else if (Event.current.keyCode == KeyCode.F5)
                     m_tilemap.Refresh(true, true, true, true);
             }
@@ -1073,104 +1101,9 @@ namespace CreativeSpore.SuperTilemapEditor
             return isMouseInsideToolbar;
         }
 
-        private void _DoToolbarButton(Rect rToolBtn, ToolIcons.eToolIcon toolIcon)
-        {
-            BrushBehaviour brush = BrushBehaviour.GetOrCreateBrush(m_tilemap);
-            int iconPadding = 6;
-            Rect rToolIcon = new Rect(rToolBtn.x + iconPadding, rToolBtn.y + iconPadding, rToolBtn.size.y - 2 * iconPadding, rToolBtn.size.y - 2 * iconPadding);
-            Color activeColor = new Color(1f, 1f, 1f, 0.8f);
-            Color disableColor = new Color(1f, 1f, 1f, 0.4f);
-            switch(toolIcon)
-            {
-                case ToolIcons.eToolIcon.Pencil:
-                    GUI.color = GetBrushMode() == eBrushMode.Paint && (Tools.current == Tool.Rect || Tools.current == Tool.None) ? activeColor : disableColor;
-                    if( GUI.Button(rToolBtn, new GUIContent("", "Paint")) )
-                    {
-                        s_brushMode = eBrushMode.Paint;
-                        Tools.current = Tool.None;
-                    }
-                    break;
-                case ToolIcons.eToolIcon.Erase:
-                    GUI.color = GetBrushMode() == eBrushMode.Erase ? activeColor : disableColor;
-                    if (GUI.Button(rToolBtn, new GUIContent("", "Erase (Hold Shift)")))
-                    {
-                        s_brushMode = eBrushMode.Erase;
-                        Tools.current = Tool.None;
-                    }
-                    break;
-                case ToolIcons.eToolIcon.Fill:
-                    GUI.color = GetBrushMode() == eBrushMode.Fill ? activeColor : disableColor;
-                    if (GUI.Button(rToolBtn, new GUIContent("", "Fill (Double click)")))
-                    {
-                        s_brushMode = eBrushMode.Fill;
-                        Tools.current = Tool.None;
-                    }
-                    break;
-                case ToolIcons.eToolIcon.FlipV:
-                    GUI.color = s_brushFlipV ? activeColor : disableColor;
-                    if (GUI.Button(rToolBtn, new GUIContent("", "Flip Vertical ("+ShortcutKeys.k_FlipV+")")))
-                    {
-                        brush.FlipV();
-                        s_brushFlipV = !s_brushFlipV;
-                        Tools.current = Tool.None;
-                    }
-                    break;
-                case ToolIcons.eToolIcon.FlipH:
-                    GUI.color = s_brushFlipH ? activeColor : disableColor;
-                    if (GUI.Button(rToolBtn, new GUIContent("", "Flip Horizontal ("+ShortcutKeys.k_FlipH+")")))
-                    {
-                        brush.FlipH();
-                        s_brushFlipH = !s_brushFlipH;
-                        Tools.current = Tool.None;
-                    }
-                    break;
-                case ToolIcons.eToolIcon.Rot90:
-                    GUI.color = s_brushRot90 ? activeColor : disableColor;
-                    if (GUI.Button(rToolBtn, new GUIContent("", "Rotate 90 clockwise (" + ShortcutKeys.k_Rot90 + "); anticlockwise (" + ShortcutKeys.k_Rot90Back + ")")))
-                    {
-                        if (!s_brushRot90)
-                            brush.Rot90();
-                        else 
-                            brush.Rot90Back();
-                        s_brushRot90 = !s_brushRot90;
-                        Tools.current = Tool.None;
-                    }
-                    break;
-                case ToolIcons.eToolIcon.Info:
-                    GUI.color = m_displayHelpBox ? activeColor : disableColor;
-                    if (GUI.Button(rToolBtn, new GUIContent("", " Display Help (F1)")))
-                    {
-                        m_displayHelpBox = !m_displayHelpBox;
-                        Tools.current = Tool.None;
-                    }
-                    break;
-                case ToolIcons.eToolIcon.Refresh:
-                    GUI.color = m_displayHelpBox ? activeColor : disableColor;
-                    if (GUI.Button(rToolBtn, new GUIContent("", " Refresh Tilemap (F5)")))
-                    {
-                        TilemapGroup tilemapGroup = Selection.activeGameObject.GetComponent<TilemapGroup>();
-                        if (tilemapGroup)
-                        {
-                            foreach (Tilemap tilemap in tilemapGroup.Tilemaps)
-                            {
-                                tilemap.Refresh(true, true, true, true);
-                            }
-                        }
-                        else
-                        {
-                            m_tilemap.Refresh(true, true, true, true);
-                        }
-                        Tools.current = Tool.None;
-                    }
-                    break;
-            }            
-            GUI.color = Color.white;
-            GUI.DrawTexture(rToolIcon, ToolIcons.GetToolTexture(toolIcon));            
-        }
-
-        private bool m_displayHelpBox = false;
         void DisplayHelpBox()
         {
+            string sCtrl = (Application.platform == RuntimePlatform.OSXEditor) ? "Command" : "Ctrl";
             string sHelp =
                 "\n" +
                 " - <b>Drag:</b>\t Middle mouse button\n" +
@@ -1179,7 +1112,8 @@ namespace CreativeSpore.SuperTilemapEditor
                 " - <b>Fill:</b>\t Double Click\n\n" +
                 " - <b>Copy</b> tiles by dragging and holding right mouse button\n\n" +
                 " - <b>Cut</b> copy while holding Shift key\n\n" +
-                " - <b>Select</b> a tile or brush by right clicking over the tile.\n    If it's a brush, the brush will be selected first and second time the\n    tile painted by the brush will be selected cycling between them\n\n" +
+                " - <b>Select</b> a tile or brush by right clicking over the tile.\n    If it's a brush, the brush will be selected first and second time the\n    tile painted by the brush will be selected cycling between them\n" +
+                " - <b>Select + " + sCtrl + "</b> to select the first tile not empty found\n in a tilemap group from bottom to top in the tilemap list.\n\n" +
                 " - <b>Rotating and flipping:</b>\n" +
                 "   * <b>Rotate</b> ±90º by using <b>comma ','</b> and <b>period '.'</b>\n" +
                 "   * <b>Vertical Flip</b> by pressing X\n" +
@@ -1208,7 +1142,6 @@ namespace CreativeSpore.SuperTilemapEditor
         private void ResetBrushMode()
         {
             s_brushMode = eBrushMode.Paint;
-            s_brushFlipH = s_brushFlipV = s_brushRot90 = false;
         }
         
         private bool IsTilemapChunksVisible()

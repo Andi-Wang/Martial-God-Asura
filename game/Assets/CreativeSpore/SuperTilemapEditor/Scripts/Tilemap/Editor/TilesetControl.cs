@@ -189,6 +189,15 @@ namespace CreativeSpore.SuperTilemapEditor
             }
             //---
 
+            // Draw Zoom Selector
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label(EditorGUIUtility.FindTexture("ViewToolZoom"), GUILayout.Width(35f));
+            float visualTileZoom = EditorGUILayout.Slider(Tileset.VisualTileSize.x / Tileset.TilePxSize.x, 0.25f, 4f);
+            Tileset.VisualTileSize = visualTileZoom * Tileset.TilePxSize;
+            if (GUILayout.Button("Reset", GUILayout.Width(50f))) Tileset.VisualTileSize = new Vector2(32f, 32f);
+            EditorGUILayout.EndHorizontal();
+            //---
+
             string sTileIdLabel = Tileset.SelectedTileId != Tileset.k_TileId_Empty? " (id:" + Tileset.SelectedTileId + ")" : "";
             EditorGUILayout.LabelField("Tile Palette" + sTileIdLabel, EditorStyles.boldLabel);
 
@@ -234,7 +243,7 @@ namespace CreativeSpore.SuperTilemapEditor
                             tileData = tileView.tileSelection.selectionData[tileId];
                             tileId = (int)(tileData & Tileset.k_TileDataMask_TileId);
                         }
-                        Tile tile = tileId != Tileset.k_TileId_Empty && tileId < Tileset.Tiles.Count ? Tileset.Tiles[tileId] : null;
+                        Tile tile = Tileset.GetTile(tileId);
                         visibleTileList.Add(tileData);
 
                         int tx = m_visibleTileCount % m_sharedData.tileViewRowLength;
@@ -329,6 +338,7 @@ namespace CreativeSpore.SuperTilemapEditor
             EditorGUILayout.LabelField("Brush Palette" + sBrushIdLabel, EditorStyles.boldLabel);
             m_displayBrushReordList = EditorUtils.DoToggleButton("Display List", m_displayBrushReordList);
             EditorGUILayout.EndHorizontal();
+            Tileset.BrushTypeMask = EditorGUILayout.MaskField("Brush Mask", Tileset.BrushTypeMask, Tileset.GetBrushTypeArray());
 
             int tileRowLength = (int)(m_rTileScrollSize.width / (Tileset.VisualTileSize.x + visualTilePadding));
             if (tileRowLength <= 0) tileRowLength = 1;
@@ -342,7 +352,7 @@ namespace CreativeSpore.SuperTilemapEditor
             }
             else
             {
-                bool isRefreshBrushes = false;
+                bool refreshBrushes = false;
                 Vector2 brushesScrollPos = EditorGUILayout.BeginScrollView(m_sharedData.brushesScrollPos, Styles.Instance.scrollStyle);
                 if (m_updateScrollPos) m_sharedData.brushesScrollPos = brushesScrollPos;
                 {
@@ -351,17 +361,22 @@ namespace CreativeSpore.SuperTilemapEditor
                     if (Tileset.Brushes != null)
                     {
                         GUILayout.Space((Tileset.VisualTileSize.y + visualTilePadding) * (1 + (Tileset.Brushes.Count - 1) / tileRowLength));
-                        for (int i = 0; i < Tileset.Brushes.Count; ++i)
+                        for (int i = 0, idx = 0; i < Tileset.Brushes.Count; ++i, ++idx)
                         {
                             Tileset.BrushContainer brushCont = Tileset.Brushes[i];
-                            if (brushCont.BrushAsset == null)
+                            if (brushCont.BrushAsset == null || brushCont.BrushAsset.Tileset != Tileset)
                             {
-                                isRefreshBrushes = true;
+                                refreshBrushes = true;
+                                continue;
+                            }
+                            if (!brushCont.BrushAsset.ShowInPalette || !Tileset.IsBrushVisibleByTypeMask(brushCont.BrushAsset))
+                            {
+                                --idx;
                                 continue;
                             }
 
-                            int tx = i % tileRowLength;
-                            int ty = i / tileRowLength;
+                            int tx = idx % tileRowLength;
+                            int ty = idx / tileRowLength;
                             Rect rVisualTile = new Rect(2 + tx * (Tileset.VisualTileSize.x + visualTilePadding), 2 + ty * (Tileset.VisualTileSize.y + visualTilePadding), Tileset.VisualTileSize.x, Tileset.VisualTileSize.y);
                             //Fix Missing Tileset reference
                             if(brushCont.BrushAsset.Tileset == null)
@@ -401,9 +416,10 @@ namespace CreativeSpore.SuperTilemapEditor
                         }
                     }
 
-                    if (isRefreshBrushes)
+                    if (refreshBrushes)
                     {
-                        Tileset.RemoveNullBrushes();
+                        Tileset.RemoveInvalidBrushes();
+                        Tileset.UpdateBrushTypeArray();
                     }
                 }
                 EditorGUILayout.EndScrollView();
@@ -414,7 +430,7 @@ namespace CreativeSpore.SuperTilemapEditor
             }
             EditorGUILayout.EndVertical();
             
-            if (GUILayout.Button("Import all brushes found"))
+            if (GUILayout.Button("Import all brushes found in the project"))
             {
                 TilesetEditor.AddAllBrushesFoundInTheProject(Tileset);
                 EditorUtility.SetDirty(Tileset);

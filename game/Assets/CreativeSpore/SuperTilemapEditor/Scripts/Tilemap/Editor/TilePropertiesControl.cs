@@ -280,7 +280,7 @@ namespace CreativeSpore.SuperTilemapEditor
                 foreach (uint tileData in Tileset.TileSelection.selectionData)
                 {
                     int tileId = (int)(tileData & Tileset.k_TileDataMask_TileId);
-                    Tile tile = (tileId != Tileset.k_TileId_Empty) ? Tileset.Tiles[tileId] : null;
+                    Tile tile = Tileset.GetTile(tileId);
                     if (tile != null)
                     {
                         GUI.color = new Color(1f, 1f, 1f, 1f / Tileset.TileSelection.selectionData.Count);
@@ -524,7 +524,7 @@ namespace CreativeSpore.SuperTilemapEditor
                 }
                 EditorUtility.SetDirty(Tileset);
                 //Refresh selected tilemap
-                Tilemap selectedTilemap = Selection.activeGameObject.GetComponent<Tilemap>();
+                Tilemap selectedTilemap = Selection.activeGameObject? Selection.activeGameObject.GetComponent<Tilemap>() : null;
                 if(selectedTilemap)
                     selectedTilemap.Refresh(false, true);
             }
@@ -572,9 +572,13 @@ namespace CreativeSpore.SuperTilemapEditor
                 {
                     paramContainer.AddNewParam(new Parameter("new float", 0f));
                 };
+                GenericMenu.MenuFunction addStringParamFunc = () =>
+                {
+                    paramContainer.AddNewParam(new Parameter("new string", ""));
+                };
                 GenericMenu.MenuFunction addObjectParamFunc = () =>
                 {
-                    paramContainer.AddNewParam(new Parameter("new object", null));
+                    paramContainer.AddNewParam(new Parameter("new object", (UnityEngine.Object)null));
                 };
                 GenericMenu.MenuFunction removeAllFunc = () =>
                 {
@@ -586,11 +590,13 @@ namespace CreativeSpore.SuperTilemapEditor
                 menu.AddItem(new GUIContent("Add Bool"), false, addBoolParamFunc);
                 menu.AddItem(new GUIContent("Add Int"), false, addIntParamFunc);
                 menu.AddItem(new GUIContent("Add Float"), false, addFloatParamFunc);
+                menu.AddItem(new GUIContent("Add String"), false, addStringParamFunc);
                 menu.AddItem(new GUIContent("Add Object"), false, addObjectParamFunc);
                 menu.AddSeparator("");
                 menu.AddItem(new GUIContent("Remove All"), false, removeAllFunc);
                 menu.AddSeparator("");
                 menu.AddItem(new GUIContent("Sort By Name"), false, paramContainer.SortByName);
+                menu.AddItem(new GUIContent("Sort By Type"), false, paramContainer.SortByType);
                 menu.ShowAsContext();
             };
             reordList.onRemoveCallback = (ReorderableList list) =>
@@ -649,6 +655,10 @@ namespace CreativeSpore.SuperTilemapEditor
                 else if (param.GetParamType() == eParameterType.Float)
                 {
                     param.SetValue(EditorGUI.FloatField(rParamValue, param.GetAsFloat()));
+                }
+                else if (param.GetParamType() == eParameterType.String)
+                {
+                    param.SetValue(EditorGUI.TextField(rParamValue, param.GetAsString()));
                 }
                 else if (param.GetParamType() == eParameterType.Object)
                 {

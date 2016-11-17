@@ -89,6 +89,10 @@
     <Compile Include="Assets\CreativeSpore\SuperTilemapEditor\Scripts\Utils\HandlesEx.cs" />
     <Compile Include="Assets\CreativeSpore\SuperTilemapEditor\Scripts\Utils\TilemapDrawingUtils.cs" />
     <Compile Include="Assets\CreativeSpore\SuperTilemapEditor\Scripts\Utils\TilemapUtils.cs" />
+    <Compile Include="Assets\Scripts\CameraFollow.cs" />
+    <Compile Include="Assets\Scripts\DoorEnter.cs" />
+    <Compile Include="Assets\Scripts\Platformer2DUserControl.cs" />
+    <Compile Include="Assets\Scripts\PlatformerCharacter2D.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\CreativeSpore\SuperTilemapEditor\Extra\Tileset - Samples\Tiled - Tmx Import\license.txt" />

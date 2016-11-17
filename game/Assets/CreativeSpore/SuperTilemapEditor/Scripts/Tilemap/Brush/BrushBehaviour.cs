@@ -121,7 +121,9 @@ namespace CreativeSpore.SuperTilemapEditor
             }
             brush.IsUndoEnabled = tilemap.EnableUndoWhilePainting;
             brush.m_brushTilemap.ColliderType = eColliderType.None;
-            bool needsRefresh = brush.m_brushTilemap.Tileset != tilemap.Tileset;
+            bool needsRefresh = 
+                brush.m_brushTilemap.Tileset != tilemap.Tileset || 
+                brush.m_brushTilemap.CellSize != tilemap.CellSize;
             brush.m_brushTilemap.Tileset = tilemap.Tileset;
             brush.m_brushTilemap.CellSize = tilemap.CellSize;
             brush.m_brushTilemap.SortingLayerID = tilemap.SortingLayerID;
@@ -137,6 +139,7 @@ namespace CreativeSpore.SuperTilemapEditor
             brush.gameObject.hideFlags = HideFlags.HideInHierarchy;
             if (needsRefresh)
             {
+                brush.Offset = Vector2.zero;
                 brush.m_brushTilemap.ClearMap();
                 brush.m_brushTilemap.SetTileData(0, 0, Tileset.k_TileData_Empty); // setting an empty tile, map bounds increase a tile, needed to draw the brush border
                 brush.m_brushTilemap.UpdateMeshImmediate();
@@ -182,6 +185,11 @@ namespace CreativeSpore.SuperTilemapEditor
             }
             return null;
         }
+
+        public static void SFlipV(){ if(s_instance) s_instance.FlipV(); }
+        public static void SFlipH(){ if(s_instance) s_instance.FlipH(); }
+        public static void SRot90(){ if(s_instance) s_instance.Rot90(); }
+        public static void SRot90Back() { if (s_instance) s_instance.Rot90Back(); }
 
         #region Drawing Methods
 

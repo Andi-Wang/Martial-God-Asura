@@ -12,12 +12,14 @@ namespace CreativeSpore.SuperTilemapEditor
         SerializedProperty m_tileset;
         SerializedProperty m_autotilingMode;
         SerializedProperty m_group;
+        SerializedProperty m_showInPalette;
 
         public virtual void OnEnable()
         {
             m_tileset = serializedObject.FindProperty("Tileset");
             m_autotilingMode = serializedObject.FindProperty("m_autotilingMode");
             m_group = serializedObject.FindProperty("m_group");
+            m_showInPalette = serializedObject.FindProperty("m_showInPalette");
         }
 
 
@@ -34,6 +36,7 @@ namespace CreativeSpore.SuperTilemapEditor
             }
 
             EditorGUILayout.PropertyField(m_tileset);
+            EditorGUILayout.PropertyField(m_showInPalette);
             m_group.intValue = TilesetEditor.DoGroupFieldLayout(brush.Tileset, "Group", m_group.intValue);
             string sAutotilingModeTooltip =
                 "Autotiling Mode:\n" +

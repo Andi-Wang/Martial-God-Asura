@@ -40,7 +40,7 @@ namespace CreativeSpore.SuperTilemapEditor
                 TileObjData tileObjData = m_tileObjList[i];
                 uint tileData = m_tileDataList[tileObjData.tilePos];
                 int tileId = (int)(tileData & Tileset.k_TileDataMask_TileId);
-                Tile tile = tileId != Tileset.k_TileId_Empty ? Tileset.Tiles[tileId] : null;
+                Tile tile = Tileset.GetTile( tileId );
                 if (tile == null || tile.prefabData.prefab == null)
                 {
                     DestroyTileObject(tileObjData.tilePos);
@@ -52,7 +52,7 @@ namespace CreativeSpore.SuperTilemapEditor
             {
                 uint tileData = m_tileDataList[tileIdx];
                 int tileId = (int)(tileData & Tileset.k_TileDataMask_TileId);
-                Tile tile = tileId != Tileset.k_TileId_Empty ? Tileset.Tiles[tileId] : null;
+                Tile tile = Tileset.GetTile(tileId);
                 if (tile != null && tile.prefabData.prefab != null)
                 {
                     CreateTileObject(tileIdx, tile.prefabData);
@@ -114,6 +114,16 @@ namespace CreativeSpore.SuperTilemapEditor
                 }
                 else if (tileObjData.obj != null)
                 {
+#if UNITY_EDITOR
+                    //+++ Break tilemap prefab and restore tile prefab link
+                    GameObject parentPrefab = UnityEditor.PrefabUtility.FindRootGameObjectWithSameParentPrefab(tileObjData.obj);
+                    if (parentPrefab != tileObjData.obj)
+                    {
+                        DestroyImmediate(tileObjData.obj);
+                        tileObjData.obj = UnityEditor.PrefabUtility.InstantiatePrefab(tileObjData.tilePrefabData.prefab) as GameObject;
+                    }
+                    ///---
+#endif
                     _SetTileObjTransform(tileObjData.obj, gx, gy, tilePrefabData, m_tileDataList[tileIdx]);
                     tileObjData.obj.SendMessage(k_OnTilePrefabCreation,
                         new OnTilePrefabCreationData()
@@ -148,13 +158,19 @@ namespace CreativeSpore.SuperTilemapEditor
             tileObj.transform.localRotation = tilePrefabData.prefab.transform.localRotation;
             tileObj.transform.localScale = tilePrefabData.prefab.transform.localScale;
             //+++ Apply tile flags
-            Vector2 localScale = tileObj.transform.localScale;
+            Vector3 localScale = tileObj.transform.localScale;
             if((tileData & Tileset.k_TileFlag_Rot90) != 0)
                 tileObj.transform.localRotation *= Quaternion.Euler(0, 0, -90);
-            if ((tileData & Tileset.k_TileFlag_FlipH) != 0)
-                localScale.x = -tileObj.transform.localScale.x;
-            if ((tileData & Tileset.k_TileFlag_FlipV) != 0)
-                localScale.y = -tileObj.transform.localScale.y;
+            //For Rot180 and Rot270 avoid changing the scale
+            if (((tileData & Tileset.k_TileFlag_FlipH) != 0) && ((tileData & Tileset.k_TileFlag_FlipV) != 0))
+                tileObj.transform.localRotation *= Quaternion.Euler(0, 0, -180);
+            else
+            {
+                if ((tileData & Tileset.k_TileFlag_FlipH) != 0)
+                    localScale.x = -tileObj.transform.localScale.x;
+                if ((tileData & Tileset.k_TileFlag_FlipV) != 0)
+                    localScale.y = -tileObj.transform.localScale.y;
+            }
             tileObj.transform.localScale = localScale;
             //---
         }

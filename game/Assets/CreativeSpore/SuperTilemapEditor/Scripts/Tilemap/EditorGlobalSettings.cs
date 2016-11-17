@@ -24,5 +24,14 @@ namespace CreativeSpore.SuperTilemapEditor
             }
             set { PlayerPrefs.SetInt("STE_TilemapColliderColor", Color32ToInt(value)); }
         }
+
+        public static Color TilemapGridColor
+        {
+            get
+            {
+                return IntToColor32(PlayerPrefs.GetInt("STE_TilemapGridColor", Color32ToInt(new Color32(255, 255, 255, 60))));
+            }
+            set { PlayerPrefs.SetInt("STE_TilemapGridColor", Color32ToInt(value)); }
+        }
     }
 }

@@ -11,10 +11,7 @@ namespace CreativeSpore.SuperTilemapEditor
     {
         public Tilemap SelectedTilemap { 
             get { return m_selectedIndex >= 0 && m_selectedIndex < m_tilemaps.Count ? m_tilemaps[m_selectedIndex] : null; }
-            set
-            {
-                m_selectedIndex = m_tilemaps != null? m_tilemaps.IndexOf(value) : -1;
-            }
+            set{ m_selectedIndex = m_tilemaps != null? m_tilemaps.IndexOf(value) : -1; }
         }
         public List<Tilemap> Tilemaps { get { return m_tilemaps; } }
         public float UnselectedColorMultiplier { get { return m_unselectedColorMultiplier; } set { m_unselectedColorMultiplier = value; } }

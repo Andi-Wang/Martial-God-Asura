@@ -8,17 +8,25 @@ namespace CreativeSpore.SuperTilemapEditor
     public enum eAutotilingMode
     {
         /// <summary>
-        /// Autotiling with brushes of the same type
+        /// Autotiles with brushes of the same type
         /// </summary>
         Self = 1,
         /// <summary>
-        /// Autotiling  with tiles of different brush or any tile not empty
+        /// Autotiles  with tiles of different brush or any tile but not with empty cells
         /// </summary>
         Other = 1 << 1,
         /// <summary>
         /// Checks the Group Autotiling Mask to see if the relation between this brush and the neighbor brush is checked to do the autotiling
         /// </summary>
         Group = 1 << 2,
+        /// <summary>
+        /// Autotiles  with empty cells
+        /// </summary>
+        EmptyCells = 1 << 3,
+        /// <summary>
+        /// Autotiles with cells placed out of the tilemap bounds
+        /// </summary>
+        TilemapBounds = 1 << 4,
     }
 
     public class TilesetBrush : ScriptableObject, IBrush
@@ -27,35 +35,45 @@ namespace CreativeSpore.SuperTilemapEditor
         public ParameterContainer Params = new ParameterContainer();
         public int Group { get { return m_group; } }
         public eAutotilingMode AutotilingMode { get { return m_autotilingMode; } }
+        public bool ShowInPalette { get { return m_showInPalette; } set { m_showInPalette = value; } }
 
         [SerializeField]
-        private int m_group = 0;
-        
+        private int m_group = 0;        
         [SerializeField]
         private eAutotilingMode m_autotilingMode = eAutotilingMode.Self;
+        [SerializeField]
+        private bool m_showInPalette = true;
 
         public bool AutotileWith(int selfBrushId, int otherBrushId)
         {
-            if( 
-                ((AutotilingMode & eAutotilingMode.Self) != 0 && selfBrushId == otherBrushId ) ||
+            if (
+                ((AutotilingMode & eAutotilingMode.Self) != 0 && selfBrushId == otherBrushId) ||
                 ((AutotilingMode & eAutotilingMode.Other) != 0 && otherBrushId != selfBrushId && otherBrushId != (Tileset.k_TileDataMask_BrushId >> 16))
             )
             {
                 return true;
             }
-            else if((AutotilingMode & eAutotilingMode.Group) != 0)
+            if ((AutotilingMode & eAutotilingMode.Group) != 0)
             {
                 TilesetBrush brush = Tileset.FindBrush(otherBrushId);
-                if(brush)
-                {
+                if (brush)
                     return Tileset.GetGroupAutotiling(Group, brush.Group);
-                }
                 else if (otherBrushId == Tileset.k_BrushId_Default)
-                {
                     return Tileset.GetGroupAutotiling(Group, 0); //with normal tiles, use default group (0)
-                }
             }
             return false;
+        }
+
+        public bool AutotileWith(Tilemap tilemap, int selfBrushId, int gridX, int gridY)
+        {
+            bool isOutOfBounds = gridX > tilemap.MaxGridX || gridX < tilemap.MinGridX || gridY > tilemap.MaxGridY || gridY < tilemap.MinGridY;
+            if ((AutotilingMode & eAutotilingMode.TilemapBounds) != 0 && isOutOfBounds) return true;
+
+            uint otherTileData = tilemap.GetTileData(gridX, gridY);
+            if ((AutotilingMode & eAutotilingMode.EmptyCells) != 0 && otherTileData == Tileset.k_TileData_Empty) return true;
+
+            int otherBrushId = (int)((uint)(otherTileData & Tileset.k_TileDataMask_BrushId) >> 16);
+            return AutotileWith(selfBrushId, otherBrushId);
         }
 
         protected static bool s_refreshingLinkedBrush = false; //avoid infinite loop

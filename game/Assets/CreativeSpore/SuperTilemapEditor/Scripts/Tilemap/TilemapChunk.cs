@@ -80,7 +80,8 @@ namespace CreativeSpore.SuperTilemapEditor
         struct AnimTileData
         {
             public int VertexIdx;
-            public TilesetBrush Brush;
+            public int SubTileIdx;
+            public IBrush Brush;
         }
         private List<AnimTileData> m_animatedTiles = new List<AnimTileData>();
         #endregion
@@ -159,10 +160,23 @@ namespace CreativeSpore.SuperTilemapEditor
                 {
                     AnimTileData animTileData = m_animatedTiles[i];
                     Vector2[] uvs = animTileData.Brush.GetAnimUVWithFlags(InnerPadding);
-                    m_uvArray[animTileData.VertexIdx + 0] = uvs[0];
-                    m_uvArray[animTileData.VertexIdx + 1] = uvs[1];
-                    m_uvArray[animTileData.VertexIdx + 2] = uvs[2];
-                    m_uvArray[animTileData.VertexIdx + 3] = uvs[3];
+                    if (animTileData.SubTileIdx >= 0)
+                    {
+                        for (int j = 0; j < 4; ++j)
+                        {
+                            if (j == animTileData.SubTileIdx)
+                                m_uvArray[animTileData.VertexIdx + j] = uvs[j];
+                            else
+                                m_uvArray[animTileData.VertexIdx + j] = (uvs[j] + uvs[animTileData.SubTileIdx]) / 2f;
+                        }
+                    }
+                    else
+                    {
+                        m_uvArray[animTileData.VertexIdx + 0] = uvs[0];
+                        m_uvArray[animTileData.VertexIdx + 1] = uvs[1];
+                        m_uvArray[animTileData.VertexIdx + 2] = uvs[2];
+                        m_uvArray[animTileData.VertexIdx + 3] = uvs[3];
+                    }
                 }
                 m_meshFilter.sharedMesh.uv = m_uvArray;
             }
@@ -377,10 +391,10 @@ namespace CreativeSpore.SuperTilemapEditor
                 int tileIdx = locGridY * m_width + locGridX;
 
                 int tileId = (int)(tileData & Tileset.k_TileDataMask_TileId);
-                Tile tile = tileId != Tileset.k_TileId_Empty? Tileset.Tiles[tileId] : null;
+                Tile tile = Tileset.GetTile(tileId);
 
                 int prevTileId = (int)(m_tileDataList[tileIdx] & Tileset.k_TileDataMask_TileId);
-                Tile prevTile = prevTileId != Tileset.k_TileId_Empty? Tileset.Tiles[prevTileId] : null;                             
+                Tile prevTile = Tileset.GetTile(prevTileId);                             
 
                 int brushId = Tileset.GetBrushIdFromTileData(tileData);
                 int prevBrushId = Tileset.GetBrushIdFromTileData(m_tileDataList[tileIdx]);

@@ -113,7 +113,10 @@
     <Compile Include="Assets\CreativeSpore\SuperTilemapEditor\Scripts\Tilemap\Brush\Editor\RandomBrushEditor.cs" />
     <Compile Include="Assets\CreativeSpore\SuperTilemapEditor\Scripts\Tilemap\Brush\Editor\RoadBrushEditor.cs" />
     <Compile Include="Assets\CreativeSpore\SuperTilemapEditor\Scripts\Tilemap\Brush\Editor\TilesetBrushEditor.cs" />
+    <Compile Include="Assets\CreativeSpore\SuperTilemapEditor\Scripts\Tilemap\Editor\AtlasEditorWindow.cs" />
     <Compile Include="Assets\CreativeSpore\SuperTilemapEditor\Scripts\Tilemap\Editor\BrushTileGridControl.cs" />
+    <Compile Include="Assets\CreativeSpore\SuperTilemapEditor\Scripts\Tilemap\Editor\STEditorStyles.cs" />
+    <Compile Include="Assets\CreativeSpore\SuperTilemapEditor\Scripts\Tilemap\Editor\STEditorToolbars.cs" />
     <Compile Include="Assets\CreativeSpore\SuperTilemapEditor\Scripts\Tilemap\Editor\ShortcutKeys.cs" />
     <Compile Include="Assets\CreativeSpore\SuperTilemapEditor\Scripts\Tilemap\Editor\SortingLayerPropertyDrawer.cs" />
     <Compile Include="Assets\CreativeSpore\SuperTilemapEditor\Scripts\Tilemap\Editor\TilePropertiesControl.cs" />
@@ -124,6 +127,7 @@
     <Compile Include="Assets\CreativeSpore\SuperTilemapEditor\Scripts\Tilemap\Editor\TilesetControl.cs" />
     <Compile Include="Assets\CreativeSpore\SuperTilemapEditor\Scripts\Tilemap\Editor\TilesetEditor.cs" />
     <Compile Include="Assets\CreativeSpore\SuperTilemapEditor\Scripts\Tilemap\Editor\ToolIcons.cs" />
+    <Compile Include="Assets\CreativeSpore\SuperTilemapEditor\Scripts\Tilemap\Editor\ToolbarControl.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\CreativeSpore\SuperTilemapEditor\Extra\Tileset - Samples\Tiled - Tmx Import\license.txt" />

@@ -264,15 +264,9 @@ namespace CreativeSpore.SuperTilemapEditor
         public void SetGroupAutotiling(int groupA, int groupB, bool value)
         {
             if (value)
-            {
                 m_brushGroupAutotilingMatrix[groupA] |= (1u << groupB);
-                m_brushGroupAutotilingMatrix[groupB] |= (1u << groupA);
-            }
             else
-            {
                 m_brushGroupAutotilingMatrix[groupA] &= ~(1u << groupB);
-                m_brushGroupAutotilingMatrix[groupB] &= ~(1u << groupA);
-            }
         }
         public string[] BrushGroupNames { get { return m_brushGroupNames; } }
 
@@ -288,15 +282,10 @@ namespace CreativeSpore.SuperTilemapEditor
         //public IList<Tile> Tiles { get { return m_tiles.AsReadOnly(); } } //NOTE: removed AsReadOnly for performance and for removing memory allocation
         public List<Tile> Tiles { get { return m_tiles; } }
         public float PixelsPerUnit { get { return m_pixelsPerUnit; } set { m_pixelsPerUnit = value; } }
-
         public void SetTiles(List<Tile> tiles) { m_tiles = tiles; }
-
-        public Vector2 CalculateTileTexelSize()
-        {
-            return AtlasTexture != null ? Vector2.Scale(AtlasTexture.texelSize, TilePxSize) : Vector2.zero;
-        }
-
+        public Vector2 CalculateTileTexelSize(){ return AtlasTexture != null ? Vector2.Scale(AtlasTexture.texelSize, TilePxSize) : Vector2.zero;}
         public List<TileView> TileViews { get { return m_tileViews; } }
+        public int BrushTypeMask { get { return m_brushTypeMask; } set { m_brushTypeMask = value; } }
 
         public int SelectedTileId
         {
@@ -389,6 +378,10 @@ namespace CreativeSpore.SuperTilemapEditor
         private string[] m_brushGroupNames = Enumerable.Range(0, 32).Select( x => x == 0? "Default" : "").ToArray();
         [SerializeField]
         private uint[] m_brushGroupAutotilingMatrix = Enumerable.Range(0, 31).Select(x => 1u << x).ToArray();
+        [SerializeField]
+        private string[] m_brushTypeMaskOptions;
+        [SerializeField]
+        private int m_brushTypeMask = -1;
 
         private int m_selectedTileId = k_TileId_Empty;
         private int m_selectedBrushId = -1;
@@ -450,9 +443,9 @@ namespace CreativeSpore.SuperTilemapEditor
             return m_tileViews.Find(x => x.name == name);
         }
 
-        public void RemoveNullBrushes()
+        public void RemoveInvalidBrushes()
         {
-            m_brushes.RemoveAll(x => x.BrushAsset == null);
+            m_brushes.RemoveAll(x => x.BrushAsset == null || x.BrushAsset.Tileset != this);
             m_brushCache.Clear();
         }
 
@@ -549,6 +542,43 @@ namespace CreativeSpore.SuperTilemapEditor
                     Debug.LogWarning(" Error while slicing. There is something wrong with slicing parameters. uInc = " + uInc + "; vInc = " + vInc);
                 }
             }
+        }
+
+        public string[] UpdateBrushTypeArray()
+        {
+            List<string> outList = new List<string>();
+            for(int i = 0; i < Brushes.Count; ++i)
+            {
+                TilesetBrush brush = Brushes[i].BrushAsset;
+                if(brush)
+                {
+                    string type = brush.GetType().Name;
+                    if (!outList.Contains(type)) outList.Add(type);
+                }
+            }
+            m_brushTypeMaskOptions = outList.ToArray();
+            return m_brushTypeMaskOptions;
+        }
+
+        public string[] GetBrushTypeArray()
+        {
+            if (m_brushTypeMaskOptions == null || m_brushTypeMaskOptions.Length == 0)
+                UpdateBrushTypeArray();
+            return m_brushTypeMaskOptions;
+        }
+
+        public bool IsBrushVisibleByTypeMask(TilesetBrush brush)
+        {
+            if(brush)
+            {
+                string[] brushTypes = GetBrushTypeArray();
+                if(brushTypes != null && brushTypes.Length > 0)
+                {
+                    int idx = System.Array.IndexOf(brushTypes, brush.GetType().Name);
+                    return ((1 << idx) & m_brushTypeMask) != 0;
+                }
+            }
+            return false;
         }
 
 #if UNITY_EDITOR

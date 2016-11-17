@@ -28,15 +28,22 @@ namespace CreativeSpore.TiledImporter
         {
             foreach( TmxTileset tileset in m_map.Tilesets )
             {
-                Texture2D texture = new Texture2D(tileset.Image.Width, tileset.Image.Height, TextureFormat.ARGB32, false, false);
-                texture.filterMode = FilterMode.Point;
-                texture.name = tileset.Name;
-                texture.LoadImage(File.ReadAllBytes(Path.Combine(FilePathDirectory, tileset.Image.Source)));
-                texture.hideFlags = HideFlags.DontSave;
-                m_dicTilesetTex2d.Add(
-                    tileset.FirstGId,
-                    texture
-                );
+                if (tileset.Image == null)
+                {
+                    Debug.LogWarning("No texture found for tileset " + tileset.Name);
+                }
+                else
+                {
+                    Texture2D texture = new Texture2D(tileset.Image.Width, tileset.Image.Height, TextureFormat.ARGB32, false, false);
+                    texture.filterMode = FilterMode.Point;
+                    texture.name = tileset.Name;
+                    texture.LoadImage(File.ReadAllBytes(Path.Combine(FilePathDirectory, tileset.Image.Source)));
+                    texture.hideFlags = HideFlags.DontSave;
+                    m_dicTilesetTex2d.Add(
+                        tileset.FirstGId,
+                        texture
+                    );
+                }
             }
         }        
 

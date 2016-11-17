@@ -1,3 +1,32 @@
+--- v1.4.1 ---
+- Added Brush Mask to brush palette to filter brushes by type
+- Added option Show In Palette to brushes to unhide them in the brush palette
+- Added the name of the brush in the brush list
+- Added Atlas Editor Window to modify the padding and extrude the tile color after creating the tileset
+- Added autocomple from tile selection to Carpet & Road brushes
+- Added a reset button to Tilemap\Map\CellSize to set the cell size that fits the pixels to units set in the tileset
+- Added new autotiling modes for brushes: EmptyCells & TilemapBounds
+- Added string type to tile parameters
+- Added Zoom slider to tile palette
+- When a tilemap linked to a prefab is refreshed, the game objects instantiated by tiles will fix the prefab connection, breaking the tilemap prefab link.
+- Visual improvements
+- Keypad '+' & '-' will cycle the tilemaps when painting in a tilemap inside a tilemap group
+- Autotiling between groups is now allowing group A to make autotiling with group B but not the opposite
+- Holding Control/Command key while right clicking when painting will take the first tile not empty from the list of tilemap in the tilemap group from bottom to top, and will select the tilemap where the tile was copied from.
+- The prefabs instantiated by a tile now are rotated 180º and 270º instead of negating both X & Y scale
+- Tilemap chunks are now hidden when instantiating a prefab and also during tilemap Awake event
+- Minimum tile size for a tileset is now (1,1)
+- Fixed animated brushes used in Carpet & Road brushes, now they are animated.
+- Fixed an bug setting the Z scale to 0 when a tile was instantiating a prefab
+- Fixed null exception when modifying a tile collider from Tile Property Window and there was no tilemap selected
+- Fixed some out of bounds exceptions when changing the tilemap tileset for another with less tiles
+- Fixed line artifacts due to float errors when calculating tile vertex position
+- Fixed null exception when selecting a brush from another tileset to be used by a brush to paint a tile
+- Fixed removing invalid brushes from tileset when they are deleted or the tileset has been changed
+- Fixed updating paint brush when cell size is changed
+- Fixed issue with BrushTileGridControl when using a grid with width != height
+
+
 --- v1.4.0 ---
 - Added support to edit tile colliders directly in the scene view when Colliders tab is selected
 - Added PhysicMaterial and PhysicMaterial2D property to tilemaps
