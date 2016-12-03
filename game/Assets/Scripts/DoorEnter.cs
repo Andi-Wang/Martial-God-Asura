@@ -15,7 +15,7 @@ public class DoorEnter : MonoBehaviour {
 
     void Update()
     {
-        if (Input.GetButtonUp("Interact") && entered)
+        if (entered && Input.GetButtonUp("Interact"))
         {
             NextLevel(1);
         }
