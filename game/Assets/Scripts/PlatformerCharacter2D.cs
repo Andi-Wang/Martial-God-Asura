@@ -47,7 +47,99 @@ namespace UnityStandardAssets._2D
             m_Anim.SetFloat("vSpeed", m_Rigidbody2D.velocity.y);
         }
 
+        
+        public void Move(Controls input) {
+            // If crouching, check to see if the character can stand up
+            if (!input.vDown && m_Anim.GetBool("Crouch")) {
+                // If the character has a ceiling preventing them from standing up, keep them crouching
+                if (Physics2D.OverlapCircle(m_CeilingCheck.position, k_CeilingRadius, m_WhatIsGround)) {
+                    input.vDown = true;
+                }
+            }
 
+            //On the ground, so character can move
+            if(m_Grounded) {
+                m_Rigidbody2D.gravityScale = 1.0f;
+
+                if(input.altMoveDown || skillManager.backdashing) {
+                    m_Anim.SetBool("Crouch", false);
+                    skillManager.backdashSpeed = Skill.Backdash(m_Rigidbody2D, m_FacingRight, skillManager.backdashSpeed, input.altMoveDown);
+                    if(skillManager.backdashSpeed > 0) {
+                        skillManager.backdashing = true;
+                    }
+                    else {
+                        skillManager.backdashing = false;
+                    }
+                }
+                // If the player should jump...
+                else if (m_Grounded && input.jumpDown && m_Anim.GetBool("Ground")) {
+                    // Add a vertical force to the player.
+                    m_Grounded = false;
+                    m_Anim.SetBool("Ground", false);
+                    m_Rigidbody2D.AddForce(new Vector2(0f, playerEntity.jumpForce));
+                }
+                else {
+                    // Reduce the speed if crouching by the crouchSpeed multiplier
+                    input.h = (input.vDown ? input.h * playerEntity.crouchSpeed : input.h);
+
+                    // Set whether or not the character is crouching in the animator
+                    m_Anim.SetBool("Crouch", input.vDown);
+
+                    // The Speed animator parameter is set to the absolute value of the horizontal input.
+                    m_Anim.SetFloat("Speed", Mathf.Abs(input.h));
+
+                    // Move the character
+                    m_Rigidbody2D.velocity = new Vector2(input.h * playerEntity.maxSpeed, m_Rigidbody2D.velocity.y);
+
+                    // If the input is movting the player right and the player is facing left...
+                    if (input.h > 0 && !m_FacingRight) {
+                        // ... flip the player.
+                        Flip();
+                    }
+                    // Otherwise if the input is moving the player left and the player is facing right...
+                    else if (input.h < 0 && m_FacingRight) {
+                        // ... flip the player.
+                        Flip();
+                    }
+                }
+            }
+            //In the air
+            else
+            {
+                // The Speed animator parameter is set to the absolute value of the horizontal input.
+                m_Anim.SetFloat("Speed", Mathf.Abs(input.h));
+
+                if(input.vDown) {
+                    Skill.FastFall(m_Rigidbody2D, input.h * playerEntity.maxSpeed);
+                }
+                else {
+                    if(input.altMoveDown) {
+                        Skill.Glide(m_Rigidbody2D, playerEntity.gravity, input.h * playerEntity.maxSpeed);
+                    }
+                }
+
+                // Move the character
+                m_Rigidbody2D.velocity = new Vector2(input.h * playerEntity.maxSpeed, m_Rigidbody2D.velocity.y);
+
+
+                // If the input is moving the player right and the player is facing left...
+                if (input.h > 0 && !m_FacingRight)
+                {
+                    // ... flip the player.
+                    Flip();
+                }
+                // Otherwise if the input is moving the player left and the player is facing right...
+                else if (input.h < 0 && m_FacingRight)
+                {
+                    // ... flip the player.
+                    Flip();
+                }
+            }
+
+
+        }
+        
+        /*
         public void Move(float move, bool vDown, bool jump, bool alt_move_down, bool alt_move_hold)
         {
             // If crouching, check to see if the character can stand up
@@ -143,7 +235,7 @@ namespace UnityStandardAssets._2D
 
 
         }
-
+        */
 
         private void Flip()
         {

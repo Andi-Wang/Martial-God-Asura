@@ -67,4 +67,15 @@ public class Skill {
             body.gravityScale = gravity;
         }
     }
+
+    public static void Punch(Collider2D other) {
+        //Damage the other entity and knock back slightly
+        getEnemyScript(other).enemyEntity.health -= 10f;
+        getEnemyScript(other).recoil = 5f;
+    }
+
+
+    public static EnemyCharacter2D getEnemyScript(Collider2D other) {
+        return other.attachedRigidbody.gameObject.GetComponent<EnemyCharacter2D>() as EnemyCharacter2D;
+    }
 }

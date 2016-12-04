@@ -11,39 +11,52 @@ namespace UnityStandardAssets._2D
         private bool m_Jump;
         private bool m_Alt_Move_Down;
         private bool m_Alt_Move_Hold;
+        private Controls input;
 
-        private void Awake()
-        {
+        private void Awake() {
             m_Character = GetComponent<PlatformerCharacter2D>();
+            input = new Controls();
         }
 
 
-        private void Update()
-        {
-            if (!m_Alt_Move_Down)
-            {
-                // Read the jump input in Update so button presses aren't missed.
-                m_Alt_Move_Down = CrossPlatformInputManager.GetButtonDown("AltMove");
+        private void Update() {
+            // Read button down inputs in Update so button presses aren't missed.
+            
+            if(!input.altMoveDown) {
+                input.altMoveDown = CrossPlatformInputManager.GetButtonDown("AltMove");
             }
-
-            if (!m_Jump)
-            {
-                // Read the jump input in Update so button presses aren't missed.
-                m_Jump = CrossPlatformInputManager.GetButtonDown("Jump");
+            if(!input.interactDown) {
+                input.interactDown = CrossPlatformInputManager.GetButtonDown("Interact");
+            }
+            if(!input.jumpDown) {
+                input.jumpDown = CrossPlatformInputManager.GetButtonDown("Jump");
+            }
+            if(!input.fire1Down) {
+                input.fire1Down = CrossPlatformInputManager.GetButtonDown("Fire1");
+            }
+            if(!input.fire2Down) {
+                input.fire2Down = CrossPlatformInputManager.GetButtonDown("Fire2");
+            }
+            if (!input.fire3Down) {
+                input.fire3Down = CrossPlatformInputManager.GetButtonDown("Fire3");
             }
         }
 
 
-        private void FixedUpdate()
-        {
-            // Read the inputs.
-            bool vDown = CrossPlatformInputManager.GetAxis("Vertical") < 0;
-            float h = CrossPlatformInputManager.GetAxis("Horizontal");
-            m_Alt_Move_Hold = CrossPlatformInputManager.GetButton("AltMove");
-            // Pass all parameters to the character control script.
-            m_Character.Move(h, vDown, m_Jump, m_Alt_Move_Down, m_Alt_Move_Hold);
-            m_Jump = false;
-            m_Alt_Move_Down = false;
+        private void FixedUpdate() {
+            input.h = CrossPlatformInputManager.GetAxis("Horizontal");
+            input.v = CrossPlatformInputManager.GetAxis("Vertical");
+            input.vDown = input.v < 0;
+            input.vUp = input.v > 0;
+            input.altMoveHold = CrossPlatformInputManager.GetButton("AltMove");
+            input.jumpHold = CrossPlatformInputManager.GetButton("Jump");
+            input.interactHold = CrossPlatformInputManager.GetButton("Interact");
+            input.fire1Hold = CrossPlatformInputManager.GetButton("Fire1");
+            input.fire2Hold = CrossPlatformInputManager.GetButton("Fire2");
+            input.fire3Hold = CrossPlatformInputManager.GetButton("Fire3");
+
+            m_Character.Move(input);
+            input.resetButtonDown();
         }
     }
 }

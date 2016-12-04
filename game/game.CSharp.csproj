@@ -63,6 +63,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\ActivateLadder.cs" />
+    <Compile Include="Assets\CameraAnimatorController.cs" />
     <Compile Include="Assets\CreativeSpore\SuperTilemapEditor\Extra\Tileset - Samples\Kenneys - Rogue Like\RogueLikeMapGenerator.cs" />
     <Compile Include="Assets\CreativeSpore\SuperTilemapEditor\Scripts\Data\ParameterContainer.cs" />
     <Compile Include="Assets\CreativeSpore\SuperTilemapEditor\Scripts\Tilemap\Brush\A2X2Brush.cs" />
@@ -90,6 +92,7 @@
     <Compile Include="Assets\CreativeSpore\SuperTilemapEditor\Scripts\Utils\TilemapDrawingUtils.cs" />
     <Compile Include="Assets\CreativeSpore\SuperTilemapEditor\Scripts\Utils\TilemapUtils.cs" />
     <Compile Include="Assets\Scripts\CameraFollow.cs" />
+    <Compile Include="Assets\Scripts\Controls.cs" />
     <Compile Include="Assets\Scripts\CrossPlatformInput\Scripts\AxisTouchButton.cs" />
     <Compile Include="Assets\Scripts\CrossPlatformInput\Scripts\ButtonHandler.cs" />
     <Compile Include="Assets\Scripts\CrossPlatformInput\Scripts\CrossPlatformInputManager.cs" />
@@ -102,7 +105,9 @@
     <Compile Include="Assets\Scripts\CrossPlatformInput\Scripts\TouchPad.cs" />
     <Compile Include="Assets\Scripts\CrossPlatformInput\Scripts\VirtualInput.cs" />
     <Compile Include="Assets\Scripts\DoorEnter.cs" />
+    <Compile Include="Assets\Scripts\EnemyCharacter2D.cs" />
     <Compile Include="Assets\Scripts\Entity.cs" />
+    <Compile Include="Assets\Scripts\LadderTrigger.cs" />
     <Compile Include="Assets\Scripts\Platformer2DUserControl.cs" />
     <Compile Include="Assets\Scripts\PlatformerCharacter2D.cs" />
     <Compile Include="Assets\Scripts\PlayerInteract.cs" />
