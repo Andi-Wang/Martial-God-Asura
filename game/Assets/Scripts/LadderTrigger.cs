@@ -12,11 +12,13 @@ public class LadderTrigger : MonoBehaviour
     Vector3 destination;
     Collider2D doorCollider;
     private bool entered;
-    int ladderTrans = 12;
+    int ladderTrans = 14;
+    float ladderCentre;
 
     void Awake()
     {
         ladderTag = gameObject.tag;
+        ladderCentre = transform.localScale.x / 2;
 
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         playerRigidBody = player.GetComponent<Rigidbody2D>();
@@ -60,7 +62,7 @@ public class LadderTrigger : MonoBehaviour
     {
         if (status)
         {
-            hintCanvas.transform.position = transform.position + new Vector3(transform.localScale.x / 2, 3);
+            hintCanvas.transform.position = transform.position + new Vector3(ladderCentre, 3);
         }
         else
         {
