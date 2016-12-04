@@ -1,5 +1,11 @@
-.vs/
-Builds/
+﻿Builds/
 Library/
 Temp/
-.csproj
+.vs/
+/*.userprefs
+/*.csproj
+/*.pidb
+/*.suo
+/*.sln*
+/*.user
+/*.unityproj
