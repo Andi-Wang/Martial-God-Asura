@@ -7,7 +7,7 @@ public class GameManager : MonoBehaviour
 {
 	public float levelStartDelay = 2f;						//Time to wait before starting level, in seconds.
 	public float turnDelay = 0.1f;							//Delay between each Player turn.
-	public int playerFoodPoints = 100;						//Starting value for Player food points.
+	public int playerPoints = 100;						//Starting value for Player points.
 	public static GameManager instance = null;				//Static instance of GameManager which allows it to be accessed by any other script.
 	[HideInInspector] public bool playersTurn = true;		//Boolean to check if it's players turn, hidden in inspector but public.
 		
@@ -18,8 +18,6 @@ public class GameManager : MonoBehaviour
 	private int level = 1;									//Current level number, expressed in game as "Day 1".
 	private List<Enemy> enemies;							//List of all Enemy units, used to issue them move commands.
 	private bool doingSetup = true;							//Boolean to check if we're setting up board, prevent Player from moving during setup.
-		
-		
 		
 	//Awake is always called before any Start functions
 	void Awake()
@@ -63,6 +61,7 @@ public class GameManager : MonoBehaviour
 	{
 		//While doingSetup is true the player can't move, prevent player from moving while title card is up.
 		doingSetup = true;
+        playersTurn = false;
 			
 		//Get a reference to our image LevelImage by finding it by name.
 		levelImage = GameObject.Find("LevelImage");
@@ -93,6 +92,7 @@ public class GameManager : MonoBehaviour
 			
 		//Set doingSetup to false allowing player to move again.
 		doingSetup = false;
+        playersTurn = true;
 	}
 		
 	//Update is called every frame.

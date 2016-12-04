@@ -16,8 +16,15 @@ public class CameraAnimatorController : MonoBehaviour {
         ladderController.unlockLadder();
     }
 
-	void SetAnimating()
+	void EndAnimating()
     {
         cam.isAnimating = false;
+        GameManager.instance.playersTurn = true;
+    }
+
+    void StartAnimating()
+    {
+        cam.isAnimating = true;
+        GameManager.instance.playersTurn = false;
     }
 }

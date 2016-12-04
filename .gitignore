@@ -1,4 +1,4 @@
-﻿Builds/
+Builds/
 Library/
 Temp/
 .vs/
@@ -9,3 +9,5 @@ Temp/
 /*.sln*
 /*.user
 /*.unityproj
+*.sln
+*.csproj

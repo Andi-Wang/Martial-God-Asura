@@ -44,18 +44,21 @@ namespace UnityStandardAssets._2D
 
 
         private void FixedUpdate() {
-            input.h = CrossPlatformInputManager.GetAxis("Horizontal");
-            input.v = CrossPlatformInputManager.GetAxis("Vertical");
-            input.vDown = input.v < 0;
-            input.vUp = input.v > 0;
-            input.altMoveHold = CrossPlatformInputManager.GetButton("AltMove");
-            input.jumpHold = CrossPlatformInputManager.GetButton("Jump");
-            input.interactHold = CrossPlatformInputManager.GetButton("Interact");
-            input.fire1Hold = CrossPlatformInputManager.GetButton("Fire1");
-            input.fire2Hold = CrossPlatformInputManager.GetButton("Fire2");
-            input.fire3Hold = CrossPlatformInputManager.GetButton("Fire3");
+            if (GameManager.instance.playersTurn)
+            {
+                input.h = CrossPlatformInputManager.GetAxis("Horizontal");
+                input.v = CrossPlatformInputManager.GetAxis("Vertical");
+                input.vDown = input.v < 0;
+                input.vUp = input.v > 0;
+                input.altMoveHold = CrossPlatformInputManager.GetButton("AltMove");
+                input.jumpHold = CrossPlatformInputManager.GetButton("Jump");
+                input.interactHold = CrossPlatformInputManager.GetButton("Interact");
+                input.fire1Hold = CrossPlatformInputManager.GetButton("Fire1");
+                input.fire2Hold = CrossPlatformInputManager.GetButton("Fire2");
+                input.fire3Hold = CrossPlatformInputManager.GetButton("Fire3");
 
-            m_Character.Move(input);
+                m_Character.Move(input);
+            }
             input.resetButtonDown();
         }
     }
