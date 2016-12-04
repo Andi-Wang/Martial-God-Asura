@@ -60,7 +60,6 @@ namespace UnityStandardAssets._2D
             //On the ground, so character can move
             if(m_Grounded) {
                 m_Rigidbody2D.gravityScale = 1.0f;
-
                 if(input.altMoveDown || skillManager.backdashing) {
                     m_Anim.SetBool("Crouch", false);
                     skillManager.backdashSpeed = Skill.Backdash(m_Rigidbody2D, m_FacingRight, skillManager.backdashSpeed, input.altMoveDown);
@@ -70,6 +69,10 @@ namespace UnityStandardAssets._2D
                     else {
                         skillManager.backdashing = false;
                     }
+                }
+                //If the character punches; later, will make this just attack buttons in general in one else if
+                else if(input.fire1Down || skillManager.attacking) {
+                    //Do attacking stuff; insert stuff here, Angus
                 }
                 // If the player should jump...
                 else if (m_Grounded && input.jumpDown && m_Anim.GetBool("Ground")) {

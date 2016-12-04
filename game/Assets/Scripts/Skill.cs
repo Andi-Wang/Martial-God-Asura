@@ -5,6 +5,8 @@ public class Skill {
     public class SkillStateManager {
         public bool backdashing = false;
         public float backdashSpeed = 0f;
+
+        public bool attacking;
     }
     
     public static float Backdash(Rigidbody2D body, bool facingRight, float backdashSpeed, bool forceStart) {
