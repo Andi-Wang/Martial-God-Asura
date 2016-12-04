@@ -4,28 +4,41 @@ using CreativeSpore.SuperTilemapEditor;
 
 public class PlayerInteract : MonoBehaviour {
 
+    public Vector3 levelExit;
     private Rigidbody2D playerRigidbody2D;
+
+    int doorTrans = 4;
     
     void Awake () {
 	    playerRigidbody2D = GetComponent<Rigidbody2D>();
+        levelExit = new Vector3(69, 4);
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
         Tilemap otherObj = other.gameObject.GetComponentInParent<Tilemap>();
 
-        if (otherObj != null && (otherObj.tag == "DoorL" || otherObj.tag == "DoorR"))
+        if (otherObj == null)
+        {
+            return;
+        }
+
+        if (otherObj.tag == "DoorL" || otherObj.tag == "DoorR")
         {
             Vector3 destination = new Vector3();
             if (otherObj.tag == "DoorL")
             {
-                destination.x += 4;
+                destination.x += doorTrans;
             }
             else
             {
-                destination.x -= 4;
+                destination.x -= doorTrans;
             }
             playerRigidbody2D.MovePosition(transform.position + destination);
+        }
+        else if(otherObj.name == "ExitLevelDoor")
+        {
+            playerRigidbody2D.position = levelExit;
         }
     }
 }

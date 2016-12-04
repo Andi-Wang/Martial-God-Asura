@@ -1,11 +1,12 @@
 fileFormatVersion: 2
 guid: 2311bee519a88754c83ed72aa8dea203
-timeCreated: 1480348564
+timeCreated: 1480800560
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
     21300000: dojo_out_bg
     21300002: dojo_out_gr
+    21300004: dojo_ground
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -21,7 +22,7 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
-  isReadable: 1
+  isReadable: 0
   grayScaleToAlpha: 0
   generateCubemap: 0
   cubemapConvolution: 0
@@ -40,7 +41,7 @@ TextureImporter:
   rGBM: 0
   compressionQuality: 50
   allowsAlphaSplitting: 0
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0

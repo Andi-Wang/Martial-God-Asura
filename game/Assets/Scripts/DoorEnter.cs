@@ -9,7 +9,7 @@ public class DoorEnter : MonoBehaviour {
 
     void Awake()
     {
-        hintCanvas.SetActive(false);
+        toggleInteractHint(false);
         entered = false;
     }
 
@@ -25,14 +25,14 @@ public class DoorEnter : MonoBehaviour {
     {
         if (other.tag == "Player")
         {
-            hintCanvas.SetActive(true);
+            toggleInteractHint(true);
             entered = true;
         }
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
-        hintCanvas.SetActive(false);
+        toggleInteractHint(false);
         entered = false;
     }
     
@@ -40,5 +40,17 @@ public class DoorEnter : MonoBehaviour {
     public void NextLevel(int levelNumber)
     {
         SceneManager.LoadScene(levelNumber);
+    }
+
+    void toggleInteractHint(bool status)
+    {
+        if (status)
+        {
+            hintCanvas.transform.position = transform.position + new Vector3(0, 2);
+        }
+        else
+        {
+            hintCanvas.transform.position = new Vector3(0, -999);
+        }
     }
 }
