@@ -5,20 +5,13 @@ namespace UnityStandardAssets._2D
 {
     public class PlatformerCharacter2D : MonoBehaviour
     {
-        [SerializeField] private float m_MaxSpeed = 10f;                    // The fastest the player can travel in the x axis.
-        [SerializeField] private float m_JumpForce = 500f;                  // Amount of force added when the player jumps.
-        [SerializeField] private float m_BackdashDecay = 1f;                // Speed decay during backdash
-        [SerializeField] private float m_BackdashMaxSpeed = 17f;            // The fastest the player can travel during a backdash.
-        [SerializeField] private float m_BackdashMinSpeed = 6f;             // The slowest the player can travel during a backdash.
-        [SerializeField] private float m_GlideGravityScale = 0.05f;         // Gravity scale while gliding.
-        [Range(0, 1)] [SerializeField] private float m_CrouchSpeed = 0.7f;  // Amount of maxSpeed applied to crouching movement. 1 = 100%
         [SerializeField] private LayerMask m_WhatIsGround;                  // A mask determining what is ground to the character
+        [SerializeField] private Entity playerEntity = new Entity(100f, 100f, 0f, 5f, 0f, 500f, 10f, 1f, 0.7f);
+        private Skill.SkillStateManager skillManager = new Skill.SkillStateManager();
 
         private Transform m_GroundCheck;    // A position marking where to check if the player is grounded.
         const float k_GroundedRadius = .2f; // Radius of the overlap circle to determine if grounded
         private bool m_Grounded;            // Whether or not the player is grounded.
-        private bool m_Floating = false;
-        private float m_BackdashSpeed = 0;
         private Transform m_CeilingCheck;   // A position marking where to check for ceilings
         const float k_CeilingRadius = .01f; // Radius of the overlap circle to determine if the player can stand up
         private Animator m_Anim;            // Reference to the player's animator component.
@@ -38,6 +31,7 @@ namespace UnityStandardAssets._2D
         private void FixedUpdate()
         {
             m_Grounded = false;
+            
 
             // The player is grounded if a circlecast to the groundcheck position hits anything designated as ground
             // This can be done using layers instead but Sample Assets will not overwrite your project settings.
@@ -67,45 +61,29 @@ namespace UnityStandardAssets._2D
             }
 
             //On the ground, so character can move
-            if(m_Grounded)
-            {
+            if(m_Grounded) {
                 m_Rigidbody2D.gravityScale = 1.0f;
-                m_Floating = false;
 
-                if(alt_move_down || m_BackdashSpeed > m_BackdashMinSpeed)
-                {
+                if(alt_move_down || skillManager.backdashing) {
                     m_Anim.SetBool("Crouch", false);
-                    if (m_BackdashSpeed == 0)
-                    {
-                        m_BackdashSpeed = m_BackdashMaxSpeed;
+                    skillManager.backdashSpeed = Skill.Backdash(m_Rigidbody2D, m_FacingRight, skillManager.backdashSpeed, alt_move_down);
+                    if(skillManager.backdashSpeed > 0) {
+                        skillManager.backdashing = true;
                     }
-                    else
-                    {
-                        m_BackdashSpeed -= m_BackdashDecay;
-                    }
-
-                    if (m_FacingRight)
-                    {
-                        m_Rigidbody2D.velocity = new Vector2(-m_BackdashSpeed, m_Rigidbody2D.velocity.y);
-                    }
-                    else
-                    {
-                        m_Rigidbody2D.velocity = new Vector2(m_BackdashSpeed, m_Rigidbody2D.velocity.y);
+                    else {
+                        skillManager.backdashing = false;
                     }
                 }
                 // If the player should jump...
-                else if (m_Grounded && jump && m_Anim.GetBool("Ground"))
-                {
+                else if (m_Grounded && jump && m_Anim.GetBool("Ground")) {
                     // Add a vertical force to the player.
                     m_Grounded = false;
                     m_Anim.SetBool("Ground", false);
-                    m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
+                    m_Rigidbody2D.AddForce(new Vector2(0f, playerEntity.jumpForce));
                 }
-                else
-                {
-                    m_BackdashSpeed = 0;
+                else {
                     // Reduce the speed if crouching by the crouchSpeed multiplier
-                    move = (vDown ? move * m_CrouchSpeed : move);
+                    move = (vDown ? move * playerEntity.crouchSpeed : move);
 
                     // Set whether or not the character is crouching in the animator
                     m_Anim.SetBool("Crouch", vDown);
@@ -114,7 +92,7 @@ namespace UnityStandardAssets._2D
                     m_Anim.SetFloat("Speed", Mathf.Abs(move));
 
                     // Move the character
-                    m_Rigidbody2D.velocity = new Vector2(move * m_MaxSpeed, m_Rigidbody2D.velocity.y);
+                    m_Rigidbody2D.velocity = new Vector2(move * playerEntity.maxSpeed, m_Rigidbody2D.velocity.y);
 
                     // If the input is movting the player right and the player is facing left...
                     if (move > 0 && !m_FacingRight)
@@ -136,43 +114,17 @@ namespace UnityStandardAssets._2D
                 // The Speed animator parameter is set to the absolute value of the horizontal input.
                 m_Anim.SetFloat("Speed", Mathf.Abs(move));
 
-                if(vDown && m_Rigidbody2D.velocity.y < 6.0f)
-                {
-                    if(m_Rigidbody2D.gravityScale <= 1.0f)
-                    {
-                        m_Rigidbody2D.velocity = new Vector2(move * m_MaxSpeed, -8.0f);
-                    }
-
-                    m_Rigidbody2D.gravityScale = 8.0f;
+                if(vDown) {
+                    Skill.FastFall(m_Rigidbody2D, move * playerEntity.maxSpeed);
                 }
                 else {
-                    if(alt_move_down)
-                    {
-                        m_Floating = !m_Floating;
-
-                        if(m_Rigidbody2D.velocity.y < 0)
-                        {
-                            m_Rigidbody2D.velocity = new Vector2(move * m_MaxSpeed, m_Rigidbody2D.velocity.y * 0.25f);
-                        }
-                    }
-
-                    if (m_Rigidbody2D.velocity.y < 0 && m_Floating)
-                    {
-                        m_Floating = true;
-                        if(m_Rigidbody2D.velocity.y > -0.5f)
-                        {
-                            m_Rigidbody2D.velocity = new Vector2(move * m_MaxSpeed, -0.5f);
-                        }
-                        m_Rigidbody2D.gravityScale = m_GlideGravityScale;
-                    }
-                    else if(!m_Floating)
-                    {
-                        m_Rigidbody2D.gravityScale = 1.0f;
+                    if(alt_move_down) {
+                        Skill.Glide(m_Rigidbody2D, playerEntity.gravity, move * playerEntity.maxSpeed);
                     }
                 }
 
                 // Move the character
-                m_Rigidbody2D.velocity = new Vector2(move * m_MaxSpeed, m_Rigidbody2D.velocity.y);
+                m_Rigidbody2D.velocity = new Vector2(move * playerEntity.maxSpeed, m_Rigidbody2D.velocity.y);
 
 
                 // If the input is moving the player right and the player is facing left...
