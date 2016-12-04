@@ -45,6 +45,8 @@ namespace UnityStandardAssets._2D
 
             // Set the vertical animation
             m_Anim.SetFloat("vSpeed", m_Rigidbody2D.velocity.y);
+
+			m_Anim.SetBool ("BasicPunch", false);
         }
 
         
@@ -73,6 +75,7 @@ namespace UnityStandardAssets._2D
                 //If the character punches; later, will make this just attack buttons in general in one else if
                 else if(input.fire1Down || skillManager.attacking) {
                     //Do attacking stuff; insert stuff here, Angus
+					m_Anim.SetBool("BasicPunch", true);
                 }
                 // If the player should jump...
                 else if (m_Grounded && input.jumpDown && m_Anim.GetBool("Ground")) {
