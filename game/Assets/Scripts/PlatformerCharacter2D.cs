@@ -6,6 +6,7 @@ namespace UnityStandardAssets._2D {
     public class PlatformerCharacter2D : MonoBehaviour {
         [SerializeField] private LayerMask m_WhatIsGround;                  // A mask determining what is ground to the character
         [SerializeField] private Entity playerEntity = new Entity(100f, 100f, 0f, 5f, 0f, 500f, 10f, 1f, 0.7f);
+        [SerializeField] public Dictionary<string, int> skillRanks = new Dictionary<string, int>();
         private Skill.SkillStateManager skillManager = new Skill.SkillStateManager();
 
         private Transform m_GroundCheck;    // A position marking where to check if the player is grounded.
@@ -17,13 +18,15 @@ namespace UnityStandardAssets._2D {
         private Rigidbody2D m_Rigidbody2D;
         private bool m_FacingRight = true;  // For determining which way the player is currently facing.
 
-        private void Awake()
-        {
+
+        private void Awake() {
             // Setting up references.
             m_GroundCheck = transform.Find("GroundCheck");
             m_CeilingCheck = transform.Find("CeilingCheck");
             m_Anim = GetComponent<Animator>();
             m_Rigidbody2D = GetComponent<Rigidbody2D>();
+
+            skillRanks.Add("BasicPunch", 2);
         }
 
 
@@ -45,15 +48,6 @@ namespace UnityStandardAssets._2D {
             m_Anim.SetFloat("vSpeed", m_Rigidbody2D.velocity.y);
 
 			m_Anim.SetBool ("BasicPunch", false);
-
-            
-            //Disable hitbox when animation finishes; currently doesn't seem to work
-            if(!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("BasicPunch")) {
-                m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = false;
-            }
-
-
-
         }
 
 
@@ -80,10 +74,9 @@ namespace UnityStandardAssets._2D {
                     }
                 }
                 //If the character punches; later, will make this just attack buttons in general in one else if
-                else if(input.fire1Down) {
-                    //Activates the hitbox and animation; hitbox activation doesn't seem to work consistently
+                else if(input.fire1Down && !m_Anim.GetCurrentAnimatorStateInfo(0).IsName("BasicPunch")) {
                     m_Anim.SetBool("BasicPunch", true);
-                    m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = true;
+                    this.GetComponentInChildren<PlayerHitbox>().setSkill("BasicPunch", skillRanks["BasicPunch"]);
                 }
                 // If the player should jump...
                 else if (m_Grounded && input.jumpDown && m_Anim.GetBool("Ground")) {
@@ -163,6 +156,10 @@ namespace UnityStandardAssets._2D {
 
         public void setHitboxEnabled(string hitboxName, bool value) {
             m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = value;
+        }
+
+        public Animator getAnim() {
+            return m_Anim;
         }
     }
 }

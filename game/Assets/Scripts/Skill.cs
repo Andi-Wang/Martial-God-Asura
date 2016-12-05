@@ -69,8 +69,8 @@ public class Skill {
     }
 
     //Damage the other entity
-    public static void Punch(Enemy target) {
-        target.enemyEntity.health -= 10f;
+    public static void BasicPunch(int rank, Enemy target) {
+        target.enemyEntity.health -= 5f * rank;
     }
 
 

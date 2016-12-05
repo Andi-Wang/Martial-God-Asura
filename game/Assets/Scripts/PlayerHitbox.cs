@@ -2,19 +2,26 @@
 using System.Collections;
 
 public class PlayerHitbox : MonoBehaviour {
-    /*
-    public GameObject parent;
-    public UnityStandardAssets._2D.PlatformerCharacter2D playerScript;
-
-    void Awake() { 
-        parent = this.transform.parent.gameObject;
-        playerScript = parent.GetComponent<UnityStandardAssets._2D.PlatformerCharacter2D>() as UnityStandardAssets._2D.PlatformerCharacter2D;
-    }*/
-
+    string currentSkill;
+    int rank;
     
+    public void setSkill(string skillName, int skillRank) {
+        currentSkill = skillName;
+        rank = skillRank;
+    }
+    
+     
     void OnTriggerEnter2D(Collider2D other) {
         if (other.gameObject.tag == "Enemy") {
-            other.gameObject.GetComponent<Enemy>().enemyEntity.health -= 5;
+            Enemy enemy = other.gameObject.GetComponent<Enemy>();
+            UnityStandardAssets._2D.PlatformerCharacter2D player = this.transform.parent.gameObject.GetComponent<UnityStandardAssets._2D.PlatformerCharacter2D>();
+            AnimatorStateInfo state = player.getAnim().GetCurrentAnimatorStateInfo(0);
+
+            if(currentSkill == "BasicPunch") {
+                Skill.BasicPunch(rank, enemy);
+            }
+
+            
         }
     }
 }
