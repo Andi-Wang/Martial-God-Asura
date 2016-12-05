@@ -8,11 +8,6 @@ namespace UnityStandardAssets._2D {
         [SerializeField] private Entity playerEntity = new Entity(100f, 100f, 0f, 5f, 0f, 500f, 10f, 1f, 0.7f);
         private Skill.SkillStateManager skillManager = new Skill.SkillStateManager();
 
-        
-        //public List<Enemy> enemiesHit = new List<Enemy>(); //List of enemies that have been hit and not resolved; elements are added by PlayerHitbox, removed during FixedUpdate
-        //public string currentHitboxName;
-
-
         private Transform m_GroundCheck;    // A position marking where to check if the player is grounded.
         const float k_GroundedRadius = .2f; // Radius of the overlap circle to determine if grounded
         private bool m_Grounded;            // Whether or not the player is grounded.
@@ -52,25 +47,16 @@ namespace UnityStandardAssets._2D {
 			m_Anim.SetBool ("BasicPunch", false);
 
             /*
-            foreach(Enemy e in enemiesHit) {
-                if (m_Anim.GetCurrentAnimatorStateInfo(0).IsName("BasicPunch")) {
-                    Skill.Punch(e);
-                    enemiesHit.Remove(e);
-                }
+            //Disable hitbox when animation finishes; currently doesn't seem to work
+            if(!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("BasicPunch")) {
+                m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = false;
             }*/
 
-            /*
-            if(currentHitboxName != "") {
-                setHitboxEnabled(currentHitboxName, false);
-            }
-            else {
-                currentHitboxName = "";
-            }*/
 
 
         }
 
-        
+
         public void Move(Controls input) {
             // If crouching, check to see if the character can stand up
             if (!input.vDown && m_Anim.GetBool("Crouch")) {
@@ -94,16 +80,10 @@ namespace UnityStandardAssets._2D {
                     }
                 }
                 //If the character punches; later, will make this just attack buttons in general in one else if
-                else if(input.fire1Down) {//|| m_Anim.GetCurrentAnimatorStateInfo(0).IsName("BasicPunch")) {
+                else if(input.fire1Down) {
+                    //Activates the hitbox and animation; hitbox activation doesn't seem to work consistently
                     m_Anim.SetBool("BasicPunch", true);
-                    /*if (!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("BasicPunch")) {
-                        
-                    }*/
                     m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = true;
-                    //currentHitboxName = "PunchHitbox";
-                }
-                if (!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("BasicPunch")) {
-                    m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = false;
                 }
                 // If the player should jump...
                 else if (m_Grounded && input.jumpDown && m_Anim.GetBool("Ground")) {

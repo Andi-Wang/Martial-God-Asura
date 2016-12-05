@@ -12,6 +12,7 @@ public class PlayerHitbox : MonoBehaviour {
 
     public void OnTriggerEnter(Collider2D other) {
         if (other.transform.parent.GetComponent<Enemy>() != null) {
+            other.transform.parent.GetComponent<Enemy>().enemyEntity.health -= 10;
             //playerScript.enemiesHit.Add(other.transform.parent.gameObject.GetComponent<Enemy>() as Enemy);
         }
     }

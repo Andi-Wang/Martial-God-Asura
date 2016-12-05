@@ -5,11 +5,11 @@ using System.Collections;
 public class Enemy : MonoBehaviour {
     public Entity enemyEntity;
 
-
+    //These three variables are in enemyEntity
     //public float speed = 1f;
-    
     //public float startingHealth = 10f;
     //public float currentHealth;
+
     public float playerDamage;
     public AudioClip attackSound1;                      //First of two audio clips to play when attacking the player.
     public AudioClip attackSound2;                      //Second of two audio clips to play when attacking the player.
@@ -29,13 +29,9 @@ public class Enemy : MonoBehaviour {
         boxCollider = GetComponent<BoxCollider2D>();
         rb2D = GetComponent<Rigidbody2D>();
         origX = transform.position.x;
-<<<<<<< HEAD
         //currentHealth = startingHealth;
         enemyEntity = new Entity(10f, 0f, 0f, 0f, 0f, 0f, 1f, 1f, 0f);
-=======
-        currentHealth = startingHealth;
         movement.Set(-1, 0, 0);
->>>>>>> f876780a8b4a0c593cb2caa62298d540bfc00267
     }
 
     //Start overrides the virtual Start function of the base class.
@@ -58,7 +54,7 @@ public class Enemy : MonoBehaviour {
         }
     }
 
-    
+    //Trying to implement damage by accessing an enemy's enemyEntity.health directly from the damage source; moved death checks to update()
     /*
     public void TakeDamage(float amount, Vector3 hitPoint) {
         if (isDead)
@@ -120,19 +116,6 @@ public class Enemy : MonoBehaviour {
     void Patrol() {
         float currentXOffset = transform.position.x - origX;
 
-<<<<<<< HEAD
-        if (Mathf.Abs(currentXOffset) >= detectionRange) {
-            
-            movement.Set(currentXOffset > 0 ? -1 : 1, 0, 0);
-            Debug.Log(movement);
-        }
-        else {
-            movement.Set(currentXOffset > 0 ? 1 : -1, 0, 0);
-        }
-
-        movement = movement * enemyEntity.maxSpeed * Time.deltaTime;
-        //Debug.Log(movement);
-=======
         // out of positive range
         if (currentXOffset > detectionRange)
         {
@@ -143,9 +126,8 @@ public class Enemy : MonoBehaviour {
             movement.Set(1, 0, 0);
         }
 
-        movement = movement * speed * Time.deltaTime;
+        movement = movement * enemyEntity.maxSpeed * Time.deltaTime;
 
->>>>>>> f876780a8b4a0c593cb2caa62298d540bfc00267
         rb2D.MovePosition(transform.position + movement);
     }
 }
