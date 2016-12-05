@@ -18,6 +18,9 @@ public class LadderTriggerManager : MonoBehaviour {
 
     public void unlockLadder(int ladderId)
     {
-        ladders[ladderId].SetActive(true);
+        if (ladders[ladderId] != null)
+        {
+            ladders[ladderId].SetActive(true);
+        }
     }
 }

@@ -1,9 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ActivateLadderAuto : MonoBehaviour {
-    public GameObject ladder;
-    public int ladderId;
+public class TopFloorView : MonoBehaviour {
 
     bool alreadyEntered;
     Animator anim;
@@ -17,10 +15,10 @@ public class ActivateLadderAuto : MonoBehaviour {
     // Update is called once per frame
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (!alreadyEntered && other.tag == "Player" && !ladder.activeInHierarchy)
+        if (!alreadyEntered && other.tag == "Player")
         {
             alreadyEntered = true;
-            anim.SetTrigger("LadderUnlock" + ladderId);
+            anim.SetTrigger("OnTopFloor");
         }
     }
 }

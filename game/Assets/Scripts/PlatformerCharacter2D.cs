@@ -1,9 +1,12 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 namespace UnityStandardAssets._2D {
     public class PlatformerCharacter2D : MonoBehaviour {
+        public Slider healthSlider;
+
         [SerializeField] private LayerMask m_WhatIsGround;                  // A mask determining what is ground to the character
         [SerializeField] private Entity playerEntity = new Entity(100f, 100f, 0f, 5f, 0f, 500f, 10f, 1f, 0.7f);
         [SerializeField] public Dictionary<string, int> skillRanks = new Dictionary<string, int>();
@@ -18,17 +21,51 @@ namespace UnityStandardAssets._2D {
         private Rigidbody2D m_Rigidbody2D;
         private bool m_FacingRight = true;  // For determining which way the player is currently facing.
 
+<<<<<<< HEAD
 
         private void Awake() {
+=======
+        bool isDead;
+
+        private void Awake()
+        {
+>>>>>>> 8e57063719f3f214a572e906f818e8b7fca2285f
             // Setting up references.
             m_GroundCheck = transform.Find("GroundCheck");
             m_CeilingCheck = transform.Find("CeilingCheck");
             m_Anim = GetComponent<Animator>();
             m_Rigidbody2D = GetComponent<Rigidbody2D>();
+<<<<<<< HEAD
 
             skillRanks.Add("BasicPunch", 2);
+=======
+            isDead = false;
+>>>>>>> 8e57063719f3f214a572e906f818e8b7fca2285f
         }
 
+        void TakeDamage(float amount)
+        {
+            playerEntity.health -= amount;
+            healthSlider.value = playerEntity.health;
+
+            //TODO: player hurt sound,animation
+            if (playerEntity.health <= 0 && !isDead)
+            {
+                Death();
+            }
+        }
+        void Death()
+        {
+            // Set the death flag so this function won't be called again.
+            isDead = true;
+            
+            // Tell the animator that the player is dead.
+            //anim.SetTrigger("Die");
+
+            // Set the audiosource to play the death clip and play it (this will stop the hurt sound from playing).
+            //playerAudio.clip = deathClip;
+            //playerAudio.Play();
+        }
 
         private void FixedUpdate() {
             m_Grounded = false;
@@ -48,6 +85,18 @@ namespace UnityStandardAssets._2D {
             m_Anim.SetFloat("vSpeed", m_Rigidbody2D.velocity.y);
 
 			m_Anim.SetBool ("BasicPunch", false);
+<<<<<<< HEAD
+=======
+
+            
+            //Disable hitbox when animation finishes; currently doesn't seem to work
+            if(!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("BasicPunch")) {
+                //m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = false;
+            }
+
+
+
+>>>>>>> 8e57063719f3f214a572e906f818e8b7fca2285f
         }
 
 

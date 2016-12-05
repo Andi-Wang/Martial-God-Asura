@@ -20,7 +20,6 @@ public class CameraAnimatorController : MonoBehaviour {
     {
         cam.isAnimating = false;
         GameManager.instance.playersTurn = true;
-        Debug.Log("reseted");
     }
 
     void StartAnimating()
