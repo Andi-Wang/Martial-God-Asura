@@ -20,8 +20,11 @@ public class PickupTrigger : MonoBehaviour {
     void Update () {
         if (Input.GetButtonUp("Interact") && entered == true)
         {
+            toggleInteractHint(false);
+
             //TODO: update repository
             gameObject.SetActive(false);
+
         }
     }
 
