@@ -29,6 +29,7 @@ public class Enemy : MonoBehaviour
         rb2D = GetComponent<Rigidbody2D>();
         origX = transform.position.x;
         currentHealth = startingHealth;
+        movement.Set(-1, 0, 0);
     }
 
     //Start overrides the virtual Start function of the base class.
@@ -93,7 +94,7 @@ public class Enemy : MonoBehaviour
             //If the y coordinate of the player's (player) position is greater than the y coordinate of this enemy's position set y direction 1 (to move up). If not, set it to -1 (to move down).
             yDir = player.position.y > transform.position.y ? 1 : -1;
             xDir = player.position.x > transform.position.x ? 1 : -1;
-            Debug.Log("inrange");
+  
             movement.Set(xDir, yDir, 0);
             movement = movement * speed * Time.deltaTime;
             rb2D.MovePosition(transform.position + movement);
@@ -118,19 +119,18 @@ public class Enemy : MonoBehaviour
     {
         float currentXOffset = transform.position.x - origX;
 
-        if (Mathf.Abs(currentXOffset) >= detectionRange)
+        // out of positive range
+        if (currentXOffset > detectionRange)
         {
-            
-            movement.Set(currentXOffset > 0 ? -1 : 1, 0, 0);
-            Debug.Log(movement);
+            movement.Set(-1, 0, 0);
         }
-        else
+        else if (currentXOffset < -detectionRange)
         {
-            movement.Set(currentXOffset > 0 ? 1 : -1, 0, 0);
+            movement.Set(1, 0, 0);
         }
 
         movement = movement * speed * Time.deltaTime;
-        //Debug.Log(movement);
+
         rb2D.MovePosition(transform.position + movement);
     }
 }

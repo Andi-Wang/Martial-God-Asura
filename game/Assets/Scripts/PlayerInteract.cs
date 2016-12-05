@@ -7,7 +7,7 @@ public class PlayerInteract : MonoBehaviour {
     public Vector3 levelExit;
     private Rigidbody2D playerRigidbody2D;
 
-    int doorTrans = 4;
+    float doorTrans = 4.2f;
     
     void Awake () {
 	    playerRigidbody2D = GetComponent<Rigidbody2D>();
