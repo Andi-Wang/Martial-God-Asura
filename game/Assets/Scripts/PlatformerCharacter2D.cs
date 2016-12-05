@@ -1,9 +1,12 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 namespace UnityStandardAssets._2D {
     public class PlatformerCharacter2D : MonoBehaviour {
+        public Slider healthSlider;
+
         [SerializeField] private LayerMask m_WhatIsGround;                  // A mask determining what is ground to the character
         [SerializeField] private Entity playerEntity = new Entity(100f, 100f, 0f, 5f, 0f, 500f, 10f, 1f, 0.7f);
         private Skill.SkillStateManager skillManager = new Skill.SkillStateManager();
@@ -17,6 +20,8 @@ namespace UnityStandardAssets._2D {
         private Rigidbody2D m_Rigidbody2D;
         private bool m_FacingRight = true;  // For determining which way the player is currently facing.
 
+        bool isDead;
+
         private void Awake()
         {
             // Setting up references.
@@ -24,8 +29,32 @@ namespace UnityStandardAssets._2D {
             m_CeilingCheck = transform.Find("CeilingCheck");
             m_Anim = GetComponent<Animator>();
             m_Rigidbody2D = GetComponent<Rigidbody2D>();
+            isDead = false;
         }
 
+        void TakeDamage(float amount)
+        {
+            playerEntity.health -= amount;
+            healthSlider.value = playerEntity.health;
+
+            //TODO: player hurt sound,animation
+            if (playerEntity.health <= 0 && !isDead)
+            {
+                Death();
+            }
+        }
+        void Death()
+        {
+            // Set the death flag so this function won't be called again.
+            isDead = true;
+            
+            // Tell the animator that the player is dead.
+            //anim.SetTrigger("Die");
+
+            // Set the audiosource to play the death clip and play it (this will stop the hurt sound from playing).
+            //playerAudio.clip = deathClip;
+            //playerAudio.Play();
+        }
 
         private void FixedUpdate() {
             m_Grounded = false;
