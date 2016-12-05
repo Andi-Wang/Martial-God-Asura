@@ -1,13 +1,17 @@
 using System;
 using UnityEngine;
+using System.Collections.Generic;
 
-namespace UnityStandardAssets._2D
-{
-    public class PlatformerCharacter2D : MonoBehaviour
-    {
+namespace UnityStandardAssets._2D {
+    public class PlatformerCharacter2D : MonoBehaviour {
         [SerializeField] private LayerMask m_WhatIsGround;                  // A mask determining what is ground to the character
         [SerializeField] private Entity playerEntity = new Entity(100f, 100f, 0f, 5f, 0f, 500f, 10f, 1f, 0.7f);
         private Skill.SkillStateManager skillManager = new Skill.SkillStateManager();
+
+        
+        //public List<Enemy> enemiesHit = new List<Enemy>(); //List of enemies that have been hit and not resolved; elements are added by PlayerHitbox, removed during FixedUpdate
+        //public string currentHitboxName;
+
 
         private Transform m_GroundCheck;    // A position marking where to check if the player is grounded.
         const float k_GroundedRadius = .2f; // Radius of the overlap circle to determine if grounded
@@ -28,8 +32,7 @@ namespace UnityStandardAssets._2D
         }
 
 
-        private void FixedUpdate()
-        {
+        private void FixedUpdate() {
             m_Grounded = false;
             
 
@@ -47,6 +50,24 @@ namespace UnityStandardAssets._2D
             m_Anim.SetFloat("vSpeed", m_Rigidbody2D.velocity.y);
 
 			m_Anim.SetBool ("BasicPunch", false);
+
+            /*
+            foreach(Enemy e in enemiesHit) {
+                if (m_Anim.GetCurrentAnimatorStateInfo(0).IsName("BasicPunch")) {
+                    Skill.Punch(e);
+                    enemiesHit.Remove(e);
+                }
+            }*/
+
+            /*
+            if(currentHitboxName != "") {
+                setHitboxEnabled(currentHitboxName, false);
+            }
+            else {
+                currentHitboxName = "";
+            }*/
+
+
         }
 
         
@@ -73,9 +94,16 @@ namespace UnityStandardAssets._2D
                     }
                 }
                 //If the character punches; later, will make this just attack buttons in general in one else if
-                else if(input.fire1Down || skillManager.attacking) {
-                    //Do attacking stuff; insert stuff here, Angus
-					m_Anim.SetBool("BasicPunch", true);
+                else if(input.fire1Down) {//|| m_Anim.GetCurrentAnimatorStateInfo(0).IsName("BasicPunch")) {
+                    m_Anim.SetBool("BasicPunch", true);
+                    /*if (!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("BasicPunch")) {
+                        
+                    }*/
+                    m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = true;
+                    //currentHitboxName = "PunchHitbox";
+                }
+                if (!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("BasicPunch")) {
+                    m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = false;
                 }
                 // If the player should jump...
                 else if (m_Grounded && input.jumpDown && m_Anim.GetBool("Ground")) {
@@ -141,110 +169,9 @@ namespace UnityStandardAssets._2D
                     Flip();
                 }
             }
-
-
         }
-        
-        /*
-        public void Move(float move, bool vDown, bool jump, bool alt_move_down, bool alt_move_hold)
-        {
-            // If crouching, check to see if the character can stand up
-            if (!vDown && m_Anim.GetBool("Crouch"))
-            {
-                // If the character has a ceiling preventing them from standing up, keep them crouching
-                if (Physics2D.OverlapCircle(m_CeilingCheck.position, k_CeilingRadius, m_WhatIsGround))
-                {
-                    vDown = true;
-                }
-            }
 
-            //On the ground, so character can move
-            if(m_Grounded) {
-                m_Rigidbody2D.gravityScale = 1.0f;
-
-                if(alt_move_down || skillManager.backdashing) {
-                    m_Anim.SetBool("Crouch", false);
-                    skillManager.backdashSpeed = Skill.Backdash(m_Rigidbody2D, m_FacingRight, skillManager.backdashSpeed, alt_move_down);
-                    if(skillManager.backdashSpeed > 0) {
-                        skillManager.backdashing = true;
-                    }
-                    else {
-                        skillManager.backdashing = false;
-                    }
-                }
-                // If the player should jump...
-                else if (m_Grounded && jump && m_Anim.GetBool("Ground")) {
-                    // Add a vertical force to the player.
-                    m_Grounded = false;
-                    m_Anim.SetBool("Ground", false);
-                    m_Rigidbody2D.AddForce(new Vector2(0f, playerEntity.jumpForce));
-                }
-                else {
-                    // Reduce the speed if crouching by the crouchSpeed multiplier
-                    move = (vDown ? move * playerEntity.crouchSpeed : move);
-
-                    // Set whether or not the character is crouching in the animator
-                    m_Anim.SetBool("Crouch", vDown);
-
-                    // The Speed animator parameter is set to the absolute value of the horizontal input.
-                    m_Anim.SetFloat("Speed", Mathf.Abs(move));
-
-                    // Move the character
-                    m_Rigidbody2D.velocity = new Vector2(move * playerEntity.maxSpeed, m_Rigidbody2D.velocity.y);
-
-                    // If the input is movting the player right and the player is facing left...
-                    if (move > 0 && !m_FacingRight)
-                    {
-                        // ... flip the player.
-                        Flip();
-                    }
-                    // Otherwise if the input is moving the player left and the player is facing right...
-                    else if (move < 0 && m_FacingRight)
-                    {
-                        // ... flip the player.
-                        Flip();
-                    }
-                }
-            }
-            //In the air
-            else
-            {
-                // The Speed animator parameter is set to the absolute value of the horizontal input.
-                m_Anim.SetFloat("Speed", Mathf.Abs(move));
-
-                if(vDown) {
-                    Skill.FastFall(m_Rigidbody2D, move * playerEntity.maxSpeed);
-                }
-                else {
-                    if(alt_move_down) {
-                        Skill.Glide(m_Rigidbody2D, playerEntity.gravity, move * playerEntity.maxSpeed);
-                    }
-                }
-
-                // Move the character
-                m_Rigidbody2D.velocity = new Vector2(move * playerEntity.maxSpeed, m_Rigidbody2D.velocity.y);
-
-
-                // If the input is moving the player right and the player is facing left...
-                if (move > 0 && !m_FacingRight)
-                {
-                    // ... flip the player.
-                    Flip();
-                }
-                // Otherwise if the input is moving the player left and the player is facing right...
-                else if (move < 0 && m_FacingRight)
-                {
-                    // ... flip the player.
-                    Flip();
-                }
-            }
-
-
-        }
-        */
-
-        private void Flip()
-        {
+        private void Flip() {
             // Switch the way the player is labelled as facing.
             m_FacingRight = !m_FacingRight;
 
@@ -252,6 +179,10 @@ namespace UnityStandardAssets._2D
             Vector3 theScale = transform.localScale;
             theScale.x *= -1;
             transform.localScale = theScale;
+        }
+
+        public void setHitboxEnabled(string hitboxName, bool value) {
+            m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = value;
         }
     }
 }

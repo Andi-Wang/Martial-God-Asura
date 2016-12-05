@@ -44,8 +44,7 @@ namespace UnityStandardAssets._2D
 
 
         private void FixedUpdate() {
-            if (GameManager.instance.playersTurn)
-            {
+            if (GameManager.instance.playersTurn) {
                 input.h = CrossPlatformInputManager.GetAxis("Horizontal");
                 input.v = CrossPlatformInputManager.GetAxis("Vertical");
                 input.vDown = input.v < 0;

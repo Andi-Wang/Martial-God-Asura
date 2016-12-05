@@ -5,8 +5,6 @@ public class Skill {
     public class SkillStateManager {
         public bool backdashing = false;
         public float backdashSpeed = 0f;
-
-        public bool attacking;
     }
     
     public static float Backdash(Rigidbody2D body, bool facingRight, float backdashSpeed, bool forceStart) {
@@ -70,14 +68,17 @@ public class Skill {
         }
     }
 
-    public static void Punch(Collider2D other) {
-        //Damage the other entity and knock back slightly
-        getEnemyScript(other).enemyEntity.health -= 10f;
-        getEnemyScript(other).recoil = 5f;
+    //Damage the other entity
+    public static void Punch(Enemy target) {
+        target.enemyEntity.health -= 10f;
     }
 
 
-    public static EnemyCharacter2D getEnemyScript(Collider2D other) {
-        return other.attachedRigidbody.gameObject.GetComponent<EnemyCharacter2D>() as EnemyCharacter2D;
+    public static Enemy getEnemyScript(Collider2D other) {
+        return other.attachedRigidbody.gameObject.GetComponent<Enemy>() as Enemy;
+    }
+
+    public static UnityStandardAssets._2D.PlatformerCharacter2D getPlayerScript(Collider2D other) {
+        return other.attachedRigidbody.gameObject.GetComponent<UnityStandardAssets._2D.PlatformerCharacter2D>() as UnityStandardAssets._2D.PlatformerCharacter2D;
     }
 }
