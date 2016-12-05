@@ -83,7 +83,7 @@ namespace UnityStandardAssets._2D {
                 else if(input.fire1Down) {
                     //Activates the hitbox and animation; hitbox activation doesn't seem to work consistently
                     m_Anim.SetBool("BasicPunch", true);
-                    m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = true;
+                    //m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = true;
                 }
                 // If the player should jump...
                 else if (m_Grounded && input.jumpDown && m_Anim.GetBool("Ground")) {
