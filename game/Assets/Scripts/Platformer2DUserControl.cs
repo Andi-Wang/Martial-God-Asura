@@ -7,6 +7,8 @@ namespace UnityStandardAssets._2D
     [RequireComponent(typeof (PlatformerCharacter2D))]
     public class Platformer2DUserControl : MonoBehaviour
     {
+        bool gamePaused;
+        GameObject pauseMenu;
         private PlatformerCharacter2D m_Character;
         private bool m_Jump;
         private bool m_Alt_Move_Down;
@@ -16,9 +18,34 @@ namespace UnityStandardAssets._2D
         private void Awake() {
             m_Character = GetComponent<PlatformerCharacter2D>();
             input = new Controls();
+            pauseMenu = GameObject.Find("Menu");
+            pauseMenu.SetActive(false);
+            gamePaused = false;
         }
 
         private void Update() {
+            if (!GameManager.instance.playersTurn)
+            {
+                input.resetButtonDown();
+                return;
+            }
+
+            if (Input.GetButtonUp("Cancel"))
+            {
+                if (gamePaused)
+                {
+                    
+                    pauseMenu.SetActive(false);
+                    Resume();
+                    gamePaused = false;
+                }
+                else
+                {
+                    pauseMenu.SetActive(true);
+                    Pause();
+                    gamePaused = true;
+                }
+            }
 
             // Read button down inputs in Update so button presses aren't missed.
             if (!input.altMoveDown) {
@@ -43,7 +70,6 @@ namespace UnityStandardAssets._2D
 
 
         private void FixedUpdate() {
-
             if (!GameManager.instance.playersTurn) {
                 input.resetButtonDown();
                 return;
@@ -62,6 +88,16 @@ namespace UnityStandardAssets._2D
 
             m_Character.Move(input);
             input.resetButtonDown();
+        }
+
+        void Pause()
+        {
+            Time.timeScale = 0;
+        }
+
+        void Resume()
+        {
+            Time.timeScale = 1;
         }
     }
 }

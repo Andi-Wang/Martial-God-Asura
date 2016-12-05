@@ -49,7 +49,7 @@ namespace UnityStandardAssets._2D {
             
             //Disable hitbox when animation finishes; currently doesn't seem to work
             if(!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("BasicPunch")) {
-                m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = false;
+                //m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = false;
             }
 
 
