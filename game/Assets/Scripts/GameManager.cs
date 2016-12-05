@@ -9,8 +9,8 @@ public class GameManager : MonoBehaviour
 	public float turnDelay = 0.1f;							//Delay between each Player turn.
 	public int playerPoints = 100;						//Starting value for Player points.
 	public static GameManager instance = null;				//Static instance of GameManager which allows it to be accessed by any other script.
-	[HideInInspector] public bool playersTurn = true;		//Boolean to check if it's players turn, hidden in inspector but public.
-		
+	[HideInInspector] public bool playersTurn = true;       //Boolean to check if it's players turn, hidden in inspector but public.
+    public int currentRoom;	
 		
 	private Text levelText;									//Text to display current level number.
 	private GameObject levelImage;							//Image to block out level as levels are being set up, background for levelText.
@@ -24,35 +24,17 @@ public class GameManager : MonoBehaviour
 	{
 		//Check if instance already exists
 		if (instance == null)
-				
-			//if not, set instance to this
 			instance = this;
-			
-		//If instance already exists and it's not this:
 		else if (instance != this)
-				
-			//Then destroy this. This enforces our singleton pattern, meaning there can only ever be one instance of a GameManager.
-			Destroy(gameObject);	
+            Destroy(gameObject);	
 			
 		//Sets this to not be destroyed when reloading scene
 		DontDestroyOnLoad(gameObject);
 			
 		//Assign enemies to a new List of Enemy objects.
 		enemies = new List<Enemy>();
-			
-		//Get a component reference to the attached BoardManager script
-		//boardScript = GetComponent<BoardManager>();
-			
+
 		//Call the InitGame function to initialize the first level 
-		InitGame();
-	}
-		
-	//This is called each time a scene is loaded.
-	void OnLevelWasLoaded(int index)
-	{
-		//Add one to our level number.
-		level++;
-		//Call InitGame to initialize our level.
 		InitGame();
 	}
 		
@@ -80,7 +62,6 @@ public class GameManager : MonoBehaviour
 			
 		//Clear any Enemy objects in our List to prepare for next level.
 		enemies.Clear();
-
 	}
 		
 		
@@ -95,17 +76,6 @@ public class GameManager : MonoBehaviour
         playersTurn = true;
 	}
 		
-	//Update is called every frame.
-	void Update()
-	{
-		if(doingSetup)
-				
-			//If any of these are true, return and do not start MoveEnemies.
-			return;
-			
-		//Start moving enemies.
-		//StartCoroutine (MoveEnemies ());
-	}
 		
 	//Call this to add the passed in Enemy to the List of Enemy objects.
 	public void AddEnemyToList(Enemy script)
@@ -114,7 +84,11 @@ public class GameManager : MonoBehaviour
 		enemies.Add(script);
 	}
 		
-		
+	public void switchRoom()
+    {
+
+    }
+
 	//GameOver is called when the player reaches 0 food points
 	public void GameOver()
 	{
@@ -127,30 +101,6 @@ public class GameManager : MonoBehaviour
 		//Disable this GameManager.
 		enabled = false;
 	}
-	/*	
-	//Coroutine to move enemies in sequence.
-	IEnumerator MoveEnemies()
-	{
-		//Wait for turnDelay seconds, defaults to .1 (100 ms).
-		yield return new WaitForSeconds(turnDelay);
-			
-		//If there are no enemies spawned (IE in first level):
-		if (enemies.Count == 0) 
-		{
-			//Wait for turnDelay seconds between moves, replaces delay caused by enemies moving when there are none.
-			yield return new WaitForSeconds(turnDelay);
-		}
-			
-		//Loop through List of Enemy objects.
-		for (int i = 0; i < enemies.Count; i++)
-		{
-			//Call the MoveEnemy function of Enemy at index i in the enemies List.
-			enemies[i].MoveEnemy ();
-				
-			//Wait for Enemy's moveTime before moving next Enemy, 
-			yield return new WaitForSeconds(enemies[i].moveTime);
-		}
-	}*/
 }
 
 

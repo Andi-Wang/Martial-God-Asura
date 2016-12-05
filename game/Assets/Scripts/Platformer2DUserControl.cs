@@ -18,6 +18,7 @@ namespace UnityStandardAssets._2D
             input = new Controls();
         }
 
+<<<<<<< HEAD
 
         private void Update() {
             // Read button down inputs in Update so button presses aren't missed.
@@ -55,9 +56,55 @@ namespace UnityStandardAssets._2D
                 input.fire1Hold = CrossPlatformInputManager.GetButton("Fire1");
                 input.fire2Hold = CrossPlatformInputManager.GetButton("Fire2");
                 input.fire3Hold = CrossPlatformInputManager.GetButton("Fire3");
+=======
+>>>>>>> f876780a8b4a0c593cb2caa62298d540bfc00267
 
-                m_Character.Move(input);
+        private void Update() {
+
+            // Read button down inputs in Update so button presses aren't missed.
+            if (!input.altMoveDown) {
+                input.altMoveDown = CrossPlatformInputManager.GetButtonDown("AltMove");
             }
+            if(!input.interactDown) {
+                input.interactDown = CrossPlatformInputManager.GetButtonDown("Interact");
+            }
+            if(!input.jumpDown) {
+                input.jumpDown = CrossPlatformInputManager.GetButtonDown("Jump");
+            }
+            if(!input.fire1Down) {
+                input.fire1Down = CrossPlatformInputManager.GetButtonDown("Fire1");
+            }
+<<<<<<< HEAD
+=======
+            if(!input.fire2Down) {
+                input.fire2Down = CrossPlatformInputManager.GetButtonDown("Fire2");
+            }
+            if (!input.fire3Down) {
+                input.fire3Down = CrossPlatformInputManager.GetButtonDown("Fire3");
+            }
+        }
+
+
+        private void FixedUpdate() {
+            if (!GameManager.instance.playersTurn)
+            {
+                input.resetButtonDown();
+                return;
+            }
+            
+            input.h = CrossPlatformInputManager.GetAxis("Horizontal");
+            input.v = CrossPlatformInputManager.GetAxis("Vertical");
+            input.vDown = input.v < 0;
+            input.vUp = input.v > 0;
+            input.altMoveHold = CrossPlatformInputManager.GetButton("AltMove");
+            input.jumpHold = CrossPlatformInputManager.GetButton("Jump");
+            input.interactHold = CrossPlatformInputManager.GetButton("Interact");
+            input.fire1Hold = CrossPlatformInputManager.GetButton("Fire1");
+            input.fire2Hold = CrossPlatformInputManager.GetButton("Fire2");
+            input.fire3Hold = CrossPlatformInputManager.GetButton("Fire3");
+
+            m_Character.Move(input);
+>>>>>>> f876780a8b4a0c593cb2caa62298d540bfc00267
             input.resetButtonDown();
         }
     }
