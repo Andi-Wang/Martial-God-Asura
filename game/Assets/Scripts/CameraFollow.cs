@@ -12,12 +12,14 @@ public class CameraFollow : MonoBehaviour
 
     public bool isAnimating;
 
+    Transform camTrans;
 	private Transform player;		// Reference to the player's transform.
 
     void Awake ()
 	{
 		// Setting up the reference.
 		player = GameObject.FindGameObjectWithTag("Player").transform;
+        camTrans = GetComponentInChildren<Camera>().transform;
 
         isAnimating = false;
 	}
@@ -41,6 +43,7 @@ public class CameraFollow : MonoBehaviour
 	{
         if (!isAnimating)
         {
+            camTrans.position.Set(0, 0, 0);
             TrackPlayer();
         }
 	}

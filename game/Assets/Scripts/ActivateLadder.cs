@@ -4,6 +4,7 @@ using System.Collections;
 public class ActivateLadder : MonoBehaviour {
 
     public GameObject ladder;
+    public int ladderId;
 
     bool entered;
     Animator anim;
@@ -19,7 +20,7 @@ public class ActivateLadder : MonoBehaviour {
     {
         if (Input.GetButtonUp("Interact") && entered == true)
         {
-            anim.SetTrigger("ladderUnlocked");
+            anim.SetTrigger("LadderUnlock" + ladderId);
         }
     }
 
@@ -34,10 +35,5 @@ public class ActivateLadder : MonoBehaviour {
     void OnTriggerExit2D(Collider2D other)
     {
         entered = false;
-    }
-
-    public void unlockLadder()
-    {
-        ladder.SetActive(true);
     }
 }

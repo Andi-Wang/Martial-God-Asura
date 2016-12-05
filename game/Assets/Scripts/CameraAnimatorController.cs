@@ -3,7 +3,7 @@ using System.Collections;
 
 public class CameraAnimatorController : MonoBehaviour {
 
-    public ActivateLadder ladderController;
+    public LadderTriggerManager ladderController;
 
     CameraFollow cam;
 	// Use this for initialization
@@ -11,15 +11,16 @@ public class CameraAnimatorController : MonoBehaviour {
         cam = gameObject.GetComponentInParent<CameraFollow>();
 	}
 	
-    void UnlockLadder()
+    void UnlockLadder(int ladderId)
     {
-        ladderController.unlockLadder();
+        ladderController.unlockLadder(ladderId);
     }
 
 	void EndAnimating()
     {
         cam.isAnimating = false;
         GameManager.instance.playersTurn = true;
+        Debug.Log("reseted");
     }
 
     void StartAnimating()

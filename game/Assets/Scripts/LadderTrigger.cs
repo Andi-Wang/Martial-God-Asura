@@ -4,7 +4,7 @@ using CreativeSpore.SuperTilemapEditor;
 
 public class LadderTrigger : MonoBehaviour
 {
-    public GameObject hintCanvas;
+    GameObject hintCanvas;
 
     string ladderTag;
     Rigidbody2D playerRigidBody;
@@ -14,12 +14,15 @@ public class LadderTrigger : MonoBehaviour
     private bool entered;
     int ladderTrans = 14;
     float ladderCentre;
+    Animator anim;
 
     void Awake()
     {
+        hintCanvas = GameObject.Find("HintCanvas");
         ladderTag = gameObject.tag;
         ladderCentre = transform.localScale.x / 2;
 
+        anim = GameObject.FindObjectOfType<Camera>().GetComponent<Animator>();
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         playerRigidBody = player.GetComponent<Rigidbody2D>();
         playerPosition = player.transform;
