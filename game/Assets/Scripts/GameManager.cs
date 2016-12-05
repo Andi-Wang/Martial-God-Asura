@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;		//Allows us to use Lists. 
-using UnityEngine.UI;					//Allows us to use UI.
-	
+using UnityEngine.UI;                   //Allows us to use UI.
+using UnityEngine.SceneManagement;
+
 public class GameManager : MonoBehaviour
 {
 	public float levelStartDelay = 2f;						//Time to wait before starting level, in seconds.
@@ -15,7 +16,7 @@ public class GameManager : MonoBehaviour
 	private Text levelText;									//Text to display current level number.
 	private GameObject levelImage;							//Image to block out level as levels are being set up, background for levelText.
 	//private BoardManager boardScript;						//Store a reference to our BoardManager which will set up the level.
-	public int level = 1;								
+	int level = -1;								
 	private List<Enemy> enemies;							//List of all Enemy units, used to issue them move commands.
 	private bool doingSetup = true;							//Boolean to check if we're setting up board, prevent Player from moving during setup.
 		
@@ -107,6 +108,28 @@ public class GameManager : MonoBehaviour
 		//Disable this GameManager.
 		enabled = false;
 	}
+
+    //This is called each time a scene is loaded.
+    void OnLevelFinishedLoading(Scene scene, LoadSceneMode mode)
+    {
+        //Add one to our level number.
+        level++;
+        //Call InitGame to initialize our level.
+        InitGame();
+    }
+
+    void OnEnable()
+    {
+        //Tell our ‘OnLevelFinishedLoading’ function to start listening for a scene change event as soon as this script is enabled.
+        SceneManager.sceneLoaded += OnLevelFinishedLoading;
+    }
+
+    void OnDisable()
+    {
+        //Tell our ‘OnLevelFinishedLoading’ function to stop listening for a scene change event as soon as this script is disabled.
+        //Remember to always have an unsubscription for every delegate you subscribe to!
+        SceneManager.sceneLoaded -= OnLevelFinishedLoading;
+    }
 }
 
 
