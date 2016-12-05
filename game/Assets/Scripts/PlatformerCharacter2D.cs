@@ -21,26 +21,20 @@ namespace UnityStandardAssets._2D {
         private Rigidbody2D m_Rigidbody2D;
         private bool m_FacingRight = true;  // For determining which way the player is currently facing.
 
-<<<<<<< HEAD
 
-        private void Awake() {
-=======
         bool isDead;
 
-        private void Awake()
-        {
->>>>>>> 8e57063719f3f214a572e906f818e8b7fca2285f
+        private void Awake() {
+
             // Setting up references.
             m_GroundCheck = transform.Find("GroundCheck");
             m_CeilingCheck = transform.Find("CeilingCheck");
             m_Anim = GetComponent<Animator>();
             m_Rigidbody2D = GetComponent<Rigidbody2D>();
-<<<<<<< HEAD
 
             skillRanks.Add("BasicPunch", 2);
-=======
+
             isDead = false;
->>>>>>> 8e57063719f3f214a572e906f818e8b7fca2285f
         }
 
         void TakeDamage(float amount)
@@ -85,18 +79,6 @@ namespace UnityStandardAssets._2D {
             m_Anim.SetFloat("vSpeed", m_Rigidbody2D.velocity.y);
 
 			m_Anim.SetBool ("BasicPunch", false);
-<<<<<<< HEAD
-=======
-
-            
-            //Disable hitbox when animation finishes; currently doesn't seem to work
-            if(!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("BasicPunch")) {
-                //m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = false;
-            }
-
-
-
->>>>>>> 8e57063719f3f214a572e906f818e8b7fca2285f
         }
 
 
