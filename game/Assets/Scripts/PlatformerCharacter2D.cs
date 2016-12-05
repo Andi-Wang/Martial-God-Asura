@@ -77,13 +77,12 @@ namespace UnityStandardAssets._2D {
             // Set the vertical animation
             m_Anim.SetFloat("vSpeed", m_Rigidbody2D.velocity.y);
 
-			m_Anim.SetBool ("BasicPunch", false);
-
             
             //Disable hitbox when animation finishes; currently doesn't seem to work
-            if(!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("BasicPunch")) {
+            //if(!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("BasicPunch")) {
+				//m_Anim.SetBool ("BasicPunch", false);
                 //m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = false;
-            }
+            //}
 
 
 
@@ -115,8 +114,8 @@ namespace UnityStandardAssets._2D {
                 //If the character punches; later, will make this just attack buttons in general in one else if
                 else if(input.fire1Down) {
                     //Activates the hitbox and animation; hitbox activation doesn't seem to work consistently
-                    m_Anim.SetBool("BasicPunch", true);
-                    m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = true;
+                    m_Anim.SetTrigger("BasicPunchT");
+                    //m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = true;
                 }
                 // If the player should jump...
                 else if (m_Grounded && input.jumpDown && m_Anim.GetBool("Ground")) {
@@ -194,8 +193,8 @@ namespace UnityStandardAssets._2D {
             transform.localScale = theScale;
         }
 
-        public void setHitboxEnabled(string hitboxName, bool value) {
-            m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = value;
-        }
+        //public void setHitboxEnabled(string hitboxName, bool value) {
+        //    m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = value;
+        //}
     }
 }
