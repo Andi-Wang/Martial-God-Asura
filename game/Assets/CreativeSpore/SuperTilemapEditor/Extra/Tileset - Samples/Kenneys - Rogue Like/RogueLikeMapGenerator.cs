@@ -23,7 +23,7 @@ namespace CreativeSpore.SuperTilemapEditor
         [ContextMenu("GenerateMap")]
 	    public void GenerateMap()
         {
-            Ground.ClearMap();
+            //Ground.ClearMap();
             GroundOverlay.ClearMap();
 
             float now;

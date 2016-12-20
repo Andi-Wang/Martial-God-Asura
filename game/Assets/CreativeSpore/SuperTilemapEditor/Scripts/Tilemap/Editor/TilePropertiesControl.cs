@@ -199,7 +199,7 @@ namespace CreativeSpore.SuperTilemapEditor
                     EditorGUI.BeginChangeCheck();
                     m_tileParameterList.DoLayoutList();
                     Rect rList = GUILayoutUtility.GetLastRect();
-                    if (e.isMouse && !rList.Contains(e.mousePosition))
+                    if (e.type == EventType.MouseDown && !rList.Contains(e.mousePosition))
                     {
                         m_tileParameterList.ReleaseKeyboardFocus();
                         m_tileParameterList.index = -1;

@@ -14,7 +14,7 @@ namespace CreativeSpore.SuperTilemapEditor
     {
         #region Singleton
         static BrushBehaviour s_instance;
-        private static BrushBehaviour Instance
+        public static BrushBehaviour Instance
         {
             get
             {
@@ -25,6 +25,7 @@ namespace CreativeSpore.SuperTilemapEditor
                     {
                         GameObject obj = new GameObject("Brush");
                         s_instance = obj.AddComponent<BrushBehaviour>();
+                        obj.hideFlags = HideFlags.HideInHierarchy;
                     }
                     else
                     {
@@ -87,12 +88,26 @@ namespace CreativeSpore.SuperTilemapEditor
 #endif
         #endregion
 
+        public enum eBrushPaintMode
+        {
+            Pencil,
+            Line,
+            Rect,
+            FilledRect,
+            Ellipse,
+            FilledEllipse,
+        }
+
         public Tilemap BrushTilemap { get { return m_brushTilemap; } }
         public Vector2 Offset;
         public bool IsUndoEnabled = true;
+        public eBrushPaintMode PaintMode { get { return m_paintMode; } set { m_paintMode = value; } }
+        public bool IsDragging { get { return m_isDragging; } }
 
         [SerializeField]
         Tilemap m_brushTilemap;
+
+        private eBrushPaintMode m_paintMode = eBrushPaintMode.Pencil;
 
         #region MonoBehaviour Methods
         void Start()
@@ -150,7 +165,7 @@ namespace CreativeSpore.SuperTilemapEditor
 
         public static void SetVisible(bool isVisible)
         {
-            if (s_instance != null)
+            if (s_instance && s_instance.BrushTilemap)
             {
                 s_instance.BrushTilemap.IsVisible = isVisible;
                 for (int i = 0; i < s_instance.transform.childCount; ++i)
@@ -232,7 +247,7 @@ namespace CreativeSpore.SuperTilemapEditor
             m_brushTilemap.UpdateMeshImmediate();
         }
 
-        public void FloodFill(Tilemap tilemap, Vector2 localPos, uint tileData)
+        public void FloodFill(Tilemap tilemap, Vector2 localPos)
         {
             if (IsUndoEnabled)
             {
@@ -243,7 +258,7 @@ namespace CreativeSpore.SuperTilemapEditor
             }
             tilemap.IsUndoEnabled = IsUndoEnabled;
 
-            TilemapDrawingUtils.FloodFill(tilemap, localPos, tileData);
+            TilemapDrawingUtils.FloodFill(tilemap, localPos, GetBrushPattern());
             tilemap.UpdateMeshImmediate();
 
             tilemap.IsUndoEnabled = false;
@@ -285,6 +300,118 @@ namespace CreativeSpore.SuperTilemapEditor
 
             tilemap.IsUndoEnabled = false;
         }
+
+        private Vector2 m_pressedPosition;
+        private uint[,] m_brushPattern;
+        private bool m_isDragging;
+
+        public uint[,] GetBrushPattern()
+        {
+            uint[,] brushPattern = new uint[BrushTilemap.GridWidth, BrushTilemap.GridHeight];
+            for (int y = BrushTilemap.MinGridY; y <= BrushTilemap.MaxGridY; ++y)
+                for (int x = BrushTilemap.MinGridX; x <= BrushTilemap.MaxGridX; ++x)
+                {
+                    brushPattern[x - BrushTilemap.MinGridX, y - BrushTilemap.MinGridY] = BrushTilemap.GetTileData(x, y);
+                }
+            return brushPattern;
+        }
+
+        public void DoPaintPressed(Tilemap tilemap, Vector2 localPos, EventModifiers modifiers = default(EventModifiers))
+        {
+            //Debug.Log("DoPaintPressed (" + TilemapUtils.GetGridX(tilemap, localPos) + "," + TilemapUtils.GetGridY(tilemap, localPos) + ")");            
+            if(m_paintMode == eBrushPaintMode.Pencil) Paint(tilemap, localPos);
+            else
+            {
+                m_pressedPosition = localPos;
+                m_isDragging = true;
+                Offset = Vector2.zero;
+                m_brushPattern = GetBrushPattern();
+            }
+        }
+
+        public void DoPaintDragged(Tilemap tilemap, Vector2 localPos, EventModifiers modifiers = default(EventModifiers))
+        {
+            //Debug.Log("DoPaintDragged (" + TilemapUtils.GetGridX(tilemap, localPos) + "," + TilemapUtils.GetGridY(tilemap, localPos) + ")");
+            if(m_paintMode == eBrushPaintMode.Pencil) Paint(tilemap, localPos);
+            else
+            {
+                if (m_isDragging)
+                {
+                    BrushTilemap.ClearMap();
+                    Vector2 brushLocPos = tilemap.transform.InverseTransformPoint(transform.position);
+                    Vector2 startPos = BrushUtil.GetSnappedPosition(m_pressedPosition, BrushTilemap.CellSize) + BrushTilemap.CellSize / 2f - brushLocPos;
+                    Vector2 endPos = BrushUtil.GetSnappedPosition(localPos, BrushTilemap.CellSize) + BrushTilemap.CellSize / 2f - brushLocPos;
+                    bool isCtrl = (modifiers & EventModifiers.Control) != 0;
+                    bool isShift = (modifiers & EventModifiers.Shift) != 0;
+                    switch(m_paintMode)
+                    {
+                        case eBrushPaintMode.Line:
+                            if (isCtrl) TilemapDrawingUtils.DrawLineMirrored(BrushTilemap, startPos, endPos, m_brushPattern);
+                            else TilemapDrawingUtils.DrawLine(BrushTilemap, startPos, endPos, m_brushPattern);
+                            break;
+                        case eBrushPaintMode.Rect:
+                        case eBrushPaintMode.FilledRect:
+                        case eBrushPaintMode.Ellipse:
+                        case eBrushPaintMode.FilledEllipse:    
+                            if (isShift)
+                            {
+                                Vector2 vTemp = endPos - startPos;
+                                float absX = Mathf.Abs(vTemp.x);
+                                float absY = Mathf.Abs(vTemp.y);
+                                vTemp.x = (absX > absY) ? vTemp.x : Mathf.Sign(vTemp.x) * absY;
+                                vTemp.y = Mathf.Sign(vTemp.y) * Mathf.Abs(vTemp.x);
+                                endPos = startPos + vTemp;
+                            }
+                            if (isCtrl) startPos = 2f * startPos - endPos;
+                            if(m_paintMode == eBrushPaintMode.Rect || m_paintMode == eBrushPaintMode.FilledRect)
+                                TilemapDrawingUtils.DrawRect(BrushTilemap, startPos, endPos, m_brushPattern, m_paintMode == eBrushPaintMode.FilledRect, (modifiers & EventModifiers.Alt) != 0);
+                            else if (m_paintMode == eBrushPaintMode.Ellipse || m_paintMode == eBrushPaintMode.FilledEllipse)
+                                TilemapDrawingUtils.DrawEllipse(BrushTilemap, startPos, endPos, m_brushPattern, m_paintMode == eBrushPaintMode.FilledEllipse);
+                            break;
+
+                    }                    
+                    BrushTilemap.UpdateMeshImmediate();
+                }
+            }
+        }
+
+        public void DoPaintReleased(Tilemap tilemap, Vector2 localPos, EventModifiers modifiers = default(EventModifiers))
+        {
+            //Debug.Log("DoPaintReleased (" + TilemapUtils.GetGridX(tilemap, localPos) + "," + TilemapUtils.GetGridY(tilemap, localPos) + ")");
+            if (m_paintMode != eBrushPaintMode.Pencil)
+            {
+                Vector2 pressedPos = BrushUtil.GetSnappedPosition(m_pressedPosition, BrushTilemap.CellSize) + BrushTilemap.CellSize / 2f;
+                Paint(tilemap, pressedPos + (Vector2)BrushTilemap.MapBounds.min);
+                m_pressedPosition = localPos;
+                BrushTilemap.ClearMap();
+                for (int y = 0; y < m_brushPattern.GetLength(1); ++y)
+                    for (int x = 0; x < m_brushPattern.GetLength(0); ++x)
+                    {
+                        BrushTilemap.SetTileData( x, y, m_brushPattern[x, y]);
+                    }
+                BrushTilemap.UpdateMesh();
+                m_isDragging = false;
+            }
+        }
+
+        public void DoPaintCancel()
+        {
+            if (m_isDragging)
+            {
+                m_isDragging = false;
+                if (m_paintMode != eBrushPaintMode.Pencil)
+                {
+                    BrushTilemap.ClearMap();
+                    for (int y = 0; y < m_brushPattern.GetLength(1); ++y)
+                        for (int x = 0; x < m_brushPattern.GetLength(0); ++x)
+                        {
+                            BrushTilemap.SetTileData(x, y, m_brushPattern[x, y]);
+                        }
+                    BrushTilemap.UpdateMesh();
+                }
+            }
+        }
+
 
         public void Paint(Tilemap tilemap, Vector2 localPos)
         {
@@ -349,6 +476,6 @@ namespace CreativeSpore.SuperTilemapEditor
             tilemap.IsUndoEnabled = false;
         }
 
-        #endregion
+        #endregion        
     }
 }

@@ -60,6 +60,16 @@ namespace CreativeSpore.SuperTilemapEditor
             }
         }
 
+        private TileObjData FindTileObjDataByTileIdx(int tileIdx)
+        {
+            for(int i = 0; i < m_tileObjList.Count; ++i)
+            {
+                TileObjData data = m_tileObjList[i];
+                if( data.tilePos == tileIdx ) return data;
+            }
+            return null;
+        }
+
         private GameObject CreateTileObject(int locGridX, int locGridY, TilePrefabData tilePrefabData)
         {
             if (locGridX >= 0 && locGridX < m_width && locGridY >= 0 && locGridY < m_height)
@@ -77,7 +87,7 @@ namespace CreativeSpore.SuperTilemapEditor
         {
             if (tilePrefabData.prefab != null)
             {
-                TileObjData tileObjData = m_tileObjList.Find(x => x.tilePos == tileIdx);
+                TileObjData tileObjData = FindTileObjDataByTileIdx(tileIdx);
                 GameObject tileObj = null;
                 int gx = tileIdx % m_width;
                 int gy = tileIdx / m_width;
@@ -186,7 +196,7 @@ namespace CreativeSpore.SuperTilemapEditor
 
         private void DestroyTileObject(int tileIdx)
         {
-            TileObjData tileObjData = m_tileObjList.Find(x => x.tilePos == tileIdx);
+            TileObjData tileObjData = FindTileObjDataByTileIdx(tileIdx);
             if (tileObjData != null)
             {
                 m_tileObjToBeRemoved.Add(tileObjData.obj);

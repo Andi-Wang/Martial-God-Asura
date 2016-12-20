@@ -128,5 +128,65 @@ namespace CreativeSpore.SuperTilemapEditor
             return GetGridY(tilemap, tilemap.transform.InverseTransformPoint(locPos));
         }
 
+        /// <summary>
+        /// Get the parameter container from tileData if tileData contains a tile with parameters or Null in other case
+        /// </summary>
+        /// <param name="tilemap"></param>
+        /// <param name="tileData"></param>
+        /// <returns></returns>
+        static public ParameterContainer GetParamsFromTileData(Tilemap tilemap, uint tileData)
+        {
+            int brushId = Tileset.GetBrushIdFromTileData(tileData);
+            TilesetBrush brush = tilemap.Tileset.FindBrush(brushId);
+            if(brush)
+            {
+                return brush.Params;
+            }
+            else
+            {
+                int tileId = Tileset.GetTileIdFromTileData(tileData);
+                Tile tile = tilemap.Tileset.GetTile(tileId);
+                if(tile != null)
+                {
+                    return tile.paramContainer;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Iterate through all the tilemap cells and calls an action for each cell
+        /// </summary>
+        /// <param name="tilemap"></param>
+        /// <param name="action"></param>
+        static public void IterateTilemapWithAction( Tilemap tilemap, System.Action<Tilemap, int, int> action )
+        {
+            if (tilemap)
+            for(int gy = tilemap.MinGridY; gy <= tilemap.MaxGridY; ++gy)
+                for(int gx = tilemap.MinGridX; gx <= tilemap.MaxGridX; ++gx)
+                    if (action != null) action(tilemap, gx, gy);
+        }
+
+        /// <summary>
+        /// Iterate through all the tilemap cells and calls an action for each cell.
+        /// Ex:
+        /// void EraseTilesFromTilemap(Tilemap tilemap)
+        /// {
+        ///    IterateTilemapWithAction(tilemap, EraseTilesAction);
+        /// }
+        /// void EraseTilesAction(Tilemap tilemap, int gx, int gy)
+        /// {
+        ///    tilemap.Erase(gx, gy);
+        /// }
+        /// </summary>
+        /// <param name="tilemap"></param>
+        /// <param name="action"></param>
+        static public void IterateTilemapWithAction(Tilemap tilemap, System.Action<Tilemap, int, int, uint> action)
+        {
+            if (tilemap)
+                for (int gy = tilemap.MinGridY; gy <= tilemap.MaxGridY; ++gy)
+                    for (int gx = tilemap.MinGridX; gx <= tilemap.MaxGridX; ++gx)
+                        if (action != null) action(tilemap, gx, gy, tilemap.GetTileData(gx, gy));
+        }
     }
 }

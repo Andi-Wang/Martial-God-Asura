@@ -71,10 +71,10 @@ namespace CreativeSpore.SuperTilemapEditor
         [SerializeField, HideInInspector]
         private List<uint> m_tileDataList = new List<uint>();        
 
-        private List<Vector3> m_vertices;
-        private List<Vector2> m_uv;
-        private List<int> m_triangles;
-        private Vector2[] m_uvArray;
+        private static List<Vector3> s_vertices;
+        private List<Vector2> m_uv; //NOTE: this is the only one not static because it's needed to update the animated tiles
+        private static List<int> s_triangles;
+
         // private List<Color32> m_colors; TODO: add color vertex support
 
         struct AnimTileData
@@ -88,7 +88,6 @@ namespace CreativeSpore.SuperTilemapEditor
 
         #region Monobehaviour Methods
 
-        [SerializeField]
         private MaterialPropertyBlock m_matPropBlock;
         void UpdateMaterialPropertyBlock()
         {
@@ -121,8 +120,8 @@ namespace CreativeSpore.SuperTilemapEditor
             }
             if (Tileset && Tileset.AtlasTexture != null)
                 m_matPropBlock.SetTexture("_MainTex", Tileset.AtlasTexture);
-            else
-                m_matPropBlock.SetTexture("_MainTex", default(Texture));
+            //else //TODO: find a way to set a null texture or pink texture
+              //  m_matPropBlock.SetTexture("_MainTex", default(Texture));
             m_meshRenderer.SetPropertyBlock(m_matPropBlock);
         }
 
@@ -165,20 +164,25 @@ namespace CreativeSpore.SuperTilemapEditor
                         for (int j = 0; j < 4; ++j)
                         {
                             if (j == animTileData.SubTileIdx)
-                                m_uvArray[animTileData.VertexIdx + j] = uvs[j];
+                                m_uv[animTileData.VertexIdx + j] = uvs[j];
                             else
-                                m_uvArray[animTileData.VertexIdx + j] = (uvs[j] + uvs[animTileData.SubTileIdx]) / 2f;
+                                m_uv[animTileData.VertexIdx + j] = (uvs[j] + uvs[animTileData.SubTileIdx]) / 2f;
                         }
                     }
                     else
                     {
-                        m_uvArray[animTileData.VertexIdx + 0] = uvs[0];
-                        m_uvArray[animTileData.VertexIdx + 1] = uvs[1];
-                        m_uvArray[animTileData.VertexIdx + 2] = uvs[2];
-                        m_uvArray[animTileData.VertexIdx + 3] = uvs[3];
+                        m_uv[animTileData.VertexIdx + 0] = uvs[0];
+                        m_uv[animTileData.VertexIdx + 1] = uvs[1];
+                        m_uv[animTileData.VertexIdx + 2] = uvs[2];
+                        m_uv[animTileData.VertexIdx + 3] = uvs[3];
                     }
                 }
-                m_meshFilter.sharedMesh.uv = m_uvArray;
+                if (m_meshFilter.sharedMesh) 
+#if UNITY_5_0 || UNITY_5_1
+                    m_meshFilter.sharedMesh.uv = m_uv.ToArray();
+#else
+                    m_meshFilter.sharedMesh.SetUVs(0, m_uv);
+#endif
             }
         }
 
@@ -234,6 +238,14 @@ namespace CreativeSpore.SuperTilemapEditor
             //---
         }
 
+        void Awake()
+        {
+            //+++ fix when a tilemap is instantiated from a prefab, the Mesh is shared between all instances
+            if (m_meshFilter) m_meshFilter.sharedMesh = null;
+            if (m_meshCollider) m_meshCollider.sharedMesh = null;
+            //---
+        }
+
         void OnEnable()
         {
             if (ParentTilemap == null)
@@ -244,10 +256,14 @@ namespace CreativeSpore.SuperTilemapEditor
 #if UNITY_EDITOR
             if (m_meshRenderer != null)
             {
+#if UNITY_5_5_OR_NEWER
+                EditorUtility.SetSelectedRenderState(m_meshRenderer, EditorSelectedRenderState.Hidden);
+#else
                 EditorUtility.SetSelectedWireframeHidden(m_meshRenderer, true);
+#endif
             }
 #endif
-            m_meshRenderer = GetComponent<MeshRenderer>();
+                m_meshRenderer = GetComponent<MeshRenderer>();
             m_meshFilter = GetComponent<MeshFilter>();
             m_meshCollider = GetComponent<MeshCollider>();
 
@@ -279,7 +295,11 @@ namespace CreativeSpore.SuperTilemapEditor
 #if UNITY_EDITOR
             if (m_meshRenderer != null)
             {
+#if UNITY_5_5_OR_NEWER
+                EditorUtility.SetSelectedRenderState(m_meshRenderer, EditorSelectedRenderState.Hidden);
+#else
                 EditorUtility.SetSelectedWireframeHidden(m_meshRenderer, true);
+#endif
             }
 #endif
 

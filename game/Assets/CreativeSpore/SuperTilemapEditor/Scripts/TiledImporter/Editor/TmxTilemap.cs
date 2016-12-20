@@ -37,7 +37,11 @@ namespace CreativeSpore.TiledImporter
                     Texture2D texture = new Texture2D(tileset.Image.Width, tileset.Image.Height, TextureFormat.ARGB32, false, false);
                     texture.filterMode = FilterMode.Point;
                     texture.name = tileset.Name;
-                    texture.LoadImage(File.ReadAllBytes(Path.Combine(FilePathDirectory, tileset.Image.Source)));
+                    string texturePath = Path.Combine(FilePathDirectory, tileset.Image.Source);
+                    if (File.Exists(texturePath))
+                        texture.LoadImage(File.ReadAllBytes(texturePath));
+                    else
+                        Debug.LogError("Texture file not found: " + texturePath);
                     texture.hideFlags = HideFlags.DontSave;
                     m_dicTilesetTex2d.Add(
                         tileset.FirstGId,

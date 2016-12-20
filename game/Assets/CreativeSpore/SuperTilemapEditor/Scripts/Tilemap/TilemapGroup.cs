@@ -15,6 +15,9 @@ namespace CreativeSpore.SuperTilemapEditor
         }
         public List<Tilemap> Tilemaps { get { return m_tilemaps; } }
         public float UnselectedColorMultiplier { get { return m_unselectedColorMultiplier; } set { m_unselectedColorMultiplier = value; } }
+        public bool DisplayTilemapRList { get { return m_displayTilemapRList; } set { m_displayTilemapRList = value; } }
+        public Tilemap this[int idx] { get { return m_tilemaps[idx]; } }
+        public Tilemap this[string name] { get { return FindTilemapByName(name); } }
 
         [SerializeField]
         private List<Tilemap> m_tilemaps;
@@ -22,6 +25,8 @@ namespace CreativeSpore.SuperTilemapEditor
         private int m_selectedIndex = -1;
         [SerializeField, Range(0f, 1f)]
         private float m_unselectedColorMultiplier = 1f;
+        [SerializeField]
+        private bool m_displayTilemapRList = true;
 
         void OnValidate()
         {
@@ -49,6 +54,11 @@ namespace CreativeSpore.SuperTilemapEditor
             }
         }
 	    
+        public Tilemap FindTilemapByName(string name)
+        {
+            return Tilemaps.Find(x => x.name == name);
+        }
+
         public void Refresh()
         {
             m_tilemaps = new List<Tilemap>( GetComponentsInChildren<Tilemap>(true) );

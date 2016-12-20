@@ -76,6 +76,10 @@ namespace CreativeSpore.SuperTilemapEditor
             else
             {
                 EditorGUILayout.PropertyField(serializedObject.FindProperty("m_pixelsPerUnit"));
+                if (GUILayout.Button(new GUIContent("Optimize Atlas Texture Settings", "Change the import settings for an optimum result")))
+                {
+                    OptimizeTextureImportSettings(tileset.AtlasTexture);
+                }
                 s_atlasSettingsFoldout = EditorGUILayout.Foldout(s_atlasSettingsFoldout, "Atlas Settings");
                 if (s_atlasSettingsFoldout)
                 {
@@ -98,23 +102,27 @@ namespace CreativeSpore.SuperTilemapEditor
                 EditorGUILayout.Separator();
                 string[] modeNames = System.Enum.GetNames(typeof(eMode));
                 s_mode = (eMode)GUILayout.Toolbar((int)s_mode, modeNames);
-                switch(s_mode)
+                EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.MinHeight(s_mode == eMode.Tiles ? Screen.height * 0.8f : 0f));
                 {
-                    case eMode.Tiles:
-                        m_tilesetCtrl.Tileset = tileset;
-                        m_tilesetCtrl.Display();
-                        Repaint();
-                        break;
-                    case eMode.BrushGroups:
-                        s_brushGroupsFoldout = EditorGUILayout.Foldout(s_brushGroupsFoldout, "Groups");
-                        if (s_brushGroupsFoldout)
-                        {
-                            m_groupsList.DoLayoutList();
-                        }
-                        GroupMatrixGUI.DoGUI("Group Autotiling Mask", tileset.BrushGroupNames, ref s_brushAutotilingMaskFoldout, ref s_brushGroupMatrixScrollPos, GetAutotiling, SetAutotiling);
-                        EditorGUILayout.HelpBox("Check the group that should autotile between them when Autotiling Mode Group is enabled in a brush", MessageType.Info);
-                        break;
+                    switch (s_mode)
+                    {
+                        case eMode.Tiles:
+                            m_tilesetCtrl.Tileset = tileset;
+                            m_tilesetCtrl.Display();
+                            Repaint();
+                            break;
+                        case eMode.BrushGroups:
+                            s_brushGroupsFoldout = EditorGUILayout.Foldout(s_brushGroupsFoldout, "Groups");
+                            if (s_brushGroupsFoldout)
+                            {
+                                m_groupsList.DoLayoutList();
+                            }
+                            GroupMatrixGUI.DoGUI("Group Autotiling Mask", tileset.BrushGroupNames, ref s_brushAutotilingMaskFoldout, ref s_brushGroupMatrixScrollPos, GetAutotiling, SetAutotiling);
+                            EditorGUILayout.HelpBox("Check the group that should autotile between them when Autotiling Mode Group is enabled in a brush", MessageType.Info);
+                            break;
+                    }
                 }
+                EditorGUILayout.EndVertical();
             }
 
             if (GUI.changed)
@@ -321,13 +329,47 @@ namespace CreativeSpore.SuperTilemapEditor
         {
             int tileId = (int)(tileData & Tileset.k_TileDataMask_TileId);
             Tile tile = tileset.GetTile(tileId);
-            if (tileId != Tileset.k_TileId_Empty)
+            if (tileId != Tileset.k_TileId_Empty && tileset.AtlasTexture)
             {
                 if ((tileData & Tileset.k_TileFlag_FlipV) != 0) GUIUtility.ScaleAroundPivot(new Vector2(1f, -1f), dstRect.center);
                 if ((tileData & Tileset.k_TileFlag_FlipH) != 0) GUIUtility.ScaleAroundPivot(new Vector2(-1f, 1f), dstRect.center);
                 if ((tileData & Tileset.k_TileFlag_Rot90) != 0) GUIUtility.RotateAroundPivot(90f, dstRect.center);
-                GUI.DrawTextureWithTexCoords(dstRect, tileset.AtlasTexture, customUV == default(Rect) && tile != null ? tile.uv : customUV, true);
+                if (tile != null && tile.prefabData.prefab)
+                {
+                    Texture2D assetPreview = AssetPreview.GetAssetPreview(tile.prefabData.prefab);
+                    if (assetPreview)
+                        GUI.DrawTexture(dstRect, assetPreview, ScaleMode.ScaleToFit);                        
+                    else
+                        GUI.DrawTextureWithTexCoords(dstRect, tileset.AtlasTexture, customUV == default(Rect) && tile != null ? tile.uv : customUV, true);
+                }
+                else
+                {
+                    GUI.DrawTextureWithTexCoords(dstRect, tileset.AtlasTexture, customUV == default(Rect) && tile != null ? tile.uv : customUV, true);
+                }
                 GUI.matrix = Matrix4x4.identity;
+            }
+        }
+
+        public static void OptimizeTextureImportSettings(Texture2D texture2D)
+        {
+            if (texture2D != null)
+            {
+                string assetPath = AssetDatabase.GetAssetPath(texture2D);
+                if (!string.IsNullOrEmpty(assetPath))
+                {
+                    TextureImporter textureImporter = AssetImporter.GetAtPath(assetPath) as UnityEditor.TextureImporter;
+                    textureImporter.textureType = TextureImporterType.Sprite;
+                    if (textureImporter.spriteImportMode == SpriteImportMode.None)
+                        textureImporter.spriteImportMode = SpriteImportMode.Single;
+                    textureImporter.mipmapEnabled = false;
+                    textureImporter.filterMode = FilterMode.Point;
+#if UNITY_5_5_OR_NEWER
+                    textureImporter.textureCompression = TextureImporterCompression.Uncompressed;
+#else
+                    textureImporter.textureFormat = TextureImporterFormat.AutomaticTruecolor;
+#endif
+                    AssetDatabase.ImportAsset(assetPath);
+                }
             }
         }
     }

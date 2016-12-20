@@ -38,18 +38,21 @@ namespace CreativeSpore.SuperTilemapEditor
 
         public void InvalidateSortedList()
         {
-            m_sortedList = new List<RandomTileData>(RandomTileList.OrderBy(x => x.probabilityFactor));           
+            m_sortedList = new List<RandomTileData>(RandomTileList.OrderBy(x => x.probabilityFactor));
+            m_sumProbabilityFactor = Mathf.Max(GetSumProbabilityFactor(), float.Epsilon);
         }
 
         private List<RandomTileData> m_sortedList;
+        private float m_sumProbabilityFactor;
         public uint GetRandomTile()
         {
             float randPercent = Random.value;
-            float sumProbabilityFactor = Mathf.Max(GetSumProbabilityFactor(), float.Epsilon);
+            //float sumProbabilityFactor = Mathf.Max(GetSumProbabilityFactor(), float.Epsilon); //commented to fix GC allocation
             if (m_sortedList == null || m_sortedList.Count == 0) InvalidateSortedList();
-            foreach (RandomTileData randomTileData in m_sortedList)
+            for (int i = 0; i < m_sortedList.Count; ++i)
             {
-                float probability = randomTileData.probabilityFactor / sumProbabilityFactor;
+                RandomTileData randomTileData = m_sortedList[i];
+                float probability = randomTileData.probabilityFactor / m_sumProbabilityFactor;
                 if (randPercent <= probability)
                 {
                     return randomTileData.tileData;
@@ -86,9 +89,29 @@ namespace CreativeSpore.SuperTilemapEditor
                 // overwrite flags
                 brushTileData &= ~Tileset.k_TileDataMask_Flags;
                 brushTileData |= randomTileData & Tileset.k_TileDataMask_Flags;
-                // overwrite brush id
-                brushTileData &= ~Tileset.k_TileDataMask_BrushId;
-                brushTileData |= tileData & Tileset.k_TileDataMask_BrushId; 
+                
+
+                TilesetBrush brush = Tileset.FindBrush(Tileset.GetBrushIdFromTileData(brushTileData));
+                if (brush && brush.IsAnimated())
+                {
+                    // Set the animated brush (overwriting the random brush for this tile)
+                    brushTileData &= ~Tileset.k_TileDataMask_BrushId;
+                    brushTileData |= randomTileData & Tileset.k_TileDataMask_BrushId;
+                }
+
+                // - Commented:
+                // This code will make the Random Brush to work only once
+                // Copy the tile will copy the tile placed the first time
+                // - Uncommented:
+                // This code will make Refresh Tilemap to update all random brushes
+                // Copy the tile will copy a random brush tile
+                /*
+                {
+                    // overwrite brush id
+                    brushTileData &= ~Tileset.k_TileDataMask_BrushId;
+                    brushTileData |= tileData & Tileset.k_TileDataMask_BrushId;
+                }*/
+
                 return brushTileData;
             }
             return tileData;

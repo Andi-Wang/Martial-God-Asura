@@ -77,21 +77,24 @@ namespace CreativeSpore.SuperTilemapEditor
             {
                 m_meshRenderer.sharedMaterial = ParentTilemap.Material;
             }
-
-            m_meshRenderer.enabled = ParentTilemap.IsVisible;                       
-
+            m_meshRenderer.enabled = ParentTilemap.IsVisible;
             if (m_needsRebuildMesh)
             {
                 m_needsRebuildMesh = false;
                 if (FillMeshData())
                 {
                     m_invalidateBrushes = false;
-                    m_uvArray = m_uv.ToArray();
                     Mesh mesh = m_meshFilter.sharedMesh;
                     mesh.Clear();
-                    mesh.vertices = m_vertices.ToArray();
-                    mesh.uv = m_uvArray;
-                    mesh.triangles = m_triangles.ToArray();
+#if UNITY_5_0 || UNITY_5_1
+                    mesh.vertices = s_vertices.ToArray();
+                    mesh.triangles = s_triangles.ToArray();
+                    mesh.uv = m_uv.ToArray();
+#else
+                    mesh.SetVertices(s_vertices);
+                    mesh.SetTriangles(s_triangles, 0);
+                    mesh.SetUVs(0, m_uv);
+#endif
                     mesh.RecalculateNormals(); //NOTE: allow directional lights to work properly
                 }
                 else
@@ -130,40 +133,31 @@ namespace CreativeSpore.SuperTilemapEditor
         private bool FillMeshData()
         {
             //Debug.Log( "[" + ParentTilemap.name + "] FillData -> " + name);
-            if (Tileset == null)
+            if (!Tileset || !Tileset.AtlasTexture)
             {
                 return false;
             }
 
             int totalTiles = m_width * m_height;
-            if (m_vertices == null)
-            {
-                m_vertices = new List<Vector3>(totalTiles * 4);
-                m_uv = new List<Vector2>(totalTiles * 4);
-                m_triangles = new List<int>(totalTiles * 6);
-            }
-            else
-            {
-                m_vertices.Clear();
-                m_triangles.Clear();
-                m_uv.Clear();
-            }
+            if (s_vertices == null) s_vertices = new List<Vector3>(totalTiles * 4);
+            else s_vertices.Clear();
+            if (s_triangles == null) s_triangles = new List<int>(totalTiles * 6);
+            else s_triangles.Clear();
+            if (m_uv == null) m_uv = new List<Vector2>(totalTiles * 4);
+            else m_uv.Clear();
 
             //+++ MeshCollider
-            if (m_meshCollVertices == null)
+            if (s_meshCollVertices == null)
             {
-                m_meshCollVertices = new List<Vector3>(totalTiles * 4);
-                m_meshCollTriangles = new List<int>(totalTiles * 6);
+                s_meshCollVertices = new List<Vector3>(totalTiles * 4);
+                s_meshCollTriangles = new List<int>(totalTiles * 6);
             }
             else
             {
-                m_meshCollVertices.Clear();
-                m_meshCollTriangles.Clear();
+                s_meshCollVertices.Clear();
+                s_meshCollTriangles.Clear();
             }
-            TileColliderData testCollData = new TileColliderData();
-            testCollData.vertices = new Vector2[4] { new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 1), new Vector2(1, 0) };
             //---
-
             Vector2[] subTileOffset = new Vector2[]
             {
                 new Vector2( 0f, 0f ),
@@ -196,6 +190,22 @@ namespace CreativeSpore.SuperTilemapEditor
                             if (tileBrush != null && (m_invalidateBrushes || (tileData & Tileset.k_TileFlag_Updated) == 0))
                             {
                                 tileData = tileBrush.Refresh(ParentTilemap, GridPosX + tx, GridPosY + ty, tileData);
+                                //+++NOTE: this code add support for animated brushes inside a random brush
+                                // Collateral effects of supporting changing the brush id in Refresh:
+                                // - When the random brush select a tile data with another brush id, this tile won't be a random tile any more
+                                // - If the tilemap is refreshed several times, and at least a tile data contains another brush id, then all tiles will loose the brush id of the random brush
+                                if (BrushBehaviour.Instance.BrushTilemap == ParentTilemap) // avoid changing brushId when updating the BrushTilemap
+                                {
+                                    tileData &= ~Tileset.k_TileDataMask_BrushId;
+                                    tileData |= (uint)( brushId << 16 );
+                                }
+                                int newBrushId = (int)((tileData & Tileset.k_TileDataMask_BrushId) >> 16);
+                                if(brushId != newBrushId)
+                                {
+                                    brushId = newBrushId;
+                                    tileBrush = Tileset.FindBrush(brushId);
+                                }
+                                //---
                                 tileData |= Tileset.k_TileFlag_Updated;// set updated flag
                                 m_tileDataList[tileIdx] = tileData; // update tileData                                
                                 tileId = (int)(tileData & Tileset.k_TileDataMask_TileId);
@@ -212,11 +222,11 @@ namespace CreativeSpore.SuperTilemapEditor
 
                         if (tileBrush != null && tileBrush.IsAnimated())
                         {
-                            m_animatedTiles.Add(new AnimTileData() { VertexIdx = m_vertices.Count, Brush = tileBrush, SubTileIdx = -1 });
+                            m_animatedTiles.Add(new AnimTileData() { VertexIdx = s_vertices.Count, Brush = tileBrush, SubTileIdx = -1 });
                         }
 
                         s_currUpdatedTilechunk = this;
-                        s_currUVVertex = m_vertices.Count;
+                        s_currUVVertex = s_vertices.Count;
                         Rect tileUV;
                         uint[] subtileData = tileBrush != null ? tileBrush.GetSubtiles(ParentTilemap, GridPosX + tx, GridPosY + ty, tileData) : null;
                         if (subtileData == null)
@@ -237,7 +247,8 @@ namespace CreativeSpore.SuperTilemapEditor
                             {
                                 uint subTileData = subtileData[i];
                                 int subTileId = (int)(subTileData & Tileset.k_TileDataMask_TileId);
-                                tileUV = subTileId != Tileset.k_TileId_Empty ? Tileset.Tiles[subTileId].uv : default(Rect);
+                                Tile subTile = Tileset.GetTile(subTileId);
+                                tileUV = subTile != null ? subTile.uv : default(Rect);
                                 //if (tileUV != default(Rect)) //NOTE: if this is uncommented, there won't be coherence with geometry ( 16 vertices per tiles with subtiles ). But it means also, the tile shouldn't be null.
                                 {
                                     _AddTileToMesh(tileUV, tx, ty, subTileData, subTileOffset[i], subTileSize, i);
@@ -258,6 +269,7 @@ namespace CreativeSpore.SuperTilemapEditor
             return !isEmpty;
         }
 
+        static Vector2[] s_tileUV = new Vector2[4];
         private void _AddTileToMesh(Rect tileUV, int tx, int ty, uint tileData, Vector2 subtileOffset, Vector2 subtileCellSize, int subTileIdx = -1)
         {
             float px0 = tx * CellSize.x + subtileOffset.x;
@@ -266,19 +278,18 @@ namespace CreativeSpore.SuperTilemapEditor
             float px1 = tx * CellSize.x + subtileOffset.x + subtileCellSize.x;
             float py1 = ty * CellSize.y + subtileOffset.y + subtileCellSize.y;           
 
-            int vertexIdx = m_vertices.Count;
+            int vertexIdx = s_vertices.Count;
+            s_vertices.Add(new Vector3(px0, py0, 0));
+            s_vertices.Add(new Vector3(px1, py0, 0));
+            s_vertices.Add(new Vector3(px0, py1, 0));
+            s_vertices.Add(new Vector3(px1, py1, 0));
 
-            m_vertices.Add(new Vector3(px0, py0, 0));
-            m_vertices.Add(new Vector3(px1, py0, 0));
-            m_vertices.Add(new Vector3(px0, py1, 0));
-            m_vertices.Add(new Vector3(px1, py1, 0));
-
-            m_triangles.Add(vertexIdx + 3);
-            m_triangles.Add(vertexIdx + 0);
-            m_triangles.Add(vertexIdx + 2);
-            m_triangles.Add(vertexIdx + 0);
-            m_triangles.Add(vertexIdx + 3);
-            m_triangles.Add(vertexIdx + 1);
+            s_triangles.Add(vertexIdx + 3);
+            s_triangles.Add(vertexIdx + 0);
+            s_triangles.Add(vertexIdx + 2);
+            s_triangles.Add(vertexIdx + 0);
+            s_triangles.Add(vertexIdx + 3);
+            s_triangles.Add(vertexIdx + 1);
 
             bool flipH = (tileData & Tileset.k_TileFlag_FlipH) != 0;
             bool flipV = (tileData & Tileset.k_TileFlag_FlipV) != 0;
@@ -302,35 +313,31 @@ namespace CreativeSpore.SuperTilemapEditor
                 u0 = u1;
                 u1 = u;
             }
-
-            Vector2[] uvs = new Vector2[4];
             if (rot90)
             {
-                uvs[0] = new Vector2(u1, v0);
-                uvs[1] = new Vector2(u1, v1);
-                uvs[2] = new Vector2(u0, v0);
-                uvs[3] = new Vector2(u0, v1);
+                s_tileUV[0] = new Vector2(u1, v0);
+                s_tileUV[1] = new Vector2(u1, v1);
+                s_tileUV[2] = new Vector2(u0, v0);
+                s_tileUV[3] = new Vector2(u0, v1);
             }
             else
             {
-                uvs[0] = new Vector2(u0, v0);
-                uvs[1] = new Vector2(u1, v0);
-                uvs[2] = new Vector2(u0, v1);
-                uvs[3] = new Vector2(u1, v1);
+                s_tileUV[0] = new Vector2(u0, v0);
+                s_tileUV[1] = new Vector2(u1, v0);
+                s_tileUV[2] = new Vector2(u0, v1);
+                s_tileUV[3] = new Vector2(u1, v1);
             }
-
             if (subTileIdx >= 0)
             {
                 for (int i = 0; i < 4; ++i)
                 {
                     if (i == subTileIdx) continue;
-                    uvs[i] = (uvs[i] + uvs[subTileIdx]) / 2f;
+                    s_tileUV[i] = (s_tileUV[i] + s_tileUV[subTileIdx]) / 2f;
                 }
             }
-
             for (int i = 0; i < 4; ++i)
             {
-                m_uv.Add(uvs[i]);
+                m_uv.Add(s_tileUV[i]);
             }
         }
     }

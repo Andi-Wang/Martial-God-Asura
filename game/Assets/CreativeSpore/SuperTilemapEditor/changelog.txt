@@ -1,3 +1,25 @@
+--- v1.4.2 ---
+- Added support for UNITY 5.5
+- Improved performance and reduced memory allocation when updating the tilemap
+- Added more painting tools: line, rectangle, filled rectangle, ellipse and filled ellipse
+- Flood Fill now supports a pattern from a tile selection
+- When a tilemap group is selected, the tilemap list will be display in the SceneView for a direct access
+- When a tile has attached a prefab, the prefab preview will be displayed in the tile palette instead of the tile
+- Added "Optimize Atlas Import Settings" button in the tileset inspector view to automatically change the import settings of the atlas texture to the recommended settings.
+- Added FindTilemapByName to TilemapGroup to acces a children tilemap
+- Added index property to tilemap group to access a tilemap by index of by name: tmapGroup[index] or tmapGroup["tilemapName"].
+- Added TileObjMesh component (more optimized version of TileObjectBehaviour)
+- Added GetParamsFromTileData to TilemapUtils to get a paramter from a brush or a tile directly from the tile data.
+- Added IterateTilemapWithAction to call a System.Action for all cells in a tilemap
+- Added support for selecting animated brushes in random brushes
+- Random brushes now works in a different way. Once the tile is randomly selected, it paint the tile but loose the random brush connection, so copy and paste that tile will not draw a new random tile.
+- Selecting a tile in a tilemap with right click will select the tile istead of the brush is ALT is being hold
+- Fixed some null exceptions when removing the atlas texture from the tileset in a scene with a tilemap using the tileset
+- Fixed in Atlas Editor Window, when adding padding to an atlas, the color between tiles was white with alpha, not transparent
+- Fixed instantiating tilemaps from a prefab was keeping the same Mesh reference for all instances. Now all instances will have its own Mesh.
+- Default tile size is now (32,32) when creating a new tilemap
+- Fixed moving the mouse over a tile parameter name field was unhighlighting the name field
+
 --- v1.4.1 ---
 - Added Brush Mask to brush palette to filter brushes by type
 - Added option Show In Palette to brushes to unhide them in the brush palette

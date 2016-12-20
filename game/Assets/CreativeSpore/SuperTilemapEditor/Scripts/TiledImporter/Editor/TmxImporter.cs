@@ -32,7 +32,7 @@ namespace CreativeSpore.TiledImporter
                     return;
                 }
 
-                CreateTilesetFromTmx(tmxFilePath, EditorUtils.GetAssetSelectedPath());
+                CreateTilesetFromTmx(tmxFilePath, SuperTilemapEditor.EditorUtils.GetAssetSelectedPath());
             }
         }
 
@@ -225,7 +225,11 @@ namespace CreativeSpore.TiledImporter
 					textureImporter.spriteImportMode = SpriteImportMode.Single;
 					textureImporter.wrapMode = TextureWrapMode.Clamp;
 					textureImporter.filterMode = FilterMode.Point;
-					textureImporter.textureFormat = TextureImporterFormat.ARGB32;
+#if UNITY_5_5_OR_NEWER
+                    textureImporter.textureCompression = TextureImporterCompression.Uncompressed;
+#else
+                    textureImporter.textureFormat = TextureImporterFormat.AutomaticTruecolor;
+#endif
                     textureImporter.textureType = TextureImporterType.Sprite;
 					textureImporter.maxTextureSize = 8192;                    
 					AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate); 

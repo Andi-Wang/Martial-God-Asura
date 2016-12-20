@@ -373,7 +373,7 @@ namespace CreativeSpore.SuperTilemapEditor
 
         Material FindDefaultSpriteMaterial()
         {
-#if UNITY_EDITOR && UNITY_5_4
+#if UNITY_EDITOR && (UNITY_5_4 || UNITY_5_5_OR_NEWER)
             return UnityEditor.AssetDatabase.GetBuiltinExtraResource<Material>("Sprites-Default.mat"); //fix: Unity 5.4.0f3 is not finding the material using Resources
 #else
             return Resources.GetBuiltinResource<Material>("Sprites-Default.mat");

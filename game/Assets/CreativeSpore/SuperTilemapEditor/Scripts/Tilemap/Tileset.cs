@@ -245,7 +245,7 @@ namespace CreativeSpore.SuperTilemapEditor
 
         #region Public Properties
         public Texture2D AtlasTexture;
-        public Vector2 TilePxSize;
+        public Vector2 TilePxSize = new Vector2(32, 32);
         public Vector2 SliceOffset;
         public Vector2 SlicePadding;
         public Color BackgroundColor = new Color32(205, 205, 205, 205);
@@ -372,7 +372,7 @@ namespace CreativeSpore.SuperTilemapEditor
         private List<BrushContainer> m_brushes = new List<BrushContainer>();
         [SerializeField]
         private List<Tile> m_tiles = new List<Tile>();
-        [SerializeField, Tooltip("Used only to set the initial cell size of a created tilemap")]
+        [SerializeField, Tooltip("Used only to set the initial cell size when a new tilemap is created")]
         private float m_pixelsPerUnit = 100f;
         [SerializeField]
         private string[] m_brushGroupNames = Enumerable.Range(0, 32).Select( x => x == 0? "Default" : "").ToArray();
@@ -483,6 +483,12 @@ namespace CreativeSpore.SuperTilemapEditor
             }
         }
 
+        private BrushContainer FindBrushContainerByBrushId(int brushId)
+        {
+            for (int i = 0; i < m_brushes.Count; ++i) if (m_brushes[i].Id == brushId) return m_brushes[i];
+            return default(BrushContainer);
+        }
+
         Dictionary<int, TilesetBrush> m_brushCache = new Dictionary<int, TilesetBrush>();
         public TilesetBrush FindBrush(int brushId)
         {
@@ -491,7 +497,7 @@ namespace CreativeSpore.SuperTilemapEditor
             TilesetBrush tileBrush = null;
             if (!m_brushCache.TryGetValue(brushId, out tileBrush))
             {
-                tileBrush = m_brushes.FirstOrDefault(x => x.Id == brushId).BrushAsset;
+                tileBrush = FindBrushContainerByBrushId(brushId).BrushAsset;
                 m_brushCache[brushId] = tileBrush;
                 //Debug.Log(" Cache miss! " + tileBrush.name);
             }
@@ -500,7 +506,11 @@ namespace CreativeSpore.SuperTilemapEditor
 
         public int FindBrushId(string name)
         {
-            return m_brushes.FirstOrDefault(x => x.BrushAsset.name == name).Id;
+            for (int i = 0; i < m_brushes.Count; ++i )
+            {
+                if (m_brushes[i].BrushAsset.name == name) return m_brushes[i].Id;
+            }
+            return  -1;
         }
 
         public void Slice()

@@ -157,6 +157,8 @@ namespace CreativeSpore.SuperTilemapEditor
             int height = heightInTiles * padTileHeight + tilePadding;
             Texture2D output = new Texture2D(width, height, TextureFormat.ARGB32, false, false);
             output.filterMode = FilterMode.Point;
+            output.SetPixels32(new Color32[width * height]);
+            output.Apply();
             List<Rect> rects = GenerateGridSpriteRectangles(atlasTexture, sliceOffset, tileSize, slicePadding);
 
             MakeTextureReadable(atlasTexture);
