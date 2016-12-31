@@ -21,6 +21,7 @@ namespace UnityStandardAssets._2D {
         private bool m_FacingRight = true;  // For determining which way the player is currently facing.
 
         bool isDead;
+		bool attacking = false; // used to detect if we are beginning an attack, in order to prevent input buffering
 
         private void Awake()
         {
@@ -77,12 +78,18 @@ namespace UnityStandardAssets._2D {
             // Set the vertical animation
             m_Anim.SetFloat("vSpeed", m_Rigidbody2D.velocity.y);
 
-            //Reset BasicPunch status
-			m_Anim.SetBool ("BasicPunch", false);
+            // Set attacking to false in Basic Punch to prevent buffered input from overriding command
+			if (m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Basic Punch")) {
+				attacking = false;
+			}
+			// Set BasicPunch to false in Idle to ensure no interrupt during Basic Punch animation
+			else if (m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Idle")) {
+				m_Anim.SetBool ("BasicPunch", false);
+			}
 
             //Force punch animation to play without override from more punches
             //if(!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("Basic Punch")) {
-				//m_Anim.SetBool ("BasicPunch", false);
+			//	m_Anim.SetBool ("BasicPunch", false);
                 //m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = false;
             //}
 
@@ -103,56 +110,57 @@ namespace UnityStandardAssets._2D {
             //On the ground, so character can move
             if(m_Grounded) {
                 m_Rigidbody2D.gravityScale = 1.0f;
-                if(input.altMoveDown || skillManager.backdashing) {
-                    m_Anim.SetBool("Crouch", false);
-                    skillManager.backdashSpeed = Skill.Backdash(m_Rigidbody2D, m_FacingRight, skillManager.backdashSpeed, input.altMoveDown);
-                    if(skillManager.backdashSpeed > 0) {
-                        skillManager.backdashing = true;
-                    }
-                    else {
-                        skillManager.backdashing = false;
-                    }
-                }
-                //If the character punches; later, will make this just attack buttons in general in one else if
-                else if(input.fire1Down) {
-                    //Activates the hitbox and animation if we are not already punching;
-					if (!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("Basic Punch") && !m_Anim.GetBool ("BasicPunch")) {
-						m_Anim.SetTrigger ("BasicPunchT");
-						m_Anim.SetBool ("BasicPunch", true);
+				if (!attacking) { //Perform movement commands if we are not currently attacking
+					if (input.altMoveDown || skillManager.backdashing) {
+						m_Anim.SetBool ("Crouch", false);
+						skillManager.backdashSpeed = Skill.Backdash (m_Rigidbody2D, m_FacingRight, skillManager.backdashSpeed, input.altMoveDown);
+						if (skillManager.backdashSpeed > 0) {
+							skillManager.backdashing = true;
+						} else {
+							skillManager.backdashing = false;
+						}
 					}
-                    //m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = true;
-                }
+                //If the character punches; later, will make this just attack buttons in general in one else if
+                else if (input.fire1Down) {
+						//Activates the hitbox and animation if we are not already punching;
+						if (!m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Basic Punch") && !m_Anim.GetBool ("BasicPunch")) {
+							m_Anim.SetTrigger ("BasicPunchT"); //Start punching
+							m_Anim.SetBool ("BasicPunch", true); //Set BasicPunch to true because we are punching
+							attacking = true; //Set attacking to true because we are attacking
+						}
+						//m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = true;
+					}
                 // If the player should jump...
-                else if (m_Grounded && input.jumpDown && m_Anim.GetBool("Ground")) {
-                    // Add a vertical force to the player.
-                    m_Grounded = false;
-                    m_Anim.SetBool("Ground", false);
-                    m_Rigidbody2D.AddForce(new Vector2(0f, playerEntity.jumpForce));
-                }
-                else {
-                    // Reduce the speed if crouching by the crouchSpeed multiplier
-                    input.h = (input.vDown ? input.h * playerEntity.crouchSpeed : input.h);
+                else if (m_Grounded && input.jumpDown && m_Anim.GetBool ("Ground")) {
+						// Add a vertical force to the player.
+						m_Grounded = false;
+						m_Anim.SetBool ("Ground", false);
+						m_Rigidbody2D.AddForce (new Vector2 (0f, playerEntity.jumpForce));
+					} else {
+						// Reduce the speed if crouching by the crouchSpeed multiplier
+						input.h = (input.vDown ? input.h * playerEntity.crouchSpeed : input.h);
 
-                    // Set whether or not the character is crouching in the animator
-                    m_Anim.SetBool("Crouch", input.vDown);
+						// Set whether or not the character is crouching in the animator
+						m_Anim.SetBool ("Crouch", input.vDown);
 
-                    // The Speed animator parameter is set to the absolute value of the horizontal input.
-                    m_Anim.SetFloat("Speed", Mathf.Abs(input.h));
+						// The Speed animator parameter is set to the absolute value of the horizontal input.
+						m_Anim.SetFloat ("Speed", Mathf.Abs (input.h));
 
-                    // Move the character
-                    m_Rigidbody2D.velocity = new Vector2(input.h * playerEntity.maxSpeed, m_Rigidbody2D.velocity.y);
+						// Move the character
+						m_Rigidbody2D.velocity = new Vector2 (input.h * playerEntity.maxSpeed, m_Rigidbody2D.velocity.y);
 
-                    // If the input is movting the player right and the player is facing left...
-                    if (input.h > 0 && !m_FacingRight) {
-                        // ... flip the player.
-                        Flip();
-                    }
+						// If the input is movting the player right and the player is facing left...
+						if (input.h > 0 && !m_FacingRight) {
+							// ... flip the player.
+							Flip ();
+						}
                     // Otherwise if the input is moving the player left and the player is facing right...
                     else if (input.h < 0 && m_FacingRight) {
-                        // ... flip the player.
-                        Flip();
-                    }
-                }
+							// ... flip the player.
+							Flip ();
+						}
+					}
+				}
             }
             //In the air
             else
