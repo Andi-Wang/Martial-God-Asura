@@ -1,14 +1,15 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Enemy.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\AttackState.cs">
     <Files>
       <File FileName="Assets\Scripts\Platformer2DUserControl.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\GameManager.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\PlatformerCharacter2D.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\DoorEnter.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\Enemy.cs" Line="10" Column="5" />
+      <File FileName="Assets\Scripts\Enemy.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\PlayerHitbox.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\Entity.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\AttackState.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
