@@ -20,6 +20,8 @@ namespace CreativeSpore.SuperTilemapEditor
         public List<RandomTileData> RandomTileList = new List<RandomTileData>();
 
         public uint RandomizeFlagMask = 0u;
+        [Tooltip("If activated, the brush id for this brush will be overwritten by the brush id of the selected tile. This should be activated to support animated brushes.")]
+        public bool RemoveBrushIdAfterRefresh = false;
 
         void OnEnable()
         {
@@ -99,18 +101,20 @@ namespace CreativeSpore.SuperTilemapEditor
                     brushTileData |= randomTileData & Tileset.k_TileDataMask_BrushId;
                 }
 
-                // - Commented:
-                // This code will make the Random Brush to work only once
-                // Copy the tile will copy the tile placed the first time
-                // - Uncommented:
-                // This code will make Refresh Tilemap to update all random brushes
-                // Copy the tile will copy a random brush tile
-                /*
+                // Overwrite the brush id for the one in the selected random tile
+                // Side Effect: the tile will loose the brush id for the random brush
+                if (RemoveBrushIdAfterRefresh)
+                {
+                    // Do nothing
+                }
+                // Overwrite the selected tile brush id for the random brush id 
+                // NOTE: animated tiles wont be animated
+                else
                 {
                     // overwrite brush id
                     brushTileData &= ~Tileset.k_TileDataMask_BrushId;
                     brushTileData |= tileData & Tileset.k_TileDataMask_BrushId;
-                }*/
+                }
 
                 return brushTileData;
             }

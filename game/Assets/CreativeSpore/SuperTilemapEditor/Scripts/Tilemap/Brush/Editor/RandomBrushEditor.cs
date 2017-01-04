@@ -199,6 +199,8 @@ namespace CreativeSpore.SuperTilemapEditor
                 m_brush.RandomTileList[m_randTileList.index].tileData = brushTileData;
             }
             EditorGUILayout.Space();
+            EditorGUILayout.HelpBox("Activate this to use animated brushes as random tiles", MessageType.Info);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("RemoveBrushIdAfterRefresh"));
 
             // Draw List
             m_randTileList.elementHeight = visualTileSize.y + 35f;
