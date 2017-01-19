@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class NPCInteract : MonoBehaviour {
-
+    ToggleHintUI hintUIController;
     Canvas dialogBox;
     bool showing;
     Vector3 origPos;
@@ -10,36 +10,26 @@ public class NPCInteract : MonoBehaviour {
 
     // Use this for initialization
     void Awake () {
+        hintUIController = GameObject.FindGameObjectWithTag("GameController").GetComponent<ToggleHintUI>();
+        hintUIController.toggleHint();
+
         showing = false;
         dialogBox = GetComponentInChildren<Canvas>();
         origPos = dialogBox.transform.position;
-        toggleInteractHint(false);
+        hintUIController.toggleDialog(dialogBox);
 	}
 
     void OnTriggerEnter2D(Collider2D other)
     {
         if (!showing && other.tag == "Player")
         {
-            toggleInteractHint(true);
+            hintUIController.toggleDialog(dialogBox, origPos.x, origPos.y);
         }
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
-        toggleInteractHint(false);
-        
+        hintUIController.toggleDialog(dialogBox);
     }
-
-    void toggleInteractHint(bool status)
-    {
-        if (status)
-        {
-            dialogBox.transform.position = origPos;
-        }
-        else
-        {
-            dialogBox.transform.position = hidePosition;
-        }
-        showing = status;
-    }
+    
 }

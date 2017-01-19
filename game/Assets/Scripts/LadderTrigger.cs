@@ -4,21 +4,20 @@ using CreativeSpore.SuperTilemapEditor;
 
 public class LadderTrigger : MonoBehaviour
 {
-    GameObject hintCanvas;
-
     string ladderTag;
-
+    ToggleHintUI hintUIController;
     Transform playerPosition;
     Vector3 destination;
     Collider2D doorCollider;
     private bool entered;
     int ladderTrans = 14;
     Vector3 ladderCentre;
-    Vector3 hidePosition = new Vector3(0, -999);
-
+   
     void Awake()
     {
-        hintCanvas = GameObject.Find("HintCanvas");
+        hintUIController = hintUIController = GameObject.FindGameObjectWithTag("GameController").GetComponent<ToggleHintUI>();
+        hintUIController.toggleHint();
+        
         ladderTag = gameObject.tag;
         ladderCentre = new Vector3(transform.localScale.x / 2, 3);
         
@@ -50,25 +49,17 @@ public class LadderTrigger : MonoBehaviour
         if (other.tag == "Player")
         {
             entered = true;
-            toggleInteractHint(true);
+            
+            Vector3 hintPos = transform.position + ladderCentre;
+            hintUIController.toggleHint(hintPos.x, hintPos.y);
         }
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
         entered = false;
-        toggleInteractHint(false);
+        
+        hintUIController.toggleHint();
     }
-
-    void toggleInteractHint(bool status)
-    {
-        if (status)
-        {
-            hintCanvas.transform.position = transform.position + ladderCentre;
-        }
-        else
-        {
-            hintCanvas.transform.position = hidePosition;
-        }
-    }
+    
 }

@@ -6,18 +6,18 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    public float levelStartDelay = 2f;                      //Time to wait before starting level, in seconds.
-    public float turnDelay = 0.1f;                          //Delay between each Player turn.
+    public float levelStartDelay = 1.2f;                      //Time to wait before starting level, in seconds.
+//    public float turnDelay = 0.1f;                          //Delay between each Player turn.
     public int playerPoints = 100;                      //Starting value for Player points.
     public static GameManager instance = null;              //Static instance of GameManager which allows it to be accessed by any other script.
     [HideInInspector] public bool playersTurn = true;       //Boolean to check if it's players turn, hidden in inspector but public.
-    
+    public int level;
     public int currentRoom;
 
     private Text levelText;                                 //Text to display current level number.
     private GameObject levelImage;                          //Image to block out level as levels are being set up, background for levelText.
                                                             //private BoardManager boardScript;						//Store a reference to our BoardManager which will set up the level.
-    int level = -1;
+    
     private List<Enemy> enemies;                            //List of all Enemy units, used to issue them move commands.
     private bool doingSetup = true;                         //Boolean to check if we're setting up board, prevent Player from moving during setup.
     Transform player;
@@ -31,9 +31,6 @@ public class GameManager : MonoBehaviour
         else if (instance != this)
             Destroy(gameObject);
 
-        //Sets this to not be destroyed when reloading scene
-        DontDestroyOnLoad(gameObject);
-
         //Assign enemies to a new List of Enemy objects.
         enemies = new List<Enemy>();
         
@@ -45,8 +42,7 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         // update the room that player is in
-        // Debug: remove = for release
-        if(level >= 0 && !RoomManager.Instance.inRoom(currentRoom, player.position.x, player.position.y))
+        if(level > 0 && !RoomManager.Instance.inRoom(currentRoom, player.position.x, player.position.y))
         {
             currentRoom = RoomManager.Instance.findRoomId(player.position.x, player.position.y);
         }
@@ -62,7 +58,7 @@ public class GameManager : MonoBehaviour
         // assign player position
         player = GameObject.FindGameObjectWithTag("Player").transform;
 
-        if (level >= 0) //Debug: remove = for release version
+        if (level > 0)
         {
             // Set up room manager
             currentRoom = RoomManager.Instance.findRoomId(player.position.x, player.position.y); 
@@ -128,35 +124,7 @@ public class GameManager : MonoBehaviour
 		enabled = false;
 	}
 
-    //This is called each time a scene is loaded.
-    void OnLevelFinishedLoading(Scene scene, LoadSceneMode mode)
-    {
-        //Add one to our level number.
-        level++;
-        //Call InitGame to initialize our level.
-        InitGame();
-    }
-
-    void OnEnable()
-    {
-        //Tell our ‘OnLevelFinishedLoading’ function to start listening for a scene change event as soon as this script is enabled.
-        SceneManager.sceneLoaded += OnLevelFinishedLoading;
-    }
-
-    void OnDisable()
-    {
-        //Tell our ‘OnLevelFinishedLoading’ function to stop listening for a scene change event as soon as this script is disabled.
-        //Remember to always have an unsubscription for every delegate you subscribe to!
-        SceneManager.sceneLoaded -= OnLevelFinishedLoading;
-    }
-
-    public int Level
-    {
-        get
-        {
-            return level;
-        }
-    }
+    
 }
 
 

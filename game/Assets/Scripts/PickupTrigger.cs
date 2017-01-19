@@ -4,14 +4,12 @@ using System.Collections;
 public class PickupTrigger : MonoBehaviour {
     GameObject hintCanvas;
     private bool entered;
-    Vector3 hidePosition = new Vector3(0, -999);
-    Vector3 appearPosition;
+    ToggleHintUI hintUIController;
 
     void Awake()
     {
-        hintCanvas = GameObject.Find("HintCanvas");
-
-        appearPosition = new Vector3(0, 3);
+        hintUIController = hintUIController = GameObject.FindGameObjectWithTag("GameController").GetComponent<ToggleHintUI>();
+        hintUIController.toggleHint();
 
         entered = false;
     }
@@ -20,8 +18,7 @@ public class PickupTrigger : MonoBehaviour {
     void Update () {
         if (Input.GetButtonUp("Interact") && entered == true)
         {
-            toggleInteractHint(false);
-
+            hintUIController.toggleHint();
             //TODO: update repository
             gameObject.SetActive(false);
 
@@ -33,25 +30,14 @@ public class PickupTrigger : MonoBehaviour {
         if (other.tag == "Player")
         {
             entered = true;
-            toggleInteractHint(true);
+            hintUIController.toggleHint(transform.position.x, transform.position.y+3);
         }
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
         entered = false;
-        toggleInteractHint(false);
+        hintUIController.toggleHint();
     }
-
-    void toggleInteractHint(bool status)
-    {
-        if (status)
-        {
-            hintCanvas.transform.position = transform.position + appearPosition;
-        }
-        else
-        {
-            hintCanvas.transform.position = hidePosition;
-        }
-    }
+    
 }

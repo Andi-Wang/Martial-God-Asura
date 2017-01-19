@@ -5,11 +5,13 @@ public class DoorEnter : MonoBehaviour {
 
     public GameObject hintCanvas;
 
+    ToggleHintUI hintUIController;
     private bool entered;
 
     void Awake()
     {
-        toggleInteractHint(false);
+        hintUIController = hintUIController = GameObject.FindGameObjectWithTag("GameController").GetComponent<ToggleHintUI>();
+        hintUIController.toggleHint();
         entered = false;
     }
 
@@ -17,7 +19,7 @@ public class DoorEnter : MonoBehaviour {
     {
         if (entered && Input.GetButtonUp("Interact"))
         {
-            NextLevel(1);
+            NextLevel(2);
         }
     }
 
@@ -25,14 +27,15 @@ public class DoorEnter : MonoBehaviour {
     {
         if (other.tag == "Player")
         {
-            toggleInteractHint(true);
+            
+            hintUIController.toggleHint(transform.position.x, transform.position.y+2);
             entered = true;
         }
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
-        toggleInteractHint(false);
+        hintUIController.toggleHint();
         entered = false;
     }
     
@@ -42,15 +45,4 @@ public class DoorEnter : MonoBehaviour {
         SceneManager.LoadScene(levelNumber);
     }
 
-    void toggleInteractHint(bool status)
-    {
-        if (status)
-        {
-            hintCanvas.transform.position = transform.position + new Vector3(0, 2);
-        }
-        else
-        {
-            hintCanvas.transform.position = new Vector3(0, -999);
-        }
-    }
 }

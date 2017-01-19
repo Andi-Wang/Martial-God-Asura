@@ -25,7 +25,7 @@ public class RoomManager : ScriptableObject {
     void initRooms()
     {
         rooms = new Rooms();
-        int level = GameManager.instance.Level;
+        int level = GameManager.instance.level;
 
         rooms.addRoom(0, level, -8, 0, 27, 13);
         rooms.addRoom(1, level, 28, 0, 47, 11);
