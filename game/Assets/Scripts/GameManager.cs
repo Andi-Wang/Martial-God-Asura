@@ -16,7 +16,8 @@ public class GameManager : MonoBehaviour
 
     private Text levelText;                                 //Text to display current level number.
     private GameObject levelImage;                          //Image to block out level as levels are being set up, background for levelText.
-                                                            //private BoardManager boardScript;						//Store a reference to our BoardManager which will set up the level.
+
+    private Player playerStat;                                                 //private BoardManager boardScript;						//Store a reference to our BoardManager which will set up the level.
     
     private List<Enemy> enemies;                            //List of all Enemy units, used to issue them move commands.
     private bool doingSetup = true;                         //Boolean to check if we're setting up board, prevent Player from moving during setup.
@@ -65,17 +66,25 @@ public class GameManager : MonoBehaviour
 
             levelImage = GameObject.Find("LevelImage");
 
-            //Get a reference to our text LevelText's text component by finding it by name and calling GetComponent.
-            levelText = GameObject.Find("LevelText").GetComponent<Text>();
+            if (levelImage != null)
+            {
+                //Get a reference to our text LevelText's text component by finding it by name and calling GetComponent.
+                levelText = GameObject.Find("LevelText").GetComponent<Text>();
 
-            //Set the text of levelText to the string "Day" and append the current level number.
-            levelText.text = "Level " + level;
+                //Set the text of levelText to the string "Day" and append the current level number.
+                levelText.text = "Level " + level;
 
-            //Set levelImage to active blocking player's view of the game board during setup.
-            levelImage.SetActive(true);
+                //Set levelImage to active blocking player's view of the game board during setup.
+                levelImage.SetActive(true);
 
-            //Call the HideLevelImage function with a delay in seconds of levelStartDelay.
-            Invoke("HideLevelImage", levelStartDelay);
+                //Call the HideLevelImage function with a delay in seconds of levelStartDelay.
+                Invoke("HideLevelImage", levelStartDelay);
+            }
+            else
+            {
+                doingSetup = false;
+                playersTurn = true;
+            }
         }
         else
         {
@@ -106,11 +115,6 @@ public class GameManager : MonoBehaviour
 		enemies.Add(script);
 	}
 		
-	public void switchRoom()
-    {
-
-    }
-
 	//GameOver is called when the player reaches 0 food points
 	public void GameOver()
 	{
@@ -124,7 +128,15 @@ public class GameManager : MonoBehaviour
 		enabled = false;
 	}
 
-    
+    public void SaveProgress()
+    {
+
+    }
+
+    public List<Enemy> Enemies
+    {
+        get{ return enemies;}
+    }
 }
 
 

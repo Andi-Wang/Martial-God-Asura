@@ -1,12 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
-
-public class LadderTriggerManager : MonoBehaviour {
+/** contain list of all ladders in scene
+ * */
+public class LadderManager : MonoBehaviour {
 
     public GameObject[] ladders;
 
 	// Use this for initialization
 	void Awake () {
+        
 	    foreach(GameObject ladder in ladders)
         {
             if (ladder.activeInHierarchy)
@@ -22,5 +24,15 @@ public class LadderTriggerManager : MonoBehaviour {
         {
             ladders[ladderId].SetActive(true);
         }
+    }
+
+    public bool[] GetUnlockedLadder()
+    {
+        bool[] unlocked = new bool[ladders.Length];
+        for (int i = 0; i < unlocked.Length; ++i)
+        {
+            unlocked[i] = (ladders[i].activeInHierarchy) ? true : false;
+        }
+        return unlocked;
     }
 }

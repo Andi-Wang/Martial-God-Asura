@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+/** test class which unlock ladder as soon as player collides trigger **/
 public class ActivateLadderAuto : MonoBehaviour {
     public GameObject ladder;
     public int ladderId;

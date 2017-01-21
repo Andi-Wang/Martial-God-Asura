@@ -8,7 +8,7 @@ namespace UnityStandardAssets._2D
     public class Platformer2DUserControl : MonoBehaviour
     {
         bool gamePaused;
-        GameObject pauseMenu;
+        MenuManager pauseMenu;
         private PlatformerCharacter2D m_Character;
         private bool m_Jump;
         private bool m_Alt_Move_Down;
@@ -18,8 +18,6 @@ namespace UnityStandardAssets._2D
         private void Awake() {
             m_Character = GetComponent<PlatformerCharacter2D>();
             input = new Controls();
-            pauseMenu = GameObject.Find("Menu");
-            pauseMenu.SetActive(false);
             gamePaused = false;
         }
 
@@ -34,14 +32,13 @@ namespace UnityStandardAssets._2D
             {
                 if (gamePaused)
                 {
-                    
-                    pauseMenu.SetActive(false);
+                    pauseMenu.ToggleMenu(false);
                     Resume();
                     gamePaused = false;
                 }
                 else
                 {
-                    pauseMenu.SetActive(true);
+                    pauseMenu.ToggleMenu(true);
                     Pause();
                     gamePaused = true;
                 }

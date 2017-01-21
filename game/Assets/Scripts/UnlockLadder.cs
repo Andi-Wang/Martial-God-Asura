@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
-
-public class ActivateLadder : MonoBehaviour {
+/** ladder unlock animator **/
+public class UnlockLadder : MonoBehaviour {
 
     public GameObject ladder;
     public int ladderId;
