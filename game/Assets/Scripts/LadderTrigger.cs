@@ -16,7 +16,7 @@ public class LadderTrigger : MonoBehaviour
    
     void Awake()
     {
-        hintUIController = hintUIController = GameObject.FindGameObjectWithTag("GameController").GetComponent<ToggleHintUI>();
+        hintUIController = GameObject.FindGameObjectWithTag("GameController").GetComponent<ToggleHintUI>();
         hintUIController.toggleHint();
         
         ladderTag = gameObject.tag;
@@ -59,8 +59,6 @@ public class LadderTrigger : MonoBehaviour
     void OnTriggerExit2D(Collider2D other)
     {
         entered = false;
-        
         hintUIController.toggleHint();
     }
-    
 }

@@ -29,7 +29,9 @@ public class ModalPanel : MonoBehaviour {
     public void Choice(ModalPanelDetails details)
     {
         modalPanelObj.SetActive(true);
-        foreach(Button b in buttons)
+        GameManager.Pause();
+
+        foreach (Button b in buttons)
         {
             b.gameObject.SetActive(false);
         }
@@ -49,6 +51,7 @@ public class ModalPanel : MonoBehaviour {
     void ClosePanel()
     {
         modalPanelObj.SetActive(false);
+        GameManager.Resume();
     }
 }
 

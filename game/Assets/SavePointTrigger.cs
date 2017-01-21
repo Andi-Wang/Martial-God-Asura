@@ -9,7 +9,7 @@ public class SavePointTrigger : MonoBehaviour {
 
     void Awake()
     {
-        hintUIController = hintUIController = GameObject.FindGameObjectWithTag("GameController").GetComponent<ToggleHintUI>();
+        hintUIController = GameObject.FindGameObjectWithTag("GameController").GetComponent<ToggleHintUI>();
         hintUIController.toggleHint();
 
         modalPanel = ModalPanel.Instance();

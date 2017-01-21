@@ -5,19 +5,21 @@ using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine.SceneManagement;
 
 public class ProgressSL {
-    private GameStatus gs;
-    private string gsPath;
+    //private GameStatus gs;
+    private static string gsPath = Application.dataPath + "/Resources/savedata.dat";
 
-    public void prepareSaveData()
+   /* public void prepareSaveData(GameStatus gs)
     {
         gs = new GameStatus();
         gs.sceneNumber = SceneManager.GetActiveScene().buildIndex;
         //gs.ladderUnlocked = LadderManager.GetUnlockedLadder();
         gs.enemies = GameManager.instance.Enemies;
-    }
 
-    public void save()
+    }*/
+
+    public static void save(GameStatus gs)
     {
+        //prepareSaveData(gs);
         BinaryFormatter bf = new BinaryFormatter();
 
         FileStream fsgs = File.Create(gsPath);
@@ -25,9 +27,10 @@ public class ProgressSL {
         fsgs.Close();
     }
 
-    public void load()
+    public static GameStatus load()
     {
-        gsPath = Application.dataPath + "/Resources/savedata.dat";
+        GameStatus gs = new GameStatus();
+       // gsPath = Application.dataPath + "/Resources/savedata.dat";
  
         if (File.Exists(gsPath))
         {
@@ -38,15 +41,19 @@ public class ProgressSL {
 
                 gs = (GameStatus)bf.Deserialize(fsgs);
                 fsgs.Close();
+
+                return gs;
             }
             catch (System.Exception e)
             {
                 Debug.Log(e.Message);
+                return null;
             }
         }
         else
         {
             Debug.Log("Cannot find saved data file");
+            return null;
         }
     }
 }

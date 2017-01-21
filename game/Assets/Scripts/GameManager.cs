@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
 {
     public float levelStartDelay = 1.2f;                      //Time to wait before starting level, in seconds.
 //    public float turnDelay = 0.1f;                          //Delay between each Player turn.
-    public int playerPoints = 100;                      //Starting value for Player points.
+    //public int playerPoints = 100;                      //Starting value for Player points.
     public static GameManager instance = null;              //Static instance of GameManager which allows it to be accessed by any other script.
     [HideInInspector] public bool playersTurn = true;       //Boolean to check if it's players turn, hidden in inspector but public.
     public int level;
@@ -18,10 +18,12 @@ public class GameManager : MonoBehaviour
     private GameObject levelImage;                          //Image to block out level as levels are being set up, background for levelText.
 
     private Player playerStat;                                                 //private BoardManager boardScript;						//Store a reference to our BoardManager which will set up the level.
-    
+    private Skills skills;
     private List<Enemy> enemies;                            //List of all Enemy units, used to issue them move commands.
     private bool doingSetup = true;                         //Boolean to check if we're setting up board, prevent Player from moving during setup.
     Transform player;
+    UnityStandardAssets._2D.PlatformerCharacter2D playerScript;
+    LadderManager ladderManager;
 
     //Awake is always called before any Start functions
     void Awake()
@@ -32,9 +34,10 @@ public class GameManager : MonoBehaviour
         else if (instance != this)
             Destroy(gameObject);
 
-        //Assign enemies to a new List of Enemy objects.
+        //these should changed if load from data
         enemies = new List<Enemy>();
-        
+        playerStat = new Player();
+        skills = new Skills();
 
         //Call the InitGame function to initialize the first level 
         InitGame();
@@ -56,8 +59,13 @@ public class GameManager : MonoBehaviour
 		doingSetup = true;
         playersTurn = false;
 
+        // find ladderManager
+        ladderManager = GameObject.Find("TrapDoorTriggers").GetComponent<LadderManager>();
+        
         // assign player position
-        player = GameObject.FindGameObjectWithTag("Player").transform;
+        GameObject p = GameObject.FindGameObjectWithTag("Player");
+        player = p.transform;
+        playerScript = p.GetComponent<UnityStandardAssets._2D.PlatformerCharacter2D>();
 
         if (level > 0)
         {
@@ -130,12 +138,40 @@ public class GameManager : MonoBehaviour
 
     public void SaveProgress()
     {
+        GameStatus gs = new GameStatus();
 
+        playerStat.playerEntity = playerScript.PlayerEntity;
+        playerStat.playerPosX = player.position.x;
+        playerStat.playerPosY = player.position.y;
+
+        // dummy skills for save game
+        skills.AddSkill("Back Dash", 1, true);
+        skills.AddSkill("Glide", 1, true);
+        skills.AddSkill("Fast Fall", 1, true);
+        skills.AddSkill("Punch", 1, true);
+        playerStat.skills = skills;
+
+        gs.playerStat = playerStat;
+        //gs.enemies = enemies;// null enemies cause serializable exception
+        gs.sceneNumber = SceneManager.GetActiveScene().buildIndex;
+        gs.ladderUnlocked = ladderManager.GetUnlockedLadder();
+        
+        ProgressSL.save(gs);
     }
 
     public List<Enemy> Enemies
     {
         get{ return enemies;}
+    }
+
+    public static void Pause()
+    {
+        Time.timeScale = 0;
+    }
+
+    public static void Resume()
+    {
+        Time.timeScale = 1;
     }
 }
 

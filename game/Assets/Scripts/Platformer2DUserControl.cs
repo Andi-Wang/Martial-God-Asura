@@ -8,7 +8,7 @@ namespace UnityStandardAssets._2D
     public class Platformer2DUserControl : MonoBehaviour
     {
         bool gamePaused;
-        MenuManager pauseMenu;
+        public MenuManager pauseMenu;
         private PlatformerCharacter2D m_Character;
         private bool m_Jump;
         private bool m_Alt_Move_Down;
@@ -32,15 +32,15 @@ namespace UnityStandardAssets._2D
             {
                 if (gamePaused)
                 {
-                    pauseMenu.ToggleMenu(false);
-                    Resume();
                     gamePaused = false;
+                    pauseMenu.ToggleMenu(false);
+                    GameManager.Resume();
                 }
                 else
                 {
-                    pauseMenu.ToggleMenu(true);
-                    Pause();
                     gamePaused = true;
+                    pauseMenu.ToggleMenu(true);
+                    GameManager.Pause();
                 }
             }
 
@@ -87,7 +87,7 @@ namespace UnityStandardAssets._2D
             input.resetButtonDown();
         }
 
-        void Pause()
+     /*   void Pause()
         {
             Time.timeScale = 0;
         }
@@ -95,6 +95,6 @@ namespace UnityStandardAssets._2D
         void Resume()
         {
             Time.timeScale = 1;
-        }
+        }*/
     }
 }

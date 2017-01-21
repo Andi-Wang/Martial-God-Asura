@@ -6,7 +6,6 @@ public class NPCInteract : MonoBehaviour {
     Canvas dialogBox;
     bool showing;
     Vector3 origPos;
-    Vector3 hidePosition = new Vector3(0, -999);
 
     // Use this for initialization
     void Awake () {

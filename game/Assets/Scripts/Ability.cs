@@ -14,9 +14,15 @@ public class Ability
     }
 }
 
+[System.Serializable]
 public class Skills
 {
     private Dictionary<string, Ability> abilities;
+
+    public Skills()
+    {
+        abilities = new Dictionary<string, Ability>();
+    }
 
     public Dictionary<string, Ability> Abilities
     {

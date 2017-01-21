@@ -8,7 +8,7 @@ public class PickupTrigger : MonoBehaviour {
 
     void Awake()
     {
-        hintUIController = hintUIController = GameObject.FindGameObjectWithTag("GameController").GetComponent<ToggleHintUI>();
+        hintUIController = GameObject.FindGameObjectWithTag("GameController").GetComponent<ToggleHintUI>();
         hintUIController.toggleHint();
 
         entered = false;

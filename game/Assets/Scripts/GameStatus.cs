@@ -14,14 +14,15 @@ public class GameStatus {
 
     public GameStatus()
     {
-        playerStat = new Player();
+        //playerStat = new Player();
     }
-
-    
 }
+
+[System.Serializable]
 public class Player
 {
     public Skills skills;
-    public Vector2 playerPos;
-    public int playerHealth;
+    public float playerPosX;
+    public float playerPosY;
+    public Entity playerEntity;
 }
