@@ -83,8 +83,11 @@ namespace UnityStandardAssets._2D {
 			if (m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Basic Punch")) {
 				attacking = false;
 			}
+			else if (m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Low Kick")) {
+				attacking = false;
+			}
 			// Set BasicPunch to false in Idle to ensure no interrupt during Basic Punch animation
-			else if (m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Idle")) {
+			else if (m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Idle") || m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Crouch")) {
 				m_Anim.SetBool ("BasicPunch", false);
 			}
 
@@ -118,6 +121,11 @@ namespace UnityStandardAssets._2D {
                             skillStateManager.slideSpeed = Skill.Slide(m_Rigidbody2D, m_FacingRight, skillStateManager.slideSpeed, input.altMoveDown);
                             if(skillStateManager.slideSpeed > 0) {
                                 skillStateManager.sliding = true;
+								if (!m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Low Kick") && !m_Anim.GetBool ("BasicPunch")) {
+									m_Anim.SetTrigger ("LowKickT"); //Start kicking
+									m_Anim.SetBool ("BasicPunch", true); //Set BasicPunch to true because we are punching
+									attacking = true; //Set attacking to true because we are attacking
+								}
                             }
                             else {
                                 skillStateManager.sliding = false;
