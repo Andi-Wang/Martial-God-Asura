@@ -5,6 +5,11 @@ public class Skill {
     public class SkillStateManager {
         public bool backdashing = false;
         public float backdashSpeed = 0f;
+        public bool sliding = false;
+        public float slideSpeed = 0f;
+        public bool secondJumpAvailable = true;
+        public bool airdashing = false;
+        public float airdashSpeed = 0f;
     }
     
     public static float Backdash(Rigidbody2D body, bool facingRight, float backdashSpeed, bool forceStart) {
@@ -33,8 +38,63 @@ public class Skill {
 
         return backdashSpeed;
     }
-    
 
+    public static float Slide(Rigidbody2D body, bool facingRight, float slideSpeed, bool forceStart) {
+        float minSpeed = 6f;
+        float maxSpeed = 17f;
+        float decay = 1f;
+
+        if (forceStart || slideSpeed > minSpeed) {
+            if (slideSpeed == 0) {
+                slideSpeed = maxSpeed;
+            }
+            else {
+                slideSpeed -= decay;
+            }
+
+            if (facingRight) {
+                body.velocity = new Vector2(slideSpeed, body.velocity.y);
+            }
+            else {
+                body.velocity = new Vector2(-slideSpeed, body.velocity.y);
+            }
+        }
+        else {
+            slideSpeed = 0;
+        }
+        return slideSpeed;
+    }
+
+    public static float Airdash(Rigidbody2D body, bool facingRight, float airdashSpeed, bool forceStart) {
+        float minSpeed = 12f;
+        float maxSpeed = 32f;
+        float decay = 1.2f;
+        float verticalSpeedModifier = 12f;
+
+        if (forceStart || airdashSpeed > minSpeed) {
+            float verticalSpeedOffset = 0f;
+
+            if (airdashSpeed == 0) {
+                airdashSpeed = maxSpeed;
+                verticalSpeedOffset = Mathf.Sqrt((airdashSpeed - minSpeed) / (maxSpeed - minSpeed)) * verticalSpeedModifier;
+            }
+            else {
+                verticalSpeedOffset = Mathf.Sqrt((airdashSpeed - minSpeed) / (maxSpeed - minSpeed)) * verticalSpeedModifier;
+                airdashSpeed -= decay;
+            }
+
+            if (facingRight) {
+                body.velocity = new Vector2(airdashSpeed, verticalSpeedOffset);
+            }
+            else {
+                body.velocity = new Vector2(-airdashSpeed, verticalSpeedOffset);
+            }
+        }
+        else {
+            airdashSpeed = 0f;
+        }
+        return airdashSpeed;
+    }
 
     public static void Glide(Rigidbody2D body, float defaultGravity, float x) {
         float velocityMultiplier = 0.25f;
@@ -68,11 +128,17 @@ public class Skill {
         }
     }
 
-    //Damage the other entity
-    public static void Punch(Enemy target) {
-        target.enemyEntity.health -= 10f;
+    public static void Counter() {
+
     }
 
+    public static void Fireball() {
+
+    }
+
+    public static void SummonWall() {
+
+    }
 
     public static Enemy getEnemyScript(Collider2D other) {
         return other.attachedRigidbody.gameObject.GetComponent<Enemy>() as Enemy;
