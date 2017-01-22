@@ -31,7 +31,7 @@ public class Skills
 
     public void AddSkill(string name, int level, bool unlocked)
     {
-        abilities.Add(name, new Ability(level, unlocked));
+        abilities[name] = new Ability(level, unlocked);
     }
 
     public bool isUnlocked(string skillName)

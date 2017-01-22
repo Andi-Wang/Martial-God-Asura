@@ -91,6 +91,10 @@ namespace UnityStandardAssets._2D {
 				m_Anim.SetBool ("BasicPunch", false);
 			}
 
+            //Add kick and block anim stuff here
+
+
+
             //Force punch animation to play without override from more punches
             //if(!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("Basic Punch")) {
 			//	m_Anim.SetBool ("BasicPunch", false);
@@ -152,6 +156,14 @@ namespace UnityStandardAssets._2D {
 					    }
 					    //m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = true;
 				    }
+                    else if(input.fire2Down) {
+                        //Add kick stuff here
+                        //attacking = true;
+                    }
+                    else if (input.fire2Down) {
+                        //Add block stuff here
+                        //attacking = true;
+                    }
                     // If the player should jump...
                     else if (m_Grounded && input.jumpDown && m_Anim.GetBool ("Ground")) {
 				        // Add a vertical force to the player.
