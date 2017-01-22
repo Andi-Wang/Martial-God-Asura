@@ -120,7 +120,7 @@ namespace UnityStandardAssets._2D {
                 m_Rigidbody2D.gravityScale = 1.0f;
                 skillStateManager.secondJumpAvailable = true;
                 if (!attacking) { //Perform movement commands if we are not currently attacking
-					if (input.altMoveDown || skillStateManager.backdashing) {
+					if (input.altMoveDown || skillStateManager.backdashing || skillStateManager.sliding) {
                         if(m_Anim.GetBool("Crouch")) {
                             skillStateManager.slideSpeed = Skill.Slide(m_Rigidbody2D, m_FacingRight, skillStateManager.slideSpeed, input.altMoveDown);
                             if(skillStateManager.slideSpeed > 0) {
