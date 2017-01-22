@@ -2,32 +2,37 @@
 using System.Collections;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using UnityEngine.SceneManagement;
 
 public class ProgressSL {
-    private GameStatus gs;
-    private Player playerData;
-    private string gsPath;
-    private string playerPath;
+    //private GameStatus gs;
+    private static string gsPath = Application.dataPath + "/Resources/savedata.dat";
 
-    public void save()
+   /* public void prepareSaveData(GameStatus gs)
     {
+        gs = new GameStatus();
+        gs.sceneNumber = SceneManager.GetActiveScene().buildIndex;
+        //gs.ladderUnlocked = LadderManager.GetUnlockedLadder();
+        gs.enemies = GameManager.instance.Enemies;
+
+    }*/
+
+    public static void save(GameStatus gs)
+    {
+        //prepareSaveData(gs);
         BinaryFormatter bf = new BinaryFormatter();
 
         FileStream fsgs = File.Create(gsPath);
         bf.Serialize(fsgs, gs);
         fsgs.Close();
-
-        FileStream fsplayer = File.Create(playerPath);
-        bf.Serialize(fsplayer, playerPath);
-        fsplayer.Close();
     }
 
-    public void load()
+    public static GameStatus load()
     {
-        gsPath = Application.dataPath + "/Resources/savedata.dat";
-        playerPath = Application.dataPath + "/Resources/playerdata.dat";
-
-        if (File.Exists(gsPath) && File.Exists(playerPath))
+        GameStatus gs = new GameStatus();
+       // gsPath = Application.dataPath + "/Resources/savedata.dat";
+ 
+        if (File.Exists(gsPath))
         {
             try
             {
@@ -37,36 +42,20 @@ public class ProgressSL {
                 gs = (GameStatus)bf.Deserialize(fsgs);
                 fsgs.Close();
 
-                FileStream fsplayer = File.Open(playerPath, FileMode.Open);
-
-                playerData = (Player)bf.Deserialize(fsplayer);
-                fsplayer.Close();
+                return gs;
             }
             catch (System.Exception e)
             {
                 Debug.Log(e.Message);
+                return null;
             }
         }
         else
         {
             Debug.Log("Cannot find saved data file");
+            return null;
         }
     }
 }
 
-public class GameStatus {
-    //current scene,activated ladder,enemies --snapshot,time if multiple saved game
-    public int sceneNumber;
-    public bool[] ladderActivated;
 
-    public GameStatus()
-    {
-
-    }
-}
-public class Player
-{
-    public int playerLevel;
-    public Vector2 playerPos;
-    //player pos, player character status,
-}

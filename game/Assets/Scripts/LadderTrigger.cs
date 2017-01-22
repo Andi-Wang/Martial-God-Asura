@@ -2,20 +2,21 @@
 using System.Collections;
 using CreativeSpore.SuperTilemapEditor;
 
+/** hint UI control and player teleport for ladder **/
 public class LadderTrigger : MonoBehaviour
 {
     string ladderTag;
     ToggleHintUI hintUIController;
     Transform playerPosition;
     Vector3 destination;
-    Collider2D doorCollider;
+
     private bool entered;
     int ladderTrans = 14;
     Vector3 ladderCentre;
    
     void Awake()
     {
-        hintUIController = hintUIController = GameObject.FindGameObjectWithTag("GameController").GetComponent<ToggleHintUI>();
+        hintUIController = GameObject.FindGameObjectWithTag("GameController").GetComponent<ToggleHintUI>();
         hintUIController.toggleHint();
         
         ladderTag = gameObject.tag;
@@ -58,8 +59,6 @@ public class LadderTrigger : MonoBehaviour
     void OnTriggerExit2D(Collider2D other)
     {
         entered = false;
-        
         hintUIController.toggleHint();
     }
-    
 }

@@ -3,7 +3,7 @@ using System.Collections;
 
 public class CameraAnimatorController : MonoBehaviour {
 
-    public LadderTriggerManager ladderController;
+    public LadderManager ladderController;
 
     CameraFollow cam;
 	// Use this for initialization

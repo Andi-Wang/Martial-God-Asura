@@ -5,11 +5,6 @@ using UnityEngine.UI;
 public class MenuManager : MonoBehaviour {
 
     public GameObject[] tabContents;
-
-	// Use this for initialization
-	void Start () {
-	
-	}
 	
 	public void SwitchTab(int tabId)
     {
@@ -22,5 +17,10 @@ public class MenuManager : MonoBehaviour {
         }
 
         tabContents[tabId].SetActive(true);
+    }
+
+    public void ToggleMenu(bool activate)
+    {
+        gameObject.SetActive(activate);
     }
 }
