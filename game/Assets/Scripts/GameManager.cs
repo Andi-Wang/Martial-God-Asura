@@ -60,7 +60,10 @@ public class GameManager : MonoBehaviour
         playersTurn = false;
 
         // find ladderManager
-        ladderManager = GameObject.Find("TrapDoorTriggers").GetComponent<LadderManager>();
+        if (level > 0)
+        {
+            ladderManager = GameObject.Find("TrapDoorTriggers").GetComponent<LadderManager>();
+        }
         
         // assign player position
         GameObject p = GameObject.FindGameObjectWithTag("Player");
