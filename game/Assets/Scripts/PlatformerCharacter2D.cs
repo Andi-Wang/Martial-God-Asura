@@ -80,7 +80,7 @@ namespace UnityStandardAssets._2D {
             m_Anim.SetFloat("vSpeed", m_Rigidbody2D.velocity.y);
 
             // Set attacking to false in Basic Punch to prevent buffered input from overriding command
-			if (m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Basic Punch") || m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Flip Kick")){
+			if (m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Basic Punch") || m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Flip Kick") || m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Block")){
 				attacking = false;
 			}
 			else if (m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Low Kick")) {
@@ -164,9 +164,13 @@ namespace UnityStandardAssets._2D {
 							attacking = true; //Set attacking to true because we are attacking
 						}
                     }
-                    else if (input.fire2Down) {
+                    else if (input.fire3Down) {
                         //Add block stuff here
-                        //attacking = true;
+						if (!m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Block") && !m_Anim.GetBool ("BasicPunch")) {
+							m_Anim.SetTrigger ("BlockT"); //Start punching
+							m_Anim.SetBool ("BasicPunch", true); //Set BasicPunch to true because we are punching
+							attacking = true; //Set attacking to true because we are attacking
+						}
                     }
                     // If the player should jump...
                     else if (m_Grounded && input.jumpDown && m_Anim.GetBool ("Ground")) {
