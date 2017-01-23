@@ -124,12 +124,12 @@ namespace UnityStandardAssets._2D {
                         if(m_Anim.GetBool("Crouch")) {
                             skillStateManager.slideSpeed = Skill.Slide(m_Rigidbody2D, m_FacingRight, skillStateManager.slideSpeed, input.altMoveDown);
                             if(skillStateManager.slideSpeed > 0) {
-                                skillStateManager.sliding = true;
-								if (!m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Low Kick") && !m_Anim.GetBool ("BasicPunch") && input.altMoveDown) {
+								if (!m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Low Kick") && !m_Anim.GetBool ("BasicPunch") && !skillStateManager.sliding) {
 									m_Anim.SetTrigger ("LowKickT"); //Start kicking
 									m_Anim.SetBool ("BasicPunch", true); //Set BasicPunch to true because we are punching
 									attacking = true; //Set attacking to true because we are attacking
 								}
+								skillStateManager.sliding = true;
                             }
                             else {
                                 skillStateManager.sliding = false;
