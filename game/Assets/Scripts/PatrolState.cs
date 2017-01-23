@@ -23,7 +23,7 @@ public class PatrolState : EnemyState {
     }
     public void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.tag == "Walls")
-            enemy.Flip();
+       // if (other.tag == "Walls")
+        //    enemy.Flip();
     }
 }

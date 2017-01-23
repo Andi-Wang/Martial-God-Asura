@@ -46,8 +46,9 @@ public class Enemy : MonoBehaviour
         GameManager.instance.AddEnemyToList(this);
         //Get and store a reference to the attached Animator component.
         animator = GetComponent<Animator>();
-        animator.SetBool("Moving", true);
+        
         changeState(new PatrolState());
+        animator.SetBool("Moving", true);
     }
 
     void Update()
@@ -58,25 +59,39 @@ public class Enemy : MonoBehaviour
         } else inMeleeRange = false;
         */
         if (isDead) return;
-        else if (enemyEntity.health > 0 /*&& playerHealth.currentHealth > 0*/)
+
+        if (enemyEntity.health > 0 /*&& playerHealth.currentHealth > 0*/)
         {
             state.Execute();
             //LookAtTarget();
-            Vector3 raycastStartPoint = transform.position + new Vector3(getDirection().x*2, 0);
+            Vector3 raycastStartPoint = transform.position + new Vector3(getDirection().x, 0);
             RaycastHit2D hit = Physics2D.Raycast(raycastStartPoint, getDirection());
             if (hit.collider != null)
             {
-                if (hit.collider.gameObject.tag != "Player")
+                if (hit.collider.gameObject.tag == "Player")
                 {
-                    //float distance = Mathf.Abs(hit.point.x - raycastStartPoint.x);
-                    //Debug.Log(distance);
+                    if (hit.distance >= 1)
+                    {
+                        changeState(new PatrolState()); //TODO: should move faster
+                    }
+                    else
+                    {
+                        changeState(new AttackState());
+                    }
+                }
+                else // player in sight, chase and start attack
+                {
+                    changeState(new PatrolState());
                     // change to opposite direction when enemy is close to the wall
                     if (hit.distance <= 2)
                     {
                         Flip();
                     }
                 }
-                
+            }
+            else
+            {
+                Flip();
             }
         }
         else if (enemyEntity.health <= 0)
@@ -88,7 +103,14 @@ public class Enemy : MonoBehaviour
     public void changeState(EnemyState newState)
     {
         if (state != null)
+        {
+            // check if new state is the same as current state
+            if (state.GetType() == newState.GetType())
+            {
+                return;
+            }
             state.Leave();
+        }
 
         state = newState;
         state.Begin(this);
