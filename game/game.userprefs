@@ -4,7 +4,7 @@
     <Files>
       <File FileName="Assets\Scripts\Platformer2DUserControl.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\GameManager.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\PlatformerCharacter2D.cs" Line="90" Column="127" />
+      <File FileName="Assets\Scripts\PlatformerCharacter2D.cs" Line="245" Column="61" />
       <File FileName="Assets\Scripts\LadderManager.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
