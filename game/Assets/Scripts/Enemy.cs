@@ -128,13 +128,32 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    public void TakeDamage(float amount)
+    {
+        if (isDead)
+            return;
+
+        //enemyAudio.Play();TODO:hurt audio
+        animator.SetTrigger("Hit");
+
+        enemyEntity.health -= amount;
+
+        //hitParticles.transform.position = hitPoint;
+        //hitParticles.Play();
+
+        if (enemyEntity.health <= 0)
+        {
+            Death();
+        }
+    }
+
     void Death()
     {
         isDead = true;
         
         //boxCollider.isTrigger = true;
 
-        //animator.SetTrigger("Dead");
+        animator.SetTrigger("Dead");
 
        // enemyAudio.clip = deathClip;
         //enemyAudio.Play();   

@@ -13,8 +13,10 @@ public class PlayerHitbox : MonoBehaviour {
 
     
     void OnTriggerEnter2D(Collider2D other) {
-        if (other.gameObject.tag == "Enemy") {
-            other.gameObject.GetComponent<Enemy>().enemyEntity.health -= 5;
+        GameObject target = other.gameObject;
+        if (target.tag == "Enemy") {
+            Enemy enemy = target.GetComponent<Enemy>();
+            enemy.TakeDamage(5);
         }
     }
 }
