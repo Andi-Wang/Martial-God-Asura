@@ -19,7 +19,7 @@ public class Enemy : MonoBehaviour
 
     private EnemyState state;
     private BoxCollider2D boxCollider;
-    public GameObject player;
+    private GameObject player;
     public Animator animator;                          //Variable of type Animator to store a reference to the enemy's Animator component.
     bool isDead;
     private Rigidbody2D rb2D;
@@ -31,6 +31,7 @@ public class Enemy : MonoBehaviour
 
     void Awake()
     {
+        player = GameObject.FindGameObjectWithTag("Player");
         boxCollider = GetComponent<BoxCollider2D>();
         rb2D = GetComponent<Rigidbody2D>();
         //currentHealth = startingHealth;
@@ -45,21 +46,38 @@ public class Enemy : MonoBehaviour
         GameManager.instance.AddEnemyToList(this);
         //Get and store a reference to the attached Animator component.
         animator = GetComponent<Animator>();
+        animator.SetBool("Moving", true);
         changeState(new PatrolState());
     }
 
     void Update()
     {
-        if (player != null)
+     /*   if (player != null)
         {
             inMeleeRange = Vector2.Distance(transform.position, player.transform.position) <= meleeRange;
         } else inMeleeRange = false;
-
+        */
         if (isDead) return;
         else if (enemyEntity.health > 0 /*&& playerHealth.currentHealth > 0*/)
         {
             state.Execute();
-            LookAtTarget();
+            //LookAtTarget();
+            Vector3 raycastStartPoint = transform.position + new Vector3(getDirection().x*2, 0);
+            RaycastHit2D hit = Physics2D.Raycast(raycastStartPoint, getDirection());
+            if (hit.collider != null)
+            {
+                if (hit.collider.gameObject.tag != "Player")
+                {
+                    //float distance = Mathf.Abs(hit.point.x - raycastStartPoint.x);
+                    //Debug.Log(distance);
+                    // change to opposite direction when enemy is close to the wall
+                    if (hit.distance <= 2)
+                    {
+                        Flip();
+                    }
+                }
+                
+            }
         }
         else if (enemyEntity.health <= 0)
         {
@@ -71,6 +89,7 @@ public class Enemy : MonoBehaviour
     {
         if (state != null)
             state.Leave();
+
         state = newState;
         state.Begin(this);
     }
@@ -106,11 +125,11 @@ public class Enemy : MonoBehaviour
 
     public void Move()
     {
-        if (!inMeleeRange)
-        {
-            animator.SetBool("Moving", true);
+        //if (!inMeleeRange)
+       // {
+           // animator.SetBool("Moving", true);
             transform.Translate(getDirection() * speed * Time.deltaTime, Space.World);
-        }
+       // }
     }
 
     public Vector2 getDirection()

@@ -11,7 +11,7 @@ public class EnemySight : MonoBehaviour
     {
         if (other.tag == "Player")
         {
-            enemy.player = other.gameObject;
+        //    enemy.player = other.gameObject;
         }
     }
 
@@ -19,7 +19,7 @@ public class EnemySight : MonoBehaviour
     {
         if(other.tag == "Player")
         {
-            enemy.player = null;
+        //    enemy.player = null;
         }
     }
 }

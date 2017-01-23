@@ -8,10 +8,10 @@ public class PatrolState : EnemyState {
     public void Execute()
     {
         enemy.Move();
-        if(enemy.player != null)
+      /*  if(enemy.player != null)
         {
             enemy.changeState(new AttackState());
-        }
+        }*/
     }
     public void Begin(Enemy enemy)
     {

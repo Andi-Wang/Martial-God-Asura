@@ -10,11 +10,11 @@ public class AttackState : EnemyState
 
     public void Execute()
     {
-        if (enemy.player != null)
-        {
+       // if (enemy.player != null)
+      //  {
             enemy.Move();
             Attack();
-        } else
+     //   } else
         {
             enemy.changeState(new PatrolState());
         }
