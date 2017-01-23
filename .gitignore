@@ -11,3 +11,5 @@ Temp/
 /*.unityproj
 *.sln
 *.csproj
+game/Assets/Resources/savedata.dat
+game/Assets/Resources/savedata.dat.meta
