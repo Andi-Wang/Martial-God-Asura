@@ -24,6 +24,8 @@ public class GameManager : MonoBehaviour
     Transform player;
     UnityStandardAssets._2D.PlatformerCharacter2D playerScript;
     LadderManager ladderManager;
+    static bool startFromLoad = false;
+    static GameStatus gs;
 
     //Awake is always called before any Start functions
     void Awake()
@@ -39,8 +41,12 @@ public class GameManager : MonoBehaviour
         playerStat = new Player();
         skills = new Skills();
 
+        //DontDestroyOnLoad(gameObject);
         //Call the InitGame function to initialize the first level 
-        InitGame();
+        if (level >= 0)
+        {
+            InitGame();
+        }
     }
 
     void Update()
@@ -58,7 +64,7 @@ public class GameManager : MonoBehaviour
 		//While doingSetup is true the player can't move, prevent player from moving while title card is up.
 		doingSetup = true;
         playersTurn = false;
-
+        
         // find ladderManager
         if (level > 0)
         {
@@ -69,6 +75,12 @@ public class GameManager : MonoBehaviour
         GameObject p = GameObject.FindGameObjectWithTag("Player");
         player = p.transform;
         playerScript = p.GetComponent<UnityStandardAssets._2D.PlatformerCharacter2D>();
+
+        if (startFromLoad)
+        {
+            SetupFromLoad();
+            startFromLoad = false;
+        }
 
         if (level > 0)
         {
@@ -139,9 +151,29 @@ public class GameManager : MonoBehaviour
 		enabled = false;
 	}
 
+    void SetupFromLoad()
+    {
+        playerScript.PlayerEntity = gs.playerStat.playerEntity;
+        player.position = new Vector3(gs.playerStat.playerPosX, gs.playerStat.playerPosY);
+
+        //setup skills gs.playerStat.skills;
+        
+        //setup enemies gs.enemies = enemies;// null enemies cause serializable exception
+        for(int i = 0; i < gs.ladderUnlocked.Length; ++i)
+        {
+            if (gs.ladderUnlocked[i])
+            {
+                ladderManager.unlockLadder(i);
+            }
+        }
+
+        // reset gamestatus data
+        gs = null;
+    }
+
     public void SaveProgress()
     {
-        GameStatus gs = new GameStatus();
+        gs = new GameStatus();
 
         playerStat.playerEntity = playerScript.PlayerEntity;
         playerStat.playerPosX = player.position.x;
@@ -160,6 +192,29 @@ public class GameManager : MonoBehaviour
         gs.ladderUnlocked = ladderManager.GetUnlockedLadder();
         
         ProgressSL.save(gs);
+    }
+
+    public void LoadProgress()
+    {
+        gs = ProgressSL.load();
+
+        if (gs != null)
+        {
+            startFromLoad = true;
+            if (gs.sceneNumber != SceneManager.GetActiveScene().buildIndex)
+            {
+                SceneManager.LoadScene(gs.sceneNumber);
+            }
+            else
+            {
+                Debug.Log("in the right scene");
+                InitGame();
+            }
+        }
+        else
+        {
+            startFromLoad = false;
+        }
     }
 
     public List<Enemy> Enemies
