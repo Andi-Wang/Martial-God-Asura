@@ -18,6 +18,7 @@ public class Enemy : MonoBehaviour
     public float stoppingDistance = 0.5f;
 
     private EnemyState state;
+    AudioSource enemyAudio;
     private BoxCollider2D boxCollider;
     private GameObject player;
     public Animator animator;                          //Variable of type Animator to store a reference to the enemy's Animator component.
@@ -36,6 +37,7 @@ public class Enemy : MonoBehaviour
         rb2D = GetComponent<Rigidbody2D>();
         //currentHealth = startingHealth;
         enemyEntity = new Entity(10f, 0f, 0f, 0f, 0f, 0f, 1f, 1f, 0f);
+        enemyAudio = GetComponent<AudioSource>();
     }
 
     //Start overrides the virtual Start function of the base class.
@@ -132,7 +134,8 @@ public class Enemy : MonoBehaviour
         if (isDead)
             return;
 
-        //enemyAudio.Play();TODO:hurt audio
+        
+        enemyAudio.Play();//TODO:hurt audio
         animator.SetTrigger("Hit");
 
         enemyEntity.health -= amount;
@@ -155,7 +158,7 @@ public class Enemy : MonoBehaviour
         animator.SetTrigger("Dead");
 
        // enemyAudio.clip = deathClip;
-        //enemyAudio.Play();   
+        //enemyAudio.Play();
     }
 
     public void OnTriggerEnter2D(Collider2D other)
