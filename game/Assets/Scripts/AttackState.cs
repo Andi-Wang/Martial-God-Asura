@@ -12,12 +12,13 @@ public class AttackState : EnemyState
     {
        // if (enemy.player != null)
       //  {
-            enemy.Move();
+            //enemy.Move();
+            //TODO: should detect distance first
             Attack();
      //   } else
-        {
-            enemy.changeState(new PatrolState());
-        }
+       // {
+      //      enemy.changeState(new PatrolState());
+       // }
     }
 
     public void Begin(Enemy enemy)
@@ -41,12 +42,13 @@ public class AttackState : EnemyState
         if(attackTimer >= attackCD)
         {
             canAttack = true;
-            attackTimer = 0;
+            
         }
         if(canAttack)
         {
-            canAttack = false;
             enemy.animator.SetBool("enemyAttack", true);
+            canAttack = false;
+            attackTimer = 0;
         }
     }
 }
