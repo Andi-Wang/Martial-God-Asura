@@ -46,7 +46,6 @@ public class Enemy : MonoBehaviour
         GameManager.instance.AddEnemyToList(this);
         //Get and store a reference to the attached Animator component.
         animator = GetComponent<Animator>();
-        
         changeState(new PatrolState());
         animator.SetBool("Moving", true);
     }
