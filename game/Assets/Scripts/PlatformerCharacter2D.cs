@@ -263,8 +263,6 @@ namespace UnityStandardAssets._2D {
         //public void setHitboxEnabled(string hitboxName, bool value) {
         //    m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = value;
         //}
-        public Entity PlayerEntity { get { return playerEntity; }
-                                     set { PlayerEntity = value; }
-        }
+        public Entity PlayerEntity { get; set;}
     }
 }
