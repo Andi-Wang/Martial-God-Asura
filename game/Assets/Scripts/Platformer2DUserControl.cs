@@ -9,6 +9,7 @@ namespace UnityStandardAssets._2D
     {
         bool gamePaused;
         public MenuManager pauseMenu;
+        public GameObject skillMenu;
         private PlatformerCharacter2D m_Character;
         private bool m_Jump;
         private bool m_Alt_Move_Down;
@@ -30,16 +31,16 @@ namespace UnityStandardAssets._2D
 
             if (Input.GetButtonUp("Cancel"))
             {
-                if (gamePaused)
-                {
+                if (gamePaused) {
                     gamePaused = false;
-                    pauseMenu.ToggleMenu(false);
+                    //pauseMenu.ToggleMenu(false);
+                    skillMenu.SetActive(false);
                     GameManager.Resume();
                 }
-                else
-                {
+                else {
                     gamePaused = true;
-                    pauseMenu.ToggleMenu(true);
+                    //pauseMenu.ToggleMenu(true);
+                    skillMenu.SetActive(true);
                     GameManager.Pause();
                 }
             }

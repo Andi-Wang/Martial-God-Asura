@@ -4,6 +4,7 @@ using System.Collections.Generic;
 [System.Serializable]
 public class Entity {
     public float health;
+    public float maxHealth;
     public float energy;
     public float healthRegen;
     public float energyRegen;
@@ -19,6 +20,7 @@ public class Entity {
 
     public Entity(float initialHealth, float initialEnergy, float initialHealthRegen, float initialEnergyRegen, float initialArmor, float initialJumpForce, float initialMaxSpeed, float initialGravity, float initialCrouchSpeed) {
         health = initialHealth;
+        maxHealth = health;
         energy = initialEnergy;
         healthRegen = initialHealthRegen;
         energyRegen = initialEnergyRegen;
@@ -27,5 +29,5 @@ public class Entity {
         maxSpeed = initialMaxSpeed;
         gravity = initialGravity;
         crouchSpeed = initialCrouchSpeed;
-    }
+        }
 }

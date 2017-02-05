@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 [System.Serializable]
 //Enemy inherits from MovingObject, our base class for objects that can move, Player also inherits from this.
@@ -21,6 +22,7 @@ public class Enemy : MonoBehaviour
     AudioSource enemyAudio;
     private BoxCollider2D boxCollider;
     private GameObject player;
+    private Image healthbar;
     public Animator animator;                          //Variable of type Animator to store a reference to the enemy's Animator component.
     bool isDead;
     private Rigidbody2D rb2D;
@@ -50,6 +52,7 @@ public class Enemy : MonoBehaviour
         animator = GetComponent<Animator>();
         changeState(new PatrolState());
         animator.SetBool("Moving", true);
+        healthbar = transform.FindChild("EnemyCanvas").FindChild("Healthbar").FindChild("Health").GetComponent<Image>();
     }
 
     void Update()
@@ -139,6 +142,7 @@ public class Enemy : MonoBehaviour
         animator.SetTrigger("Hit");
 
         enemyEntity.health -= amount;
+        healthbar.fillAmount = enemyEntity.health / enemyEntity.maxHealth;
 
         //hitParticles.transform.position = hitPoint;
         //hitParticles.Play();
@@ -152,7 +156,11 @@ public class Enemy : MonoBehaviour
     void Death()
     {
         isDead = true;
-        
+
+        foreach(Transform child in gameObject.transform) {
+            if (child.name == "EnemyCanvas") child.gameObject.SetActive(false);
+        }
+
         //boxCollider.isTrigger = true;
 
         animator.SetTrigger("Dead");
