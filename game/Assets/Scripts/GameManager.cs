@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public bool playersTurn = true;       //Boolean to check if it's players turn, hidden in inspector but public.
     public int level;
     public int currentRoom;
+    public HUDNotificationManager notiManager;
 
     private Text levelText;                                 //Text to display current level number.
     private GameObject levelImage;                          //Image to block out level as levels are being set up, background for levelText.
@@ -221,11 +222,18 @@ public class GameManager : MonoBehaviour
     {
         playersTurn = false;
 
-        float puzzleStartX = RoomManager.Instance.GetXMax(roomNum) - 3f;
+        notiManager.Display("The enemy has seen you");
+
+        float puzzleStartX = RoomManager.Instance.GetXMax(roomNum) - 2f;
 
         player.position = new Vector3(puzzleStartX, player.position.y);
-
+        
         playersTurn = true;
+    }
+
+    void transformPlayer()
+    {
+        
     }
 
     public List<Enemy> Enemies
