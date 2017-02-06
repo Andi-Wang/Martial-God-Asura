@@ -217,6 +217,17 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void ResetPuzzle(int roomNum)
+    {
+        playersTurn = false;
+
+        float puzzleStartX = RoomManager.Instance.GetXMax(roomNum) - 3f;
+
+        player.position = new Vector3(puzzleStartX, player.position.y);
+
+        playersTurn = true;
+    }
+
     public List<Enemy> Enemies
     {
         get{ return enemies;}

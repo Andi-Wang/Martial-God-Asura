@@ -48,6 +48,11 @@ public class RoomManager : ScriptableObject {
     {
         return rooms.inRoom(roomId, x, y);
     }
+
+    public float GetXMax(int roomId)
+    {
+        return rooms.GetXMax(roomId);
+    }
 }
 
 public class Room
@@ -101,6 +106,19 @@ public class Rooms
         else
         {
             return false;
+        }
+    }
+
+    public float GetXMax(int roomId)
+    {
+        if (roomDictionary.ContainsKey(roomId))
+        {
+            return roomDictionary[roomId].xMax;
+        }
+        else
+        {
+            Debug.Log("Room id does not exist:"+roomId);
+            return 0;
         }
     }
 }
