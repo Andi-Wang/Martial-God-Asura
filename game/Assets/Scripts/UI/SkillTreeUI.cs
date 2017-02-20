@@ -4,9 +4,10 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 
 public class SkillTreeUI : MonoBehaviour {
-    const int NUM_SKILL_TREE_BRANCHES = 9;
+    const int NUM_SKILL_TREES = 3;
+    const int NUM_BRANCHES_PER_TREE = 3;
     const int NUM_SKILL_TREE_TIERS = 3;
-    const int SKILLS_PER_TIER = 3;
+    const int NUM_SKILLS_PER_TIER = 3;
     
     public Toggle martialArtsToggle;
     public Toggle cultivationToggle;
@@ -24,8 +25,8 @@ public class SkillTreeUI : MonoBehaviour {
 	public Sprite bg3;
 
 	public Text pgtitle;
-
-    public Button[] buttons = new Button[NUM_SKILL_TREE_BRANCHES * NUM_SKILL_TREE_TIERS * SKILLS_PER_TIER];
+    
+    Button[] buttons = new Button[NUM_SKILL_TREES * NUM_BRANCHES_PER_TREE * NUM_SKILL_TREE_TIERS * NUM_SKILLS_PER_TIER];
 
     const int OFFSPE_BRANCH = 0;
     const int OFFDEF_BRANCH = 1;
@@ -44,9 +45,9 @@ public class SkillTreeUI : MonoBehaviour {
     SkillTree tree;
 
     void clickListener(int i) {
-        int branch = i / NUM_SKILL_TREE_BRANCHES;
-        int tier = (i - branch * NUM_SKILL_TREE_BRANCHES) / NUM_SKILL_TREE_TIERS;
-        int skill = i % SKILLS_PER_TIER;
+        int branch = i / (NUM_SKILL_TREES * NUM_BRANCHES_PER_TREE);
+        int tier = (i - branch * (NUM_SKILL_TREES * NUM_BRANCHES_PER_TREE)) / NUM_SKILL_TREE_TIERS;
+        int skill = i % NUM_SKILLS_PER_TIER;
 
         //Right now, no limitations on how you take skills; can add prerequisites here later
         //Currently, clicking toggles having the skill vs not having the skill; if the player has the skill, the button's text changes
@@ -65,9 +66,21 @@ public class SkillTreeUI : MonoBehaviour {
     void Start () {
         // normally, populate the array with previously-saved character skill data; still need to save it, too
         tree = new SkillTree();
+
+
+        Button[] temp1 = martialArtsTree.GetComponentsInChildren<Button>(true);
+        Button[] temp2 = cultivationTree.GetComponentsInChildren<Button>(true);
+        Button[] temp3 = spiritualTree.GetComponentsInChildren<Button>(true);
+
+        temp1.CopyTo(buttons, 0);
+        temp2.CopyTo(buttons, NUM_SKILL_TREES * NUM_SKILL_TREE_TIERS * NUM_SKILLS_PER_TIER);
+        temp3.CopyTo(buttons, NUM_SKILL_TREES * NUM_SKILL_TREE_TIERS * NUM_SKILLS_PER_TIER * 2);
+
         for(int i = 0; i < buttons.Length; i++) {
             int temp = i;
-            buttons[temp].onClick.AddListener(() => clickListener(temp));
+            if(buttons[temp] != null) {
+                buttons[temp].onClick.AddListener(() => clickListener(temp));
+            }
         }
 
 		maRT = martialArtsToggle.GetComponent<RectTransform>();
