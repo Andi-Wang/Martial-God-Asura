@@ -153,6 +153,7 @@ namespace UnityStandardAssets._2D {
 						    m_Anim.SetTrigger ("BasicPunchT"); //Start punching
 						    m_Anim.SetBool ("BasicPunch", true); //Set BasicPunch to true because we are punching
 						    attacking = true; //Set attacking to true because we are attacking
+                            Skill.FireballNova(m_Rigidbody2D, m_FacingRight);
 					    }
 					    //m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = true;
 				    }

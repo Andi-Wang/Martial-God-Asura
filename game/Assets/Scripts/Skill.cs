@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+﻿
+using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class Skill {
     public class SkillStateManager {
@@ -10,6 +12,25 @@ public class Skill {
         public bool secondJumpAvailable = true;
         public bool airdashing = false;
         public float airdashSpeed = 0f;
+    }
+
+    //public GameObject fireballPrefab;
+
+    public static void FireballNova(Rigidbody2D body, bool facingRight) {
+        float force = 750f;
+        float startDistance = 2f;
+        int numFireballs = 3;
+        float spread = 20f;         //Maximum angle of fireball trajectory (above and below the horizontal)
+
+        for (int i = 0; i < numFireballs; i++) {
+            float angle = spread - 2 * spread / (numFireballs - 1) * i;
+            if(!facingRight) { angle += 180f;  }
+            float xdeg = Mathf.Cos(angle * Mathf.Deg2Rad);
+            float ydeg = Mathf.Sin(angle * Mathf.Deg2Rad);
+            
+            GameObject clone = GameObject.Instantiate(Resources.Load("Fireball"), new Vector2(body.transform.position.x + xdeg * startDistance, body.transform.position.y + ydeg * startDistance), Quaternion.AngleAxis(angle, Vector3.forward)) as GameObject;
+            clone.GetComponent<Rigidbody2D>().AddForce(new Vector2(xdeg, ydeg) * force);
+        }
     }
     
     public static float Backdash(Rigidbody2D body, bool facingRight, float backdashSpeed, bool forceStart) {
@@ -133,7 +154,6 @@ public class Skill {
     }
 
     public static void Fireball() {
-
     }
 
     public static void SummonWall() {
