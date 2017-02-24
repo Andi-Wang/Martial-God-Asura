@@ -6,9 +6,11 @@ using UnityEngine.UI;
 namespace UnityStandardAssets._2D {
     public class PlatformerCharacter2D : MonoBehaviour {
         public Slider healthSlider;
+        public Rigidbody2D m_fireball;
 
         [SerializeField] private LayerMask m_WhatIsGround;                  // A mask determining what is ground to the character
         [SerializeField] private Entity playerEntity = new Entity(100f, 100f, 0f, 5f, 0f, 500f, 10f, 1f, 0.7f);
+        private Skill skill;
         private Skill.SkillStateManager skillStateManager = new Skill.SkillStateManager();
 
         private Transform m_GroundCheck;    // A position marking where to check if the player is grounded.
@@ -26,6 +28,7 @@ namespace UnityStandardAssets._2D {
 
         private void Awake()
         {
+            skill = new Skill();
             // Setting up references.
             m_GroundCheck = transform.Find("GroundCheck");
             m_CeilingCheck = transform.Find("CeilingCheck");
@@ -126,6 +129,7 @@ namespace UnityStandardAssets._2D {
                             bool enhancedCancel = false;    //replace with a check to see if we canceled the enhanced slide attack
 
                             skillStateManager.slideSpeed = Skill.Slide(m_Rigidbody2D, m_FacingRight, skillStateManager.slideSpeed, input.altMoveDown, enhanced, enhancedCancel);
+
                             if(skillStateManager.slideSpeed > 0) {
 								if (!m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Low Kick") && !m_Anim.GetBool ("BasicPunch") && !skillStateManager.sliding) {
 									m_Anim.SetTrigger ("LowKickT"); //Start kicking
@@ -140,7 +144,7 @@ namespace UnityStandardAssets._2D {
                         }
                         else {
                             m_Anim.SetBool("Crouch", false);
-                            skillStateManager.backdashSpeed = Skill.Backdash(m_Rigidbody2D, m_FacingRight, skillStateManager.backdashSpeed, input.altMoveDown);
+                            skillStateManager.backdashSpeed = skill.Backdash(m_Rigidbody2D, m_FacingRight, skillStateManager.backdashSpeed, input.altMoveDown);
                             if (skillStateManager.backdashSpeed > 0) {
                                 skillStateManager.backdashing = true;
                             }
@@ -156,7 +160,7 @@ namespace UnityStandardAssets._2D {
 						    m_Anim.SetTrigger ("BasicPunchT"); //Start punching
 						    m_Anim.SetBool ("BasicPunch", true); //Set BasicPunch to true because we are punching
 						    attacking = true; //Set attacking to true because we are attacking
-                            Skill.FireballNova(m_Rigidbody2D, m_FacingRight);
+                            skill.FireballNova(m_Rigidbody2D, m_FacingRight, m_fireball);
 					    }
 					    //m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = true;
 				    }
@@ -215,10 +219,10 @@ namespace UnityStandardAssets._2D {
                 m_Anim.SetFloat("Speed", Mathf.Abs(input.h));
 
                 if (input.vDown) {
-                    Skill.FastFall(m_Rigidbody2D, input.h * playerEntity.maxSpeed);
+                    skill.FastFall(m_Rigidbody2D, input.h * playerEntity.maxSpeed);
                 }
                 else if (skillStateManager.airdashing || (skillStateManager.secondJumpAvailable && input.jumpDown)) {
-                    skillStateManager.airdashSpeed = Skill.Airdash(m_Rigidbody2D, m_FacingRight, skillStateManager.airdashSpeed, skillStateManager.secondJumpAvailable && input.jumpDown);
+                    skillStateManager.airdashSpeed = skill.Airdash(m_Rigidbody2D, m_FacingRight, skillStateManager.airdashSpeed, skillStateManager.secondJumpAvailable && input.jumpDown);
                     skillStateManager.secondJumpAvailable = false;
                     if (skillStateManager.airdashSpeed > 0) {
                         skillStateManager.airdashing = true;
@@ -228,7 +232,7 @@ namespace UnityStandardAssets._2D {
                     }
                 }
                 else if (input.altMoveDown) {
-                    Skill.Glide(m_Rigidbody2D, playerEntity.gravity, input.h * playerEntity.maxSpeed);
+                    skill.Glide(m_Rigidbody2D, playerEntity.gravity, input.h * playerEntity.maxSpeed);
                 }
                 else {
                     // Move the character
