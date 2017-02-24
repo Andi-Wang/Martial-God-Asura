@@ -122,7 +122,10 @@ namespace UnityStandardAssets._2D {
                 if (!attacking) { //Perform movement commands if we are not currently attacking
 					if (input.altMoveDown || skillStateManager.backdashing || skillStateManager.sliding) {
                         if(m_Anim.GetBool("Crouch")) {
-                            skillStateManager.slideSpeed = Skill.Slide(m_Rigidbody2D, m_FacingRight, skillStateManager.slideSpeed, input.altMoveDown);
+                            bool enhanced = false;          //replace with a check to see if we have the slide enhancement passive
+                            bool enhancedCancel = false;    //replace with a check to see if we canceled the enhanced slide attack
+
+                            skillStateManager.slideSpeed = Skill.Slide(m_Rigidbody2D, m_FacingRight, skillStateManager.slideSpeed, input.altMoveDown, enhanced, enhancedCancel);
                             if(skillStateManager.slideSpeed > 0) {
 								if (!m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Low Kick") && !m_Anim.GetBool ("BasicPunch") && !skillStateManager.sliding) {
 									m_Anim.SetTrigger ("LowKickT"); //Start kicking

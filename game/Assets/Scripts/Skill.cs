@@ -14,17 +14,18 @@ public class Skill {
         public float airdashSpeed = 0f;
     }
 
-    //public GameObject fireballPrefab;
-
     public static void FireballNova(Rigidbody2D body, bool facingRight) {
         float force = 750f;
         float startDistance = 2f;
-        int numFireballs = 3;
-        float spread = 20f;         //Maximum angle of fireball trajectory (above and below the horizontal)
+        int numProjectiles = 3;
+        float spread = 20f;         //Maximum angle of projectile trajectory (above and below the horizontal)
 
-        for (int i = 0; i < numFireballs; i++) {
-            float angle = spread - 2 * spread / (numFireballs - 1) * i;
-            if(!facingRight) { angle += 180f;  }
+        for (int i = 0; i < numProjectiles; i++) {
+            float angle = 0f;
+            if (numProjectiles > 1) {
+                angle = spread - 2f * spread / (numProjectiles - 1) * i;
+            }
+            if (!facingRight) { angle += 180f;  }
             float xdeg = Mathf.Cos(angle * Mathf.Deg2Rad);
             float ydeg = Mathf.Sin(angle * Mathf.Deg2Rad);
             
@@ -32,7 +33,47 @@ public class Skill {
             clone.GetComponent<Rigidbody2D>().AddForce(new Vector2(xdeg, ydeg) * force);
         }
     }
-    
+
+    public static void Iceball(Rigidbody2D body, bool facingRight) {
+        float force = 450f;
+        float startDistance = 2f;
+        int numProjectiles = 1;
+        float spread = 20f;         //Maximum angle of projectile trajectory (above and below the horizontal)
+
+        for (int i = 0; i < numProjectiles; i++) {
+            float angle = 0f;
+            if (numProjectiles > 1) {
+                angle = spread - 2f * spread / (numProjectiles - 1) * i;
+            }
+            if (!facingRight) { angle += 180f; }
+            float xdeg = Mathf.Cos(angle * Mathf.Deg2Rad);
+            float ydeg = Mathf.Sin(angle * Mathf.Deg2Rad);
+
+            GameObject clone = GameObject.Instantiate(Resources.Load("Iceball"), new Vector2(body.transform.position.x + xdeg * startDistance, body.transform.position.y + ydeg * startDistance), Quaternion.AngleAxis(angle, Vector3.forward)) as GameObject;
+            clone.GetComponent<Rigidbody2D>().AddForce(new Vector2(xdeg, ydeg) * force);
+        }
+    }
+
+    public static void Torrent(Rigidbody2D body, bool facingRight, bool skillButtonHeld) {
+        float force = 450f;
+        float startDistance = 2f;
+        int numProjectiles = 1;
+        float spread = 20f;         //Maximum angle of projectile trajectory (above and below the horizontal)
+
+        for (int i = 0; i < numProjectiles; i++) {
+            float angle = 0f;
+            if (numProjectiles > 1) {
+                angle = spread - 2f * spread / (numProjectiles - 1) * i;
+            }
+            if (!facingRight) { angle += 180f; }
+            float xdeg = Mathf.Cos(angle * Mathf.Deg2Rad);
+            float ydeg = Mathf.Sin(angle * Mathf.Deg2Rad);
+
+            GameObject clone = GameObject.Instantiate(Resources.Load("Iceball"), new Vector2(body.transform.position.x + xdeg * startDistance, body.transform.position.y + ydeg * startDistance), Quaternion.AngleAxis(angle, Vector3.forward)) as GameObject;
+            clone.GetComponent<Rigidbody2D>().AddForce(new Vector2(xdeg, ydeg) * force);
+        }
+    }
+
     public static float Backdash(Rigidbody2D body, bool facingRight, float backdashSpeed, bool forceStart) {
         float minSpeed = 6f;
         float maxSpeed = 17f;
@@ -60,12 +101,22 @@ public class Skill {
         return backdashSpeed;
     }
 
-    public static float Slide(Rigidbody2D body, bool facingRight, float slideSpeed, bool forceStart) {
+    public static float Slide(Rigidbody2D body, bool facingRight, float slideSpeed, bool forceStart, bool enhanced, bool enhancedCancel) {
         float minSpeed = 6f;
         float maxSpeed = 17f;
+        float enhancementBoost = 7f;
+
+        if(enhanced) {
+            minSpeed += enhancementBoost;
+            maxSpeed += enhancementBoost;
+        }
+
         float decay = 1f;
 
-        if (forceStart || slideSpeed > minSpeed) {
+        if(enhanced && enhancedCancel) {
+            slideSpeed = 0;
+        }
+        else if (forceStart || slideSpeed > minSpeed) {
             if (slideSpeed == 0) {
                 slideSpeed = maxSpeed;
             }
@@ -85,6 +136,7 @@ public class Skill {
         }
         return slideSpeed;
     }
+
 
     public static float Airdash(Rigidbody2D body, bool facingRight, float airdashSpeed, bool forceStart) {
         float minSpeed = 12f;
