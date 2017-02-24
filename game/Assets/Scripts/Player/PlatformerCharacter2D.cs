@@ -128,7 +128,7 @@ namespace UnityStandardAssets._2D {
                             bool enhanced = false;          //replace with a check to see if we have the slide enhancement passive
                             bool enhancedCancel = false;    //replace with a check to see if we canceled the enhanced slide attack
 
-                            skillStateManager.slideSpeed = Skill.Slide(m_Rigidbody2D, m_FacingRight, skillStateManager.slideSpeed, input.altMoveDown, enhanced, enhancedCancel);
+                            skillStateManager.slideSpeed = skill.Slide(m_Rigidbody2D, m_FacingRight, skillStateManager.slideSpeed, input.altMoveDown, enhanced, enhancedCancel);
 
                             if(skillStateManager.slideSpeed > 0) {
 								if (!m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Low Kick") && !m_Anim.GetBool ("BasicPunch") && !skillStateManager.sliding) {
