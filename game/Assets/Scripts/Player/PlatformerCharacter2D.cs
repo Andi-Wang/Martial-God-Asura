@@ -155,15 +155,19 @@ namespace UnityStandardAssets._2D {
 					}
                     //If the character punches; later, will make this just attack buttons in general in one else if
                     else if (input.fire1Down) {
-					    //Activates the hitbox and animation if we are not already punching;
-					    if (!m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Basic Punch") && !m_Anim.GetBool ("BasicPunch")) {
+                        //Activates the hitbox and animation if we are not already punching;
+                        if (!m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Basic Punch") && !m_Anim.GetBool ("BasicPunch")) {
 						    m_Anim.SetTrigger ("BasicPunchT"); //Start punching
 						    m_Anim.SetBool ("BasicPunch", true); //Set BasicPunch to true because we are punching
 						    attacking = true; //Set attacking to true because we are attacking
-                            skill.FireballNova(m_Rigidbody2D, m_FacingRight, m_fireball);
-					    }
-					    //m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = true;
-				    }
+
+                            //Fireball nova; see Projectile function in Skill for a list of parameters
+                            skill.Projectile(m_Rigidbody2D, m_FacingRight, m_fireball, 1, 0, 16, 2, 5, 20);
+                        }
+
+
+                        //m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = true;
+                    }
                     else if(input.fire2Down) {
                         //Add kick stuff here
 						if (!m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Flip Kick") && !m_Anim.GetBool ("BasicPunch")) {

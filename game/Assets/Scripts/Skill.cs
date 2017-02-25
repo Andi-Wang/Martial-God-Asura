@@ -13,69 +13,43 @@ public class Skill {
         public bool secondJumpAvailable = true;
         public bool airdashing = false;
         public float airdashSpeed = 0f;
-
+        public float counter = 0f;
     }
 
-    public void FireballNova(Rigidbody2D body, bool facingRight, Rigidbody2D fireball) {
-        float speed = 8f;
-        float startDistance = 2f;
-        int numProjectiles = 3;
-        float spread = 20f;         //Maximum angle of projectile trajectory (above and below the horizontal)
+    //All-in-one method for different projectile types
+    public float Projectile(Rigidbody2D body, bool facingRight, Rigidbody2D projectile, float counter, float frequencyMultiplier, float speed, float startDistance, int numProjectiles, float spread) {
+        //Counter and frequency multiplier are used for held-down skills (determines the number of times per second a new projectile is made while the key is held down)
+        //Speed is projectile travel speed, startDistance is where the projectile starts in relation to the player (horizontal), numProjectiles is the number of projectiles fired by one call (affected by spread)
+        //Spread is the maximum angle of projectile trajectory (above and below the horizontal)
 
-        for (int i = 0; i < numProjectiles; i++) {
-            float angle = 0f;
-            if (numProjectiles > 1) {
-                angle = spread - 2f * spread / (numProjectiles - 1) * i;
+        //Some examples of possible function calls for different projectile behaviours:
+        //Fireball Nova call:     skill.Projectile(m_Rigidbody2D, m_FacingRight, m_fireball, 1, 0, 16, 2, 5, 20);
+        //Torrent call:           skillStateManager.counter = skill.Projectile(m_Rigidbody2D, m_FacingRight, m_fireball, skillStateManager.counter, 25, 20, 1, 1, 0);
+        //Iceball call:           skill.Projectile(m_Rigidbody2D, m_FacingRight, m_iceball, 1, 0, 8, 2, 1, 0);
+        //Flame Lance call:       skill.Projectile(m_Rigidbody2D, m_FacingRight, m_flamelance, 1, 0, 0, 1, 1, 0);
+
+        //m_flamelance and m_iceball prefabs not created yet
+
+        counter += Time.deltaTime * frequencyMultiplier;
+
+        if (counter >= 1) {
+            counter -= 1f;
+
+            for (int i = 0; i < numProjectiles; i++) {
+                float angle = 0f;
+                if (numProjectiles > 1) {
+                    angle = spread - 2f * spread / (numProjectiles - 1) * i;
+                }
+                if (!facingRight) { angle += 180f; }
+                float xdeg = Mathf.Cos(angle * Mathf.Deg2Rad);
+                float ydeg = Mathf.Sin(angle * Mathf.Deg2Rad);
+
+                Rigidbody2D clone = Rigidbody2D.Instantiate(projectile, new Vector2(body.transform.position.x + xdeg * startDistance, body.transform.position.y + ydeg * startDistance), Quaternion.AngleAxis(angle, Vector3.forward)) as Rigidbody2D;
+                clone.velocity = speed * new Vector2(xdeg, ydeg);
             }
-            if (!facingRight) { angle += 180f; }
-
-            float xdeg = Mathf.Cos(angle * Mathf.Deg2Rad);
-            float ydeg = Mathf.Sin(angle * Mathf.Deg2Rad);
-
-            Rigidbody2D clone = Rigidbody2D.Instantiate(fireball, new Vector2(body.transform.position.x + xdeg * startDistance, body.transform.position.y + ydeg * startDistance), Quaternion.AngleAxis(angle, Vector3.forward)) as Rigidbody2D;
-            clone.velocity = speed * new Vector2(xdeg, ydeg);
-            // clone.AddForce(new Vector2(xdeg, ydeg) * fb_force);
         }
-    }
 
-    public void Iceball(Rigidbody2D body, bool facingRight) {
-        float force = 450f;
-        float startDistance = 2f;
-        int numProjectiles = 1;
-        float spread = 20f;         //Maximum angle of projectile trajectory (above and below the horizontal)
-
-        for (int i = 0; i < numProjectiles; i++) {
-            float angle = 0f;
-            if (numProjectiles > 1) {
-                angle = spread - 2f * spread / (numProjectiles - 1) * i;
-            }
-            if (!facingRight) { angle += 180f; }
-            float xdeg = Mathf.Cos(angle * Mathf.Deg2Rad);
-            float ydeg = Mathf.Sin(angle * Mathf.Deg2Rad);
-
-            GameObject clone = GameObject.Instantiate(Resources.Load("Iceball"), new Vector2(body.transform.position.x + xdeg * startDistance, body.transform.position.y + ydeg * startDistance), Quaternion.AngleAxis(angle, Vector3.forward)) as GameObject;
-            clone.GetComponent<Rigidbody2D>().AddForce(new Vector2(xdeg, ydeg) * force);
-        }
-    }
-
-    public void Torrent(Rigidbody2D body, bool facingRight, bool skillButtonHeld) {
-        float force = 450f;
-        float startDistance = 2f;
-        int numProjectiles = 1;
-        float spread = 20f;         //Maximum angle of projectile trajectory (above and below the horizontal)
-
-        for (int i = 0; i < numProjectiles; i++) {
-            float angle = 0f;
-            if (numProjectiles > 1) {
-                angle = spread - 2f * spread / (numProjectiles - 1) * i;
-            }
-            if (!facingRight) { angle += 180f; }
-            float xdeg = Mathf.Cos(angle * Mathf.Deg2Rad);
-            float ydeg = Mathf.Sin(angle * Mathf.Deg2Rad);
-
-            GameObject clone = GameObject.Instantiate(Resources.Load("Iceball"), new Vector2(body.transform.position.x + xdeg * startDistance, body.transform.position.y + ydeg * startDistance), Quaternion.AngleAxis(angle, Vector3.forward)) as GameObject;
-            clone.GetComponent<Rigidbody2D>().AddForce(new Vector2(xdeg, ydeg) * force);
-        }
+        return counter;
     }
 
     public float Backdash(Rigidbody2D body, bool facingRight, float backdashSpeed, bool forceStart) {
@@ -83,13 +57,14 @@ public class Skill {
         float minSpeed = 6f;
         float maxSpeed = 17f;
         float decay = 1f;
+        float assumedFPS = 60f;
 
         if (forceStart || backdashSpeed > minSpeed) {
             if (backdashSpeed == 0) {
                 backdashSpeed = maxSpeed;
             }
             else {
-                backdashSpeed -= decay;
+                backdashSpeed -= decay * Time.deltaTime * assumedFPS;
             }
 
             if (facingRight) {
@@ -111,6 +86,7 @@ public class Skill {
         float minSpeed = 6f;
         float maxSpeed = 17f;
         float enhancementBoost = 7f;
+        float assumedFPS = 60f;
 
         if (enhanced) {
             minSpeed += enhancementBoost;
@@ -127,7 +103,7 @@ public class Skill {
                 slideSpeed = maxSpeed;
             }
             else {
-                slideSpeed -= decay;
+                slideSpeed -= decay * Time.deltaTime * assumedFPS;
             }
 
             if (facingRight) {
@@ -149,6 +125,7 @@ public class Skill {
         float maxSpeed = 32f;
         float decay = 1.2f;
         float verticalSpeedModifier = 12f;
+        float assumedFPS = 60f;
 
         if (forceStart || airdashSpeed > minSpeed) {
             float verticalSpeedOffset = 0f;
@@ -159,7 +136,7 @@ public class Skill {
             }
             else {
                 verticalSpeedOffset = Mathf.Sqrt((airdashSpeed - minSpeed) / (maxSpeed - minSpeed)) * verticalSpeedModifier;
-                airdashSpeed -= decay;
+                airdashSpeed -= decay * Time.deltaTime * assumedFPS;
             }
 
             if (facingRight) {
