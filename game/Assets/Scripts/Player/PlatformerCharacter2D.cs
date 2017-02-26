@@ -37,7 +37,7 @@ namespace UnityStandardAssets._2D {
             isDead = false;
         }
 
-        void TakeDamage(float amount)
+        public void TakeDamage(float amount)
         {
             playerEntity.health -= amount;
             healthSlider.value = playerEntity.health;
@@ -173,6 +173,7 @@ namespace UnityStandardAssets._2D {
                 }
                 //Activates the punching hitbox and animation if we are not already punching;
                 else if (input.fire1Down) {
+
                     if (!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("Basic Punch") && !m_Anim.GetBool("BasicPunch")) {
                         m_Anim.SetTrigger("BasicPunchT"); //Start punching
                         m_Anim.SetBool("BasicPunch", true); //Set BasicPunch to true because we are punching

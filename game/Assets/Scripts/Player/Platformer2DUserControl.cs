@@ -97,7 +97,8 @@ namespace UnityStandardAssets._2D
                 input.resetButtonDown();
                 return;
             }
-            
+
+
             input.h = CrossPlatformInputManager.GetAxis("Horizontal");
             input.v = CrossPlatformInputManager.GetAxis("Vertical");
             input.vDown = input.v < 0;

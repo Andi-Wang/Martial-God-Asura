@@ -35,7 +35,7 @@ public class AttackState : EnemyState
     {
 
     }
-
+    
     private void Attack()
     {
         if(attackTimer >= attackCD)
@@ -48,7 +48,7 @@ public class AttackState : EnemyState
             if (enemy.isBoss)
             {
                 //Animate hold punch
-                yield return new WaitForSeconds(0.5f);
+                //yield return new WaitForSeconds(0.5f);
                 //Animate punch + damage
                 canAttack = false;
                 attackTimer = 0;
