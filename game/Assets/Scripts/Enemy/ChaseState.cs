@@ -25,7 +25,7 @@ public class ChaseState : EnemyState {
             }
         }
 
-        Debug.Log(enemy.getPlayerPos().y - enemy.transform.position.y);
+        //Debug.Log(enemy.getPlayerPos().y - enemy.transform.position.y);
         if (-0.2f < enemy.getPlayerPos().y - enemy.transform.position.y || enemy.getPlayerPos().y - enemy.transform.position.y < 0.2f)
         {
             if(true) //gap between player and enemy platforms
