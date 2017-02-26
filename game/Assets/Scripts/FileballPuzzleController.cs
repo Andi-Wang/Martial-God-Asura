@@ -36,9 +36,9 @@ public class FileballPuzzleController : MonoBehaviour {
     
     void ChangeDirection()
     {
-        Vector3 theScale = transform.localScale;
-        theScale.x *= -1;
-        transform.localScale = theScale;
+        //Vector3 theScale = transform.localScale;
+        //theScale.x *= -1;
+        //transform.localScale = theScale;
         transform.right *= -1;
     }
 }
