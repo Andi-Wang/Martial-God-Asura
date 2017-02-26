@@ -122,100 +122,113 @@ namespace UnityStandardAssets._2D {
             if(m_Grounded) {
                 m_Rigidbody2D.gravityScale = 1.0f;
                 skillStateManager.secondJumpAvailable = true;
-                if (!attacking) { //Perform movement commands if we are not currently attacking
-					if (input.altMoveDown || skillStateManager.backdashing || skillStateManager.sliding) {
-                        if(m_Anim.GetBool("Crouch")) {
-                            bool enhanced = false;          //replace with a check to see if we have the slide enhancement passive
-                            bool enhancedCancel = false;    //replace with a check to see if we canceled the enhanced slide attack
 
-                            skillStateManager.slideSpeed = skill.Slide(m_Rigidbody2D, m_FacingRight, skillStateManager.slideSpeed, input.altMoveDown, enhanced, enhancedCancel);
+                //Slidekick
+                if ((input.altMoveDown && m_Anim.GetBool("Crouch")) || skillStateManager.sliding) {
+                    bool enhanced = true;          //replace with a check to see if we have the slide enhancement passive
+                    bool slideCancel = false;
 
-                            if(skillStateManager.slideSpeed > 0) {
-								if (!m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Low Kick") && !m_Anim.GetBool ("BasicPunch") && !skillStateManager.sliding) {
-									m_Anim.SetTrigger ("LowKickT"); //Start kicking
-									m_Anim.SetBool ("BasicPunch", true); //Set BasicPunch to true because we are punching
-									attacking = true; //Set attacking to true because we are attacking
-								}
-								skillStateManager.sliding = true;
-                            }
-                            else {
-                                skillStateManager.sliding = false;
-                            }
-                        }
-                        else {
-                            m_Anim.SetBool("Crouch", false);
-                            skillStateManager.backdashSpeed = skill.Backdash(m_Rigidbody2D, m_FacingRight, skillStateManager.backdashSpeed, input.altMoveDown);
-                            if (skillStateManager.backdashSpeed > 0) {
-                                skillStateManager.backdashing = true;
-                            }
-                            else {
-                                skillStateManager.backdashing = false;
-                            }
-                        }
-					}
-                    //If the character punches; later, will make this just attack buttons in general in one else if
-                    else if (input.fire1Down) {
-                        //Activates the hitbox and animation if we are not already punching;
-                        if (!m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Basic Punch") && !m_Anim.GetBool ("BasicPunch")) {
-						    m_Anim.SetTrigger ("BasicPunchT"); //Start punching
-						    m_Anim.SetBool ("BasicPunch", true); //Set BasicPunch to true because we are punching
-						    attacking = true; //Set attacking to true because we are attacking
-
-                            //Fireball nova; see Projectile function in Skill for a list of parameters
-                            skill.Projectile(m_Rigidbody2D, m_FacingRight, m_fireball, 1, 0, 16, 2, 5, 20);
-                        }
-
-
-                        //m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = true;
+                    if (enhanced && skillStateManager.sliding && input.altMoveUp) {
+                        slideCancel = true;
+                        //cancel the slidekick animation here and start the animation for the shockwave
                     }
-                    else if(input.fire2Down) {
-                        //Add kick stuff here
-						if (!m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Flip Kick") && !m_Anim.GetBool ("BasicPunch")) {
-							m_Anim.SetTrigger ("FlipKickT"); //Start punching
-							m_Anim.SetBool ("BasicPunch", true); //Set BasicPunch to true because we are punching
-							attacking = true; //Set attacking to true because we are attacking
-						}
+
+                    skillStateManager.slideSpeed = skill.Slide(m_Rigidbody2D, m_FacingRight, skillStateManager.slideSpeed, input.altMoveDown, enhanced, slideCancel);
+
+                    if (skillStateManager.slideSpeed > 0) {
+                        if (!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("Low Kick") && !m_Anim.GetBool("BasicPunch") && !skillStateManager.sliding) {
+                            m_Anim.SetTrigger("LowKickT"); //Start kicking
+                            m_Anim.SetBool("BasicPunch", true); //Set BasicPunch to true because we are punching
+                            attacking = true; //Set attacking to true because we are attacking
+                        }
+                        skillStateManager.sliding = true;
                     }
-                    else if (input.fire3Down) {
-                        //Add block stuff here
-						if (!m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Block") && !m_Anim.GetBool ("BasicPunch")) {
-							m_Anim.SetTrigger ("BlockT"); //Start punching
-							m_Anim.SetBool ("BasicPunch", true); //Set BasicPunch to true because we are punching
-							attacking = true; //Set attacking to true because we are attacking
-						}
-                    }
-                    // If the player should jump...
-                    else if (m_Grounded && input.jumpDown && m_Anim.GetBool ("Ground")) {
-				        // Add a vertical force to the player.
-					    m_Grounded = false;
-					    m_Anim.SetBool ("Ground", false);
-					    m_Rigidbody2D.AddForce (new Vector2 (0f, playerEntity.jumpForce));
-				    }
                     else {
-					    // Reduce the speed if crouching by the crouchSpeed multiplier
-					    input.h = (input.vDown ? input.h * playerEntity.crouchSpeed : input.h);
+                        skillStateManager.sliding = false;
+                    }
+                }
+                //Backdash
+                else if (input.altMoveDown || skillStateManager.backdashing) {
+                    m_Anim.SetBool("Crouch", false);
+                    skillStateManager.backdashSpeed = skill.Backdash(m_Rigidbody2D, m_FacingRight, skillStateManager.backdashSpeed, input.altMoveDown);
+                    if (skillStateManager.backdashSpeed > 0) {
+                        skillStateManager.backdashing = true;
+                    }
+                    else {
+                        skillStateManager.backdashing = false;
+                    }
+                }
 
-					    // Set whether or not the character is crouching in the animator
-					    m_Anim.SetBool ("Crouch", input.vDown);
+                else if (input.vUp) {
+                    if(input.fire1Down) {
+                        //Fireball nova; see Projectile function in Skill for a list of parameters
+                        skill.Projectile(m_Rigidbody2D, m_FacingRight, m_fireball, 1, 0, 16, 2, 5, 20);
+                    }
+                    else if(input.fire2Hold) {
+                        skillStateManager.counter = skill.Projectile(m_Rigidbody2D, m_FacingRight, m_fireball, skillStateManager.counter, 25, 20, 1, 1, 0);
+                    }
+                    else if(input.fire3Down) {
+                        skill.Projectile(m_Rigidbody2D, m_FacingRight, m_fireball, 1, 0, 8, 2, 1, 0);
+                    }
+                }
+                //Activates the punching hitbox and animation if we are not already punching;
+                else if (input.fire1Down) {
+                    if (!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("Basic Punch") && !m_Anim.GetBool("BasicPunch")) {
+                        m_Anim.SetTrigger("BasicPunchT"); //Start punching
+                        m_Anim.SetBool("BasicPunch", true); //Set BasicPunch to true because we are punching
+                        attacking = true; //Set attacking to true because we are attacking
+                    }
 
-					    // The Speed animator parameter is set to the absolute value of the horizontal input.
-					    m_Anim.SetFloat ("Speed", Mathf.Abs (input.h));
+                    //m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = true;
+                }
+                else if (input.fire2Down) {
+                    //Add kick stuff here
+					if (!m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Flip Kick") && !m_Anim.GetBool ("BasicPunch")) {
+						m_Anim.SetTrigger ("FlipKickT"); //Start punching
+						m_Anim.SetBool ("BasicPunch", true); //Set BasicPunch to true because we are punching
+						attacking = true; //Set attacking to true because we are attacking
+					}
+                }
+                else if (input.fire3Down) {
+                    //Add block stuff here
+					if (!m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Block") && !m_Anim.GetBool ("BasicPunch")) {
+						m_Anim.SetTrigger ("BlockT"); //Start punching
+						m_Anim.SetBool ("BasicPunch", true); //Set BasicPunch to true because we are punching
+						attacking = true; //Set attacking to true because we are attacking
+					}
+                }
+                // If the player should jump...
+                else if (m_Grounded && input.jumpDown && m_Anim.GetBool ("Ground")) {
+				    // Add a vertical force to the player.
+					m_Grounded = false;
+					m_Anim.SetBool ("Ground", false);
+					m_Rigidbody2D.AddForce (new Vector2 (0f, playerEntity.jumpForce));
+				}
+                //Perform movement commands if we are not currently attacking
+                else if (!attacking) {
+					// Reduce the speed if crouching by the crouchSpeed multiplier
+					input.h = (input.vDown ? input.h * playerEntity.crouchSpeed : input.h);
 
-					    // Move the character
-					    m_Rigidbody2D.velocity = new Vector2 (input.h * playerEntity.maxSpeed, m_Rigidbody2D.velocity.y);
+					// Set whether or not the character is crouching in the animator
+					m_Anim.SetBool ("Crouch", input.vDown);
 
-					    // If the input is moving the player right and the player is facing left...
-					    if (input.h > 0 && !m_FacingRight) {
-						    // ... flip the player.
-						    Flip ();
-					    }
-                        // Otherwise if the input is moving the player left and the player is facing right...
-                        else if (input.h < 0 && m_FacingRight) {
-						    // ... flip the player.
-						    Flip ();
-					    }
-				    }
-			    }
+					// The Speed animator parameter is set to the absolute value of the horizontal input.
+					m_Anim.SetFloat ("Speed", Mathf.Abs (input.h));
+
+					// Move the character
+					m_Rigidbody2D.velocity = new Vector2 (input.h * playerEntity.maxSpeed, m_Rigidbody2D.velocity.y);
+
+					// If the input is moving the player right and the player is facing left...
+					if (input.h > 0 && !m_FacingRight) {
+						// ... flip the player.
+						Flip ();
+					}
+                    // Otherwise if the input is moving the player left and the player is facing right...
+                    else if (input.h < 0 && m_FacingRight) {
+						// ... flip the player.
+						Flip ();
+					}
+				}
             }
             //In the air
             else {

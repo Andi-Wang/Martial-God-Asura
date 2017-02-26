@@ -49,21 +49,46 @@ namespace UnityStandardAssets._2D
             if (!input.altMoveDown) {
                 input.altMoveDown = CrossPlatformInputManager.GetButtonDown("AltMove");
             }
+            if(!input.altMoveUp) {
+                input.altMoveUp = CrossPlatformInputManager.GetButtonUp("AltMove");
+            }
+
             if(!input.interactDown) {
                 input.interactDown = CrossPlatformInputManager.GetButtonDown("Interact");
             }
             if(!input.jumpDown) {
                 input.jumpDown = CrossPlatformInputManager.GetButtonDown("Jump");
             }
-            if(!input.fire1Down) {
+            if(!input.fire1Up) {
+                input.fire1Up = CrossPlatformInputManager.GetButtonUp("Fire1");
+            }
+            if(!input.fire2Up) {
+                input.fire2Up = CrossPlatformInputManager.GetButtonUp("Fire2");
+            }
+            if (!input.fire3Up) {
+                input.fire3Up = CrossPlatformInputManager.GetButtonUp("Fire3");
+            }
+
+            if (!input.fire1Down) {
                 input.fire1Down = CrossPlatformInputManager.GetButtonDown("Fire1");
             }
-            if(!input.fire2Down) {
+            if (!input.fire2Down) {
                 input.fire2Down = CrossPlatformInputManager.GetButtonDown("Fire2");
             }
             if (!input.fire3Down) {
                 input.fire3Down = CrossPlatformInputManager.GetButtonDown("Fire3");
             }
+
+            /*
+            if(!input.fire1Hold) {
+                input.fire1Hold = CrossPlatformInputManager.GetButton("Fire1");
+            }
+            if (!input.fire2Hold) {
+                input.fire2Hold = CrossPlatformInputManager.GetButton("Fire2");
+            }
+            if (!input.fire3Hold) {
+                input.fire3Hold = CrossPlatformInputManager.GetButton("Fire3");
+            }*/
         }
 
 

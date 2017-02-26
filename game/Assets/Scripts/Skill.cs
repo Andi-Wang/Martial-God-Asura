@@ -82,7 +82,7 @@ public class Skill {
     }
 
 
-    public float Slide(Rigidbody2D body, bool facingRight, float slideSpeed, bool forceStart, bool enhanced, bool enhancedCancel) {
+    public float Slide(Rigidbody2D body, bool facingRight, float slideSpeed, bool forceStart, bool enhanced, bool slideCancel) {
         float minSpeed = 6f;
         float maxSpeed = 17f;
         float enhancementBoost = 7f;
@@ -95,7 +95,7 @@ public class Skill {
 
         float decay = 1f;
 
-        if (enhanced && enhancedCancel) {
+        if (enhanced && slideCancel) {
             slideSpeed = 0;
         }
         else if (forceStart || slideSpeed > minSpeed) {
