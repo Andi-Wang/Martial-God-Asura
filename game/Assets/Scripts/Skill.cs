@@ -10,7 +10,7 @@ public class Skill {
         public float backdashSpeed = 0f;
         public bool sliding = false;
         public float slideSpeed = 0f;
-        public bool secondJumpAvailable = true;
+        public bool secondJumpAvailable = false;
         public bool airdashing = false;
         public float airdashSpeed = 0f;
         public float counter = 0f;
