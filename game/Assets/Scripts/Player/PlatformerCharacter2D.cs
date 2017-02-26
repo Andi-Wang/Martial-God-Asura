@@ -28,6 +28,10 @@ namespace UnityStandardAssets._2D {
         bool isDead;
 		bool attacking = false; // used to detect if we are beginning an attack, in order to prevent input buffering
 
+        float invincibilityDurationWhenHit = 1f;
+        float timeSinceLastHit = 1f;
+        float stunned = 0;
+
         private void Awake()
         {
             skill = new Skill();
@@ -41,9 +45,39 @@ namespace UnityStandardAssets._2D {
 
         public void TakeDamage(float amount)
         {
-            playerEntity.health -= amount;
-            healthSlider.value = playerEntity.health;
-            healthbar.fillAmount = playerEntity.health / playerEntity.maxHealth;
+            if(timeSinceLastHit >= invincibilityDurationWhenHit) {
+                playerEntity.health -= amount;
+                healthSlider.value = playerEntity.health;
+                healthbar.fillAmount = playerEntity.health / playerEntity.maxHealth;
+
+                timeSinceLastHit = 0;
+                stunned = invincibilityDurationWhenHit / 2;
+
+                skillStateManager = new Skill.SkillStateManager();
+
+                if(m_Grounded) {
+                    skillStateManager.backdashSpeed = skill.Backdash(m_Rigidbody2D, m_FacingRight, skillStateManager.backdashSpeed, true);
+                    if (skillStateManager.backdashSpeed > 0) {
+                        skillStateManager.backdashing = true;
+                    }
+                    else {
+                        skillStateManager.backdashing = false;
+                    }
+                }
+                else {
+                    float knockbackForce = 700f;
+
+                    m_Rigidbody2D.velocity = new Vector2(0, -6);
+
+                    if (m_FacingRight) {
+                        m_Rigidbody2D.AddForce(new Vector2(-knockbackForce, 0));
+                    }
+                    else {
+                        m_Rigidbody2D.AddForce(new Vector2(knockbackForce, 0));
+                    }
+                }
+                
+            }
 
             //TODO: player hurt sound,animation
             if (playerEntity.health <= 0 && !isDead)
@@ -53,7 +87,7 @@ namespace UnityStandardAssets._2D {
         }
 
         public void addEnergy(float amount) {
-            playerEntity.energy += amount;
+            playerEntity.energy = Math.Min(playerEntity.energy + amount, playerEntity.maxEnergy);
             energybar.fillAmount = playerEntity.energy / playerEntity.maxEnergy;
         }
 
@@ -114,6 +148,7 @@ namespace UnityStandardAssets._2D {
             //}
 
             addEnergy(playerEntity.energyRegen * Time.deltaTime);
+            timeSinceLastHit += Time.deltaTime;
         }
 
 
@@ -124,6 +159,12 @@ namespace UnityStandardAssets._2D {
                 if (Physics2D.OverlapCircle(m_CeilingCheck.position, k_CeilingRadius, m_WhatIsGround)) {
                     input.vDown = true;
                 }
+            }
+
+            //Stunlocked; inputs are ignored during this time
+            if(stunned > 0) {
+                stunned -= Time.deltaTime;
+                input = new Controls();
             }
 
             //On the ground, so character can move
