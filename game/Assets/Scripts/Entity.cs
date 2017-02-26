@@ -6,6 +6,7 @@ public class Entity {
     public float health;
     public float maxHealth;
     public float energy;
+    public float maxEnergy;
     public float healthRegen;
     public float energyRegen;
     public float armor;
@@ -22,6 +23,7 @@ public class Entity {
         health = initialHealth;
         maxHealth = health;
         energy = initialEnergy;
+        maxEnergy = energy;
         healthRegen = initialHealthRegen;
         energyRegen = initialEnergyRegen;
         armor = initialArmor;

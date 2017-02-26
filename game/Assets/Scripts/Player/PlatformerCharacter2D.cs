@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 namespace UnityStandardAssets._2D {
     public class PlatformerCharacter2D : MonoBehaviour {
+        public Image healthbar;
+        public Image energybar;
         public Slider healthSlider;
         public Rigidbody2D m_fireball;
 
@@ -41,6 +43,7 @@ namespace UnityStandardAssets._2D {
         {
             playerEntity.health -= amount;
             healthSlider.value = playerEntity.health;
+            healthbar.fillAmount = playerEntity.health / playerEntity.maxHealth;
 
             //TODO: player hurt sound,animation
             if (playerEntity.health <= 0 && !isDead)
@@ -48,6 +51,12 @@ namespace UnityStandardAssets._2D {
                 Death();
             }
         }
+
+        public void addEnergy(float amount) {
+            playerEntity.energy += amount;
+            energybar.fillAmount = playerEntity.energy / playerEntity.maxEnergy;
+        }
+
         void Death()
         {
             // Set the death flag so this function won't be called again.
@@ -100,12 +109,11 @@ namespace UnityStandardAssets._2D {
 
             //Force punch animation to play without override from more punches
             //if(!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("Basic Punch")) {
-			//	m_Anim.SetBool ("BasicPunch", false);
-                //m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = false;
+            //	m_Anim.SetBool ("BasicPunch", false);
+            //m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = false;
             //}
 
-
-
+            addEnergy(playerEntity.energyRegen * Time.deltaTime);
         }
 
 
@@ -173,7 +181,7 @@ namespace UnityStandardAssets._2D {
                 }
                 //Activates the punching hitbox and animation if we are not already punching;
                 else if (input.fire1Down) {
-
+                    addEnergy(-10);
                     if (!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("Basic Punch") && !m_Anim.GetBool("BasicPunch")) {
                         m_Anim.SetTrigger("BasicPunchT"); //Start punching
                         m_Anim.SetBool("BasicPunch", true); //Set BasicPunch to true because we are punching
