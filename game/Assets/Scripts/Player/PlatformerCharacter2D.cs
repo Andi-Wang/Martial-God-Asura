@@ -27,7 +27,10 @@ namespace UnityStandardAssets._2D {
         bool isDead;
 		bool attacking = false; // used to detect if we are beginning an attack, in order to prevent input buffering
 
-        float invincibilityDurationWhenHit = 1f;
+        const float invincibilityDurationWhenHit = 1f;
+        const float stunDurationWhenHit = 0.5f;
+        const float knockbackForceWhenHit = 700f;
+        const float airKnockdownVelocity = 6f;
         float timeSinceLastHit = 1f;
         float stunned = 0;
 
@@ -49,7 +52,7 @@ namespace UnityStandardAssets._2D {
                 healthbar.fillAmount = playerEntity.health / playerEntity.maxHealth;
 
                 timeSinceLastHit = 0;
-                stunned = invincibilityDurationWhenHit / 2;
+                stunned = stunDurationWhenHit;
 
                 skillStateManager = new Skill.SkillStateManager();
 
@@ -63,15 +66,13 @@ namespace UnityStandardAssets._2D {
                     }
                 }
                 else {
-                    float knockbackForce = 700f;
-
-                    m_Rigidbody2D.velocity = new Vector2(0, -6);
+                    m_Rigidbody2D.velocity = new Vector2(0, -airKnockdownVelocity);
 
                     if (m_FacingRight) {
-                        m_Rigidbody2D.AddForce(new Vector2(-knockbackForce, 0));
+                        m_Rigidbody2D.AddForce(new Vector2(-knockbackForceWhenHit, 0));
                     }
                     else {
-                        m_Rigidbody2D.AddForce(new Vector2(knockbackForce, 0));
+                        m_Rigidbody2D.AddForce(new Vector2(knockbackForceWhenHit, 0));
                     }
                 }
                 
@@ -87,6 +88,10 @@ namespace UnityStandardAssets._2D {
         public void addEnergy(float amount) {
             playerEntity.energy = Math.Min(playerEntity.energy + amount, playerEntity.maxEnergy);
             energybar.fillAmount = playerEntity.energy / playerEntity.maxEnergy;
+        }
+        public void addHealth(float amount) {
+            playerEntity.health = Math.Min(playerEntity.health + amount, playerEntity.maxHealth);
+            energybar.fillAmount = playerEntity.health / playerEntity.maxHealth;
         }
 
         void Death()
@@ -146,6 +151,7 @@ namespace UnityStandardAssets._2D {
             //}
 
             addEnergy(playerEntity.energyRegen * Time.deltaTime);
+            addHealth(playerEntity.healthRegen * Time.deltaTime);
             timeSinceLastHit += Time.deltaTime;
         }
 
