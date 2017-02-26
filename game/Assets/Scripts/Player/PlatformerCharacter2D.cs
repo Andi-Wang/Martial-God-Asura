@@ -7,7 +7,6 @@ namespace UnityStandardAssets._2D {
     public class PlatformerCharacter2D : MonoBehaviour {
         public Image healthbar;
         public Image energybar;
-        public Slider healthSlider;
         public Rigidbody2D m_fireball;
 
         [SerializeField] private LayerMask m_WhatIsGround;                  // A mask determining what is ground to the character
@@ -47,7 +46,6 @@ namespace UnityStandardAssets._2D {
         {
             if(timeSinceLastHit >= invincibilityDurationWhenHit) {
                 playerEntity.health -= amount;
-                healthSlider.value = playerEntity.health;
                 healthbar.fillAmount = playerEntity.health / playerEntity.maxHealth;
 
                 timeSinceLastHit = 0;
