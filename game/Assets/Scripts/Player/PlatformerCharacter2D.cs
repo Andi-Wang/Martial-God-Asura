@@ -9,6 +9,9 @@ namespace UnityStandardAssets._2D {
         public Image energybar;
         public Slider healthSlider;
         public Rigidbody2D m_fireball;
+        public Image damageImage;
+        public Color flashColour = new Color(1f, 0f, 0f, 0.2f);
+        public float flashSpeed = 5f;
 
         [SerializeField] private LayerMask m_WhatIsGround;                  // A mask determining what is ground to the character
         [SerializeField] private Entity playerEntity = new Entity(100f, 100f, 0f, 5f, 0f, 500f, 10f, 1f, 0.7f);
@@ -24,11 +27,12 @@ namespace UnityStandardAssets._2D {
         private Rigidbody2D m_Rigidbody2D;
         private bool m_FacingRight = true;  // For determining which way the player is currently facing.
         const float airSpeedDecayTo = 0.993f;
+        bool damaged = false;
 
         bool isDead;
 		bool attacking = false; // used to detect if we are beginning an attack, in order to prevent input buffering
 
-        private void Awake()
+        void Awake()
         {
             skill = new Skill();
             // Setting up references.
@@ -38,9 +42,22 @@ namespace UnityStandardAssets._2D {
             m_Rigidbody2D = GetComponent<Rigidbody2D>();
             isDead = false;
         }
-
+        void Update()
+        {
+            if (damaged)
+            {
+                damageImage.color = flashColour;
+            }
+            else
+            {
+                damageImage.color = Color.Lerp(damageImage.color, Color.clear, flashSpeed * Time.deltaTime);
+            }
+            damaged = false;
+        }
         public void TakeDamage(float amount)
         {
+            damaged = true;
+
             playerEntity.health -= amount;
             healthSlider.value = playerEntity.health;
             healthbar.fillAmount = playerEntity.health / playerEntity.maxHealth;
@@ -118,6 +135,10 @@ namespace UnityStandardAssets._2D {
 
 
         public void Move(Controls input) {
+            if (isDead)
+            {
+                return;
+            }
             // If crouching, check to see if the character can stand up
             if (!input.vDown && m_Anim.GetBool("Crouch")) {
                 // If the character has a ceiling preventing them from standing up, keep them crouching
