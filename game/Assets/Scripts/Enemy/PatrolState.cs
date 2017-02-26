@@ -12,16 +12,12 @@ public class PatrolState : EnemyState {
         if (hit.collider != null)
         {
             if (hit.collider.gameObject.tag == "Player")
-                enemy.changeState(enemy.chaseState); //TODO: should move faster
+                enemy.changeState(enemy.chaseState); 
             else if (hit.distance <= 2)
                 enemy.Flip();
         }
 
         enemy.Move();
-      /*  if(enemy.player != null)
-        {
-            enemy.changeState(new AttackState());
-        }*/
     }
     public void Begin(Enemy enemy)
     {

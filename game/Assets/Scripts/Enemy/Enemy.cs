@@ -24,24 +24,30 @@ public class Enemy : MonoBehaviour
     public ChaseState chaseState;
     public IdleState idleState;
     public PuzzlePatrolState puzzlePatrolState;
+    public RangedAttackState rangedAttackState;
 
     private float AttackRange = 1.5f;
+    private float RangeAttackRange = 15f;
+    private float RangedAttackCD = 4f;
+    private float LastRangeTime = 4f;
+    private bool canRangeAttack = true;
+    public bool isBoss = false;
+
     AudioSource enemyAudio;
     private BoxCollider2D boxCollider;
     private GameObject player;
+    private Vector3 playerPos;
+    private Vector3 playerPrevPos;
     private Image healthbar;
     public Animator animator;                          //Variable of type Animator to store a reference to the enemy's Animator component.
     bool isDead;
     private Rigidbody2D rb2D;
-    /*[SerializeField]
-    private float meleeRange = 2f;
-    public bool inMeleeRange;
-    */
     private bool e_FacingRight = true;
 
     void Awake()
     {
         player = GameObject.FindGameObjectWithTag("Player");
+        playerPos = player.transform.position;
         boxCollider = GetComponent<BoxCollider2D>();
         rb2D = GetComponent<Rigidbody2D>();
         //currentHealth = startingHealth;
@@ -59,7 +65,8 @@ public class Enemy : MonoBehaviour
         patrolState = new PatrolState();
         attackState = new AttackState();
         chaseState = new ChaseState();
-        
+        rangedAttackState = new RangedAttackState();
+
         animator = GetComponent<Animator>();
         changeState(patrolState);
         animator.SetBool("Moving", true);
@@ -96,6 +103,22 @@ public class Enemy : MonoBehaviour
         state.Begin(this);
     }
 
+    public void setPlayerPos()
+    {
+        playerPrevPos = playerPos;
+        playerPos = player.transform.position;
+    }
+
+    public Vector3 getPlayerPrevPos()
+    {
+        return playerPrevPos;
+    }
+
+    public Vector3 getPlayerPos()
+    {
+        return playerPos;
+    }
+
     public void LookAtTarget()
     {
         if (player != null)
@@ -108,17 +131,48 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    public bool TargetInRange()
+    public bool TargetInMeleeRange()
     {
         if (player != null)
         {
-            float xDir = player.transform.position.x - transform.position.x;
-            if (Mathf.Abs(xDir) <= AttackRange)
+            float totalDis = Mathf.Sqrt(Mathf.Pow(player.transform.position.x - transform.position.x, 2) + Mathf.Pow(player.transform.position.y - transform.position.y, 2));
+            if (Mathf.Abs(totalDis) <= AttackRange)
                 return true;
             else
                 return false;
         }
         return false;
+    }
+
+    public bool TargetInRange()
+    {
+        if (player != null)
+        {
+            float totalDis = Mathf.Sqrt(Mathf.Pow(player.transform.position.x - transform.position.x, 2) + Mathf.Pow(player.transform.position.y - transform.position.y,2));
+            if (Mathf.Abs(totalDis) <= RangeAttackRange)
+                return true;
+            else
+                return false;
+        }
+        return false;
+    }
+
+    public void updateRangeCD()
+    {
+        LastRangeTime += Time.deltaTime;
+        if (LastRangeTime >= RangedAttackCD)
+        {
+            canRangeAttack = true;
+            LastRangeTime = 0;
+        }
+        else
+            canRangeAttack = false;
+    }
+
+    public bool rangeCDCheck()
+    {
+        updateRangeCD();
+        return canRangeAttack;
     }
 
     public virtual void TakeDamage(float amount)
@@ -168,11 +222,7 @@ public class Enemy : MonoBehaviour
     public void Move()
     {
         animator.SetBool("Moving", true);
-        //if (!inMeleeRange)
-        // {
-        // animator.SetBool("Moving", true);
         transform.Translate(getDirection() * speed * Time.deltaTime, Space.World);
-       // }
     }
 
     public Vector2 getDirection()

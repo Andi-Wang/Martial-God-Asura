@@ -6,26 +6,19 @@ public class AttackState : EnemyState
     private Enemy enemy;
 
     private float attackTimer;
-    private float attackCD = 2f;
+    private float attackCD = 1f;
     private bool canAttack = true;
 
     public void Execute()
     {
-        enemy.animator.SetBool("Moving", false);
-        // if (enemy.player != null)
-        //  {
-        //enemy.Move();
-        //TODO: should detect distance first
-        Attack();
-        if (!enemy.TargetInRange())
+        attackTimer += Time.deltaTime;
+        if (!enemy.TargetInMeleeRange())
         {
             enemy.animator.SetBool("Moving", true);
             enemy.changeState(enemy.chaseState);
         }
-        //   } else
-        // {
-        //      enemy.changeState(new PatrolState());
-        // }
+        enemy.animator.SetBool("Moving", false);
+        Attack();
     }
 
     public void Begin(Enemy enemy)
@@ -45,7 +38,6 @@ public class AttackState : EnemyState
 
     private void Attack()
     {
-        attackTimer += Time.deltaTime;
         if(attackTimer >= attackCD)
         {
             canAttack = true;
@@ -53,9 +45,20 @@ public class AttackState : EnemyState
         }
         if(canAttack)
         {
-            enemy.animator.SetBool("enemyAttack", true);
-            canAttack = false;
-            attackTimer = 0;
+            if (enemy.isBoss)
+            {
+                //Animate hold punch
+                yield return new WaitForSeconds(0.5f);
+                //Animate punch + damage
+                canAttack = false;
+                attackTimer = 0;
+            }
+            else
+            {
+                enemy.animator.SetBool("enemyAttack", true);
+                canAttack = false;
+                attackTimer = 0;
+            }
         }
     }
 }
