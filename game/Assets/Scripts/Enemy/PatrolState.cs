@@ -22,7 +22,10 @@ public class PatrolState : EnemyState {
     public void Begin(Enemy enemy)
     {
         this.enemy = enemy;
-        enemy.speed = 1f;
+        if (enemy.isBoss)
+            enemy.speed = 3f;
+        else
+            enemy.speed = 1f;
     }
     public void Leave()
     {
