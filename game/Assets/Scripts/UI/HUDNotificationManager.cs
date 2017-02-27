@@ -21,18 +21,14 @@ public class HUDNotificationManager : MonoBehaviour {
 	    if (displaying)
         {
             msg.color = flashColour;
-            //timer += Time.deltaTime;
+            timer += Time.deltaTime;
         }
         
-        else //(timer >= displayTime)
+        if (timer >= displayTime)
         {
-            //msg.color = Color.clear;
+            displaying = false;
             msg.color = Color.Lerp(msg.color, Color.clear, flashSpeed * Time.deltaTime);
-            //Debug.Log("test");
-            //displaying = false;
-            //timer = 0;
         }
-        displaying = false;
     }
 
     public void Display(string txt)
@@ -40,5 +36,6 @@ public class HUDNotificationManager : MonoBehaviour {
         msg.text = txt;
         msg.color = flashColour;
         displaying = true;
+        timer = 0;
     }
 }
