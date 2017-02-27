@@ -48,7 +48,7 @@ public class AttackState : EnemyState
             if (enemy.isBoss)
             {
                 //Animate hold punch
-                //yield return new WaitForSeconds(0.5f);
+
                 //Animate punch + damage
                 canAttack = false;
                 attackTimer = 0;
@@ -56,6 +56,7 @@ public class AttackState : EnemyState
             else
             {
                 enemy.animator.SetBool("enemyAttack", true);
+                enemy.attackBox.enabled = true;
                 canAttack = false;
                 attackTimer = 0;
             }

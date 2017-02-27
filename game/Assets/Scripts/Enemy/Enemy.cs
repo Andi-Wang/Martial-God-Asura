@@ -8,6 +8,8 @@ public class Enemy : MonoBehaviour
 {
     public Entity enemyEntity;
 
+    public Rigidbody2D m_fireball;
+
     public float speed = 1f;
     
     public float startingHealth = 10f;
@@ -34,6 +36,7 @@ public class Enemy : MonoBehaviour
     public bool isBoss = false;
 
     AudioSource enemyAudio;
+    public Collider2D attackBox;
     private BoxCollider2D boxCollider;
     private GameObject player;
     private Vector3 playerPos;
@@ -41,7 +44,7 @@ public class Enemy : MonoBehaviour
     private Image healthbar;
     public Animator animator;                          //Variable of type Animator to store a reference to the enemy's Animator component.
     bool isDead;
-    private Rigidbody2D rb2D;
+    public Rigidbody2D rb2D;
     private bool e_FacingRight = true;
 
     void Awake()
