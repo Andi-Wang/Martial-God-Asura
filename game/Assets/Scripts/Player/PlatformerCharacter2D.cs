@@ -91,7 +91,11 @@ namespace UnityStandardAssets._2D {
         }
         public void addHealth(float amount) {
             playerEntity.health = Math.Min(playerEntity.health + amount, playerEntity.maxHealth);
-            energybar.fillAmount = playerEntity.health / playerEntity.maxHealth;
+            healthbar.fillAmount = playerEntity.health / playerEntity.maxHealth;
+        }
+
+        public float getHealth() {
+            return playerEntity.health;
         }
 
         void Death()

@@ -16,7 +16,7 @@ public class GameoverManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (playerHealth.PlayerEntity.health <= 0)
+        if (playerHealth.getHealth() <= 0)
         {
             gameOverText.text = "You are dead";
             anim.SetTrigger("Gameover");
