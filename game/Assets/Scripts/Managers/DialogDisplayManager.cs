@@ -10,6 +10,8 @@ public class DialogDisplayManager : MonoBehaviour {
     Text dialogText;
     public int currentDialog = -1;
     bool displayed = false;
+
+	private string str = "";
     
     public static DialogDisplayManager Instance()
     {
@@ -22,6 +24,16 @@ public class DialogDisplayManager : MonoBehaviour {
 	// Use this for initialization
 	void Awake () {
         dialogText = GetComponentInChildren<Text>();
+	}
+
+	IEnumerator AnimateText(string strComplete){
+		int i = 0;
+		str = "";
+		while( i < strComplete.Length ){
+			str += strComplete[i++];
+			dialogText.text = str;
+			yield return new WaitForSeconds(0.05F);
+		}
 	}
 
     public bool displayNext()
@@ -48,7 +60,8 @@ public class DialogDisplayManager : MonoBehaviour {
             gameObject.SetActive(true);
         }
         
-        dialogText.text = testDialog[currentDialog];
+		StartCoroutine( AnimateText(testDialog[currentDialog]) );
+
         return true;
     }
 }
