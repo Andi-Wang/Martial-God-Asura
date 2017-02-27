@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class HUDNotificationManager : MonoBehaviour {
     public float displayTime = 1f;
     public Color flashColour = new Color(1f, 1f, 1f, 1f);
+    public float flashSpeed = 2f;
 
     bool displaying;
     Text msg;
@@ -24,8 +25,10 @@ public class HUDNotificationManager : MonoBehaviour {
         
         if (timer >= displayTime)
         {
-            msg.color = Color.clear;
+            //msg.color = Color.clear;
+            Color.Lerp(msg.color, Color.clear, flashSpeed * Time.deltaTime);
             displaying = false;
+            timer = 0;
         }
     }
 
