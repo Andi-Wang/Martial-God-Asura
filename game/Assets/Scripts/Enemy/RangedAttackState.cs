@@ -29,8 +29,14 @@ public class RangedAttackState : EnemyState
 
     private void Attack()
     {
-        
+        Vector2 right = enemy.getDirection();
+        if (right.x == -1)
+        {
+            m_FacingRight = false;
+        }
+        else
+            m_FacingRight = true;
         enemy.animator.SetBool("Moving", false);
-        skill.Projectile(enemy.rb2D, m_FacingRight, enemy.m_fireball, 1, 0, 16, 2, 5, 20);
+        skill.Projectile(enemy.rb2D, m_FacingRight, enemy.m_fireball, 1, 0, 20, 2, 5, 20);
     }
 }

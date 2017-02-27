@@ -29,7 +29,7 @@ public class Enemy : MonoBehaviour
     public RangedAttackState rangedAttackState;
 
     private float AttackRange = 1.5f;
-    private float RangeAttackRange = 15f;
+    private float RangeAttackRange = 12f;
     private float RangedAttackCD = 4f;
     private float LastRangeTime = 4f;
     private bool canRangeAttack = true;
