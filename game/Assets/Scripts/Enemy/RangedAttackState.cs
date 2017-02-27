@@ -29,6 +29,7 @@ public class RangedAttackState : EnemyState
 
     private void Attack()
     {
+        
         enemy.animator.SetBool("Moving", false);
         skill.Projectile(enemy.rb2D, m_FacingRight, enemy.m_fireball, 1, 0, 16, 2, 5, 20);
     }
