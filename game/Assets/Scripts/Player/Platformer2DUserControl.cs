@@ -7,6 +7,7 @@ namespace UnityStandardAssets._2D
     [RequireComponent(typeof (PlatformerCharacter2D))]
     public class Platformer2DUserControl : MonoBehaviour
     {
+        public DialogDisplayManager ddm;
         bool gamePaused;
         public MenuManager pauseMenu;
         public GameObject skillMenu;
@@ -25,8 +26,16 @@ namespace UnityStandardAssets._2D
         private void Update() {
             if (!GameManager.instance.playersTurn)
             {
-                input.resetButtonDown();
-                return;
+                if (ddm.displaying && Input.GetButtonUp("Jump"))
+                {
+                    ddm.displayNext();
+                }
+                else
+                {
+                    input.resetButtonDown();
+                    return;
+                }
+                
             }
 
             if (Input.GetButtonUp("Cancel"))
