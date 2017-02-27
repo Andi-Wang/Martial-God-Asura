@@ -47,9 +47,17 @@ public class AttackState : EnemyState
         {
             if (enemy.isBoss)
             {
+                float holdTimer = 0f;
                 //Animate hold punch
-
+                while (true)
+                {
+                    holdTimer += Time.deltaTime;
+                    if (holdTimer >= 0.5f)
+                        break;
+                }
                 //Animate punch + damage
+                enemy.animator.SetBool("enemyAttack", true);
+                enemy.attackBox.enabled = true;
                 canAttack = false;
                 attackTimer = 0;
             }
@@ -61,5 +69,6 @@ public class AttackState : EnemyState
                 attackTimer = 0;
             }
         }
+        enemy.attackBox.enabled = false;
     }
 }
