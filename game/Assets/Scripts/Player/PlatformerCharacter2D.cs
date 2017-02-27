@@ -8,6 +8,9 @@ namespace UnityStandardAssets._2D {
         public Image healthbar;
         public Image energybar;
         public Rigidbody2D m_fireball;
+        public Image damageImage;
+        public Color flashColour = new Color(1f, 0, 0, 0.3f);
+        public float flashSpeed = 2f;
 
         [SerializeField] private LayerMask m_WhatIsGround;                  // A mask determining what is ground to the character
         [SerializeField] private Entity playerEntity = new Entity(100f, 100f, 0f, 5f, 0f, 500f, 10f, 1f, 0.7f);
@@ -33,8 +36,9 @@ namespace UnityStandardAssets._2D {
         const float airKnockdownVelocity = 6f;
         float timeSinceLastHit = 1f;
         float stunned = 0;
+        bool damaged = false;
 
-        private void Awake()
+        void Awake()
         {
             skill = new Skill();
             // Setting up references.
@@ -44,9 +48,22 @@ namespace UnityStandardAssets._2D {
             m_Rigidbody2D = GetComponent<Rigidbody2D>();
             isDead = false;
         }
-
+        void Update()
+        {
+            if (damaged)
+            {
+                damageImage.color = flashColour;
+            }
+            else
+            {
+                damageImage.color = Color.Lerp(damageImage.color, Color.clear, flashSpeed * Time.deltaTime);
+            }
+            damaged = false;
+        }
         public void TakeDamage(float amount)
         {
+            damaged = true;
+
             if(timeSinceLastHit >= invincibilityDurationWhenHit) {
                 playerEntity.health -= amount;
                 healthbar.fillAmount = playerEntity.health / playerEntity.maxHealth;
