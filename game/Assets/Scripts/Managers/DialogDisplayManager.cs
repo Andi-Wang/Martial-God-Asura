@@ -5,6 +5,13 @@ using UnityEngine.UI;
 public class DialogDisplayManager : MonoBehaviour {
     public string[] testDialog;
     public bool displaying = false;
+	public bool playerTalking = false;
+	public Image playerImg;
+
+	public Sprite psprite1;
+	public Sprite psprite2;
+	public Sprite psprite3;
+
     public static DialogDisplayManager instance = null;
 
     Text dialogText;
@@ -30,8 +37,22 @@ public class DialogDisplayManager : MonoBehaviour {
 		int i = 0;
 		str = "";
 		while( i < strComplete.Length ){
+			playerTalking = true;
 			str += strComplete[i++];
 			dialogText.text = str;
+
+			if (playerTalking) {
+				if (playerImg.sprite == psprite1) {
+					playerImg.sprite = psprite2;
+				}
+				else if (playerImg.sprite == psprite2) {
+					playerImg.sprite = psprite3;
+				}
+				else {
+					playerImg.sprite = psprite1;
+				}
+			}
+
 			yield return new WaitForSeconds(0.05F);
 		}
 	}
