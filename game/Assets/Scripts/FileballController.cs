@@ -36,16 +36,21 @@ namespace UnityStandardAssets._2D
                 PlatformerCharacter2D tempTargetHealth = targetRigidbody.GetComponent<PlatformerCharacter2D>(); ;
 
                 // If there is no Enemy script attached to the gameobject, go on to the next collider.
-                if (!targetHealth)
+                if (!targetHealth || !tempTargetHealth)
                     continue;
+
                 // Calculate the amount of damage the target should take based on it's distance from the fireball.
                 float damage = CalculateDamage(targetRigidbody.position);
 
                 // Deal this damage to the enemy.
-                if (!tempTargetHealth) 
+                if (!tempTargetHealth)
+                {
                     targetHealth.TakeDamage(damage);
-                else
+                }
+                else if (!targetHealth)
+                {
                     tempTargetHealth.TakeDamage(damage);
+                }
             }
             /*
             // Unparent the particles from the shell.
