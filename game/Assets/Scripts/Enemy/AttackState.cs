@@ -69,6 +69,5 @@ public class AttackState : EnemyState
                 attackTimer = 0;
             }
         }
-        enemy.attackBox.enabled = false;
     }
 }
