@@ -15,7 +15,7 @@ public class ChaseState : EnemyState {
         {
             enemy.changeState(enemy.attackState);
         }
-        else if (enemy.TargetInRange() && enemy.rangeCDCheck())
+        else if (enemy.TargetInRange() && enemy.rangeCDCheck() && !enemy.isBoss)
         {
             Vector3 raycastStartPoint = enemy.transform.position + new Vector3(enemy.getDirection().x, 0);
             RaycastHit2D rangeHit = Physics2D.Raycast(raycastStartPoint, enemy.getPlayerPos() - enemy.transform.position);
@@ -54,7 +54,10 @@ public class ChaseState : EnemyState {
     public void Begin(Enemy enemy)
     {
         this.enemy = enemy;
-        enemy.speed = 2f;
+        if (enemy.isBoss)
+            enemy.speed = 5f;
+        else
+            enemy.speed = 2f;
     }
     public void Leave()
     {
