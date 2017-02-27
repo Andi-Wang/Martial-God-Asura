@@ -8,6 +8,7 @@ public class GameoverManager : MonoBehaviour {
     public Text gameOverText;
 
     Animator anim;
+    bool finishing = false;
 
     // Use this for initialization
     void Start () {
@@ -16,13 +17,14 @@ public class GameoverManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (playerHealth.getHealth() <= 0)
+        if (!finishing && playerHealth.getHealth() <= 0)
         {
+            finishing = true;
             gameOverText.text = "You are dead";
             anim.SetTrigger("Gameover");
-            
         }
     }
+
     public void BackToMain()
     {
         SceneManager.LoadScene(0);
