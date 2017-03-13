@@ -119,9 +119,9 @@ namespace UnityStandardAssets._2D {
         {
             // Set the death flag so this function won't be called again.
             isDead = true;
-            
+
             // Tell the animator that the player is dead.
-            //anim.SetTrigger("Die");
+            m_Anim.SetTrigger("Die");
 
             // Set the audiosource to play the death clip and play it (this will stop the hurt sound from playing).
             //playerAudio.clip = deathClip;
