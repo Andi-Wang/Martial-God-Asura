@@ -10,7 +10,9 @@ public class Enemy : MonoBehaviour
 
     public Rigidbody2D m_fireball;
 
-    public float speed = 1f;
+    public float speed = 3f;
+    public float chaseSpeed;
+    public float baseSpeed;
     
     public float startingHealth = 10f;
     public float currentHealth;
@@ -34,6 +36,7 @@ public class Enemy : MonoBehaviour
     private float LastRangeTime = 4f;
     private bool canRangeAttack = true;
     public bool isBoss = false;
+    public bool canMove = true;
 
     AudioSource enemyAudio;
     public Collider2D attackBox;
@@ -64,14 +67,32 @@ public class Enemy : MonoBehaviour
         //Register this enemy with our instance of GameManager by adding it to a list of Enemy objects. 
         //This allows the GameManager to issue movement commands.
         GameManager.instance.AddEnemyToList(this);
-        
+
+        if (!canMove)
+            AttackRange = 3f;
+
+        baseSpeed = speed;
+        if (isBoss)
+        {
+            chaseSpeed = speed + 2f;
+        }
+        else
+        {
+            chaseSpeed = speed + 1f;
+        }
+
         patrolState = new PatrolState();
         attackState = new AttackState();
         chaseState = new ChaseState();
         rangedAttackState = new RangedAttackState();
-
         animator = GetComponent<Animator>();
-        changeState(patrolState);
+        if (canMove == true)
+        {
+            changeState(patrolState);
+        }
+        else
+            changeState(chaseState);
+
         animator.SetBool("Moving", true);
         healthbar = transform.FindChild("EnemyCanvas").FindChild("Healthbar").FindChild("Health").GetComponent<Image>();
     }
@@ -224,8 +245,11 @@ public class Enemy : MonoBehaviour
 
     public void Move()
     {
-        animator.SetBool("Moving", true);
-        transform.Translate(getDirection() * speed * Time.deltaTime, Space.World);
+        if (canMove)
+        {
+            animator.SetBool("Moving", true);
+            transform.Translate(getDirection() * speed * Time.deltaTime, Space.World);
+        }
     }
 
     public Vector2 getDirection()

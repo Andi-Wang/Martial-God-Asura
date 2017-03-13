@@ -10,7 +10,9 @@ public class ChaseState : EnemyState {
         enemy.setPlayerPos();
 
         if (GameManager.instance.currentRoom != RoomManager.Instance.findRoomId(enemy.transform.position.x, enemy.transform.position.y))
+        {
             enemy.changeState(enemy.patrolState);
+        }
         else if (enemy.TargetInMeleeRange())
         {
             enemy.changeState(enemy.attackState);
@@ -25,7 +27,6 @@ public class ChaseState : EnemyState {
             }
         }
 
-        //Debug.Log(enemy.getPlayerPos().y - enemy.transform.position.y);
         if (-0.2f < enemy.getPlayerPos().y - enemy.transform.position.y || enemy.getPlayerPos().y - enemy.transform.position.y < 0.2f)
         {
             if(true) //gap between player and enemy platforms
@@ -50,14 +51,14 @@ public class ChaseState : EnemyState {
             } while (true); //while( Not on a jump point )
             //If on a jump point, face player and jump up to platform
         }
+
+        if (!enemy.canMove)
+            enemy.LookAtTarget();
     }
     public void Begin(Enemy enemy)
     {
         this.enemy = enemy;
-        if (enemy.isBoss)
-            enemy.speed = 5f;
-        else
-            enemy.speed = 2f;
+        enemy.speed = enemy.chaseSpeed;
     }
     public void Leave()
     {

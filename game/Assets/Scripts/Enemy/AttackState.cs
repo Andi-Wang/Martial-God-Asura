@@ -35,15 +35,15 @@ public class AttackState : EnemyState
     {
 
     }
-    
+
     private void Attack()
     {
-        if(attackTimer >= attackCD)
+        if (attackTimer >= attackCD)
         {
             canAttack = true;
-            
+
         }
-        if(canAttack)
+        if (canAttack)
         {
             if (enemy.isBoss)
             {
@@ -57,14 +57,19 @@ public class AttackState : EnemyState
                 }
                 //Animate punch + damage
                 enemy.animator.SetBool("enemyAttack", true);
-                enemy.attackBox.enabled = true;
                 canAttack = false;
                 attackTimer = 0;
+            }
+            else if (!enemy.canMove)
+            {
+                enemy.animator.SetBool("enemyAttack", true);
+                canAttack = false;
+                attackTimer = 0;
+                //Plant should do damage here
             }
             else
             {
                 enemy.animator.SetBool("enemyAttack", true);
-                enemy.attackBox.enabled = true;
                 canAttack = false;
                 attackTimer = 0;
             }

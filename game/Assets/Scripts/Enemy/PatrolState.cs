@@ -16,16 +16,15 @@ public class PatrolState : EnemyState {
             else if (hit.distance <= 2)
                 enemy.Flip();
         }
+        if (GameManager.instance.currentRoom == RoomManager.Instance.findRoomId(enemy.transform.position.x, enemy.transform.position.y) && (!enemy.canMove || enemy.isBoss))
+            enemy.changeState(enemy.chaseState);
 
         enemy.Move();
     }
     public void Begin(Enemy enemy)
     {
         this.enemy = enemy;
-        if (enemy.isBoss)
-            enemy.speed = 3f;
-        else
-            enemy.speed = 1f;
+        enemy.speed = enemy.baseSpeed;
     }
     public void Leave()
     {
