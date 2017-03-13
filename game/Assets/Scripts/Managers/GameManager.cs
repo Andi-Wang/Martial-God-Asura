@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     public static GameManager instance = null;              //Static instance of GameManager which allows it to be accessed by any other script.
     [HideInInspector] public bool playersTurn = true;       //Boolean to check if it's players turn, hidden in inspector but public.
     public int level;
+    public int subLevel;
     public int currentRoom;
     public HUDNotificationManager notiManager;
 
@@ -96,7 +97,7 @@ public class GameManager : MonoBehaviour
                 levelText = GameObject.Find("LevelText").GetComponent<Text>();
 
                 //Set the text of levelText to the string "Day" and append the current level number.
-                levelText.text = "Level " + level;
+                levelText.text = "Level " + level + " - Part " + subLevel;
 
                 //Set levelImage to active blocking player's view of the game board during setup.
                 levelImage.SetActive(true);
