@@ -19,9 +19,12 @@ public class PickupTrigger : MonoBehaviour {
         if (Input.GetButtonUp("Interact") && entered == true)
         {
             hintUIController.toggleHint();
+
+            // we can go to next level now
+            GameManager.instance.SubLevelComplete = true;
+
             //TODO: update repository
             gameObject.SetActive(false);
-
         }
     }
 

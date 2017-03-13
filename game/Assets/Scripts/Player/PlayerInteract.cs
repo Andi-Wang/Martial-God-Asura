@@ -40,5 +40,9 @@ public class PlayerInteract : MonoBehaviour {
         {
             playerRigidbody2D.position = levelExit;
         }
+        else if (otherObj.name == "NextLevelDoor" && GameManager.instance.SubLevelComplete)
+        {
+            GameManager.instance.gotoNextLevel();
+        }
     }
 }

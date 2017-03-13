@@ -28,6 +28,7 @@ public class GameManager : MonoBehaviour
     LadderManager ladderManager;
     static bool startFromLoad = false;
     static GameStatus gs;
+    bool subLevelComplete = false;
 
     //Awake is always called before any Start functions
     void Awake()
@@ -250,6 +251,23 @@ public class GameManager : MonoBehaviour
     public static void Resume()
     {
         Time.timeScale = 1;
+    }
+
+    public void gotoNextLevel()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    }
+
+    public bool SubLevelComplete
+    {
+        get
+        {
+            return subLevelComplete;
+        }
+        set
+        {
+            subLevelComplete = value;
+        }
     }
 }
 
