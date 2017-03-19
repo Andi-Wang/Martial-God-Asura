@@ -4,6 +4,8 @@ using System.Collections;
 using UnityEngine.UI;
 
 public class Skill {
+    const int assumedFPS = 60;
+
 
     public class SkillStateManager {
         public bool dashing = false;
@@ -19,7 +21,8 @@ public class Skill {
 
         //currently set to true by default since there's no keybind to toggle this manually
         public bool onslaughtToggle = true;
-        public Entity bonusStats = new Entity();
+        public bool glideToggle = false;
+        public bool fastFallToggle = false;
     }
 
     //Grants bonus armor (percentage damage reduction) while dashing
@@ -99,19 +102,19 @@ public class Skill {
     //Speeds up animations (basically only affects attacks), but disables energy regeneration while toggled on
     //Automatically untoggles when below a certain Energy threshold (% of max mana)
     //Call this regularly to update toggle status
-    public object[] Onslaught(bool onslaughtToggle, float currentEnergy, float maxEnergy) {
+    public bool OnslaughtToggle(bool onslaughtToggle, float currentEnergy, float maxEnergy) {
         float automaticDisableThreshold = 0.1f;
-        float bonusAnimationSpeed = 0;
 
         if (currentEnergy / maxEnergy < automaticDisableThreshold) {
             onslaughtToggle = false;
         }
 
-        if(onslaughtToggle) {
-            bonusAnimationSpeed = 0.4f;
-        }
-
-        return new object[2] { (object)onslaughtToggle, (object)bonusAnimationSpeed };
+        return onslaughtToggle;
+    }
+    public float OnslaughtEffect(bool onslaughtToggle) {
+        float bonusAnimationSpeed = 0;
+        if (onslaughtToggle) bonusAnimationSpeed = 0.4f;
+        return bonusAnimationSpeed;
     }
 
     
@@ -158,7 +161,6 @@ public class Skill {
         float minSpeed = 12f;
         float maxSpeed = 34f;
         float decay = 2f;
-        float assumedFPS = 60f;
 
         if (forceStart || dashSpeed > minSpeed) {
             if (dashSpeed == 0) {
@@ -187,7 +189,6 @@ public class Skill {
         float minSpeed = 6f;
         float maxSpeed = 17f;
         float enhancementBoost = 7f;
-        float assumedFPS = 60f;
 
         if (enhanced) {
             minSpeed += enhancementBoost;
@@ -222,12 +223,11 @@ public class Skill {
 
     
 
-    public float Airdash(Rigidbody2D body, bool facingRight, float airdashSpeed, bool forceStart) {
-        float minSpeed = 12f;
-        float maxSpeed = 32f;
-        float decay = 1.2f;
+    public float Airdash(Rigidbody2D body, Entity buffEntity, bool facingRight, float airdashSpeed, bool forceStart) {
+        float maxSpeed = 20f;
+        float minSpeed = Mathf.Min(16f + buffEntity.maxSpeed, maxSpeed);
+        float decay = (maxSpeed - minSpeed)/10;
         float verticalSpeedModifier = 12f;
-        float assumedFPS = 60f;
 
         if (forceStart || airdashSpeed > minSpeed) {
             float verticalSpeedOffset = 0f;
@@ -242,10 +242,12 @@ public class Skill {
             }
 
             if (facingRight) {
-                body.velocity = new Vector2(airdashSpeed, verticalSpeedOffset);
+                body.velocity = new Vector2(airdashSpeed, 0);
+                //body.velocity = new Vector2(airdashSpeed, verticalSpeedOffset);
             }
             else {
-                body.velocity = new Vector2(-airdashSpeed, verticalSpeedOffset);
+                body.velocity = new Vector2(-airdashSpeed, 0);
+                //body.velocity = new Vector2(-airdashSpeed, verticalSpeedOffset);
             }
         }
         else {
@@ -254,35 +256,50 @@ public class Skill {
         return airdashSpeed;
     }
 
-    public void Glide(Rigidbody2D body, float defaultGravity, float x) {
-        float velocityMultiplier = 0.25f;
-        float gravityScaleMultiplier = 0.05f;
+    public bool GlideToggle(Rigidbody2D body, bool glideToggle, bool grounded, bool justActivated) {
+        float castThreshold = 4f;
+        float velocityMultiplier = 0f;
 
-        //If the body's gravity is currently normal or greater than normal (by some other effect), start floating
-        //Also checks if the body is moving down; don't want it to be able to increase max jump height
-        if (body.gravityScale >= defaultGravity && body.velocity.y < 0f) {
-            //Slows the body immediately upon cast if falling
-            if (body.velocity.y < 0f) {
-                body.velocity = new Vector2(x, body.velocity.y * velocityMultiplier);
+        if(justActivated) {
+            if(!glideToggle && body.velocity.y < castThreshold) {
+                glideToggle = true;
+                float newY = Mathf.Min(0, velocityMultiplier * body.velocity.y);
+                body.velocity = new Vector2(body.velocity.x, newY);
             }
+            else {
+                glideToggle = false;
+            }
+        }
+        if(grounded) {
+            glideToggle = false;
+        }
 
-            body.gravityScale *= gravityScaleMultiplier;
-        }
-        //If the body's gravity is less than normal but is greater than or equal to what Float can achieve, return to normal gravity
-        //This basically means that if there's a stronger antigravity effect affecting the body, using Float will do nothing
-        else if (body.gravityScale >= defaultGravity * gravityScaleMultiplier) {
-            body.gravityScale = defaultGravity;
-        }
+        return glideToggle;
+    }
+    public float GlideEffect(bool glideToggle) {
+        float bonusGravity = 0;
+        if (glideToggle) bonusGravity = -0.93f;
+        return bonusGravity;
     }
 
-    public void FastFall(Rigidbody2D body, float x) {
+
+    public bool FastFallToggle(Rigidbody2D body, bool fastFallToggle, bool grounded, bool justActivated) {
         float castThreshold = 4f;
         float initialFallSpeed = -8f;
-        float gravity = 8f;
 
-        if (body.velocity.y < castThreshold) {
-            body.velocity = new Vector2(x, initialFallSpeed);
-            body.gravityScale = gravity;
+        if(grounded) {
+            fastFallToggle = false;
         }
+        else if (justActivated && body.velocity.y < castThreshold) {
+            fastFallToggle = true;
+            body.velocity = new Vector2(body.velocity.x, initialFallSpeed);
+        }
+
+        return fastFallToggle;
+    }
+    public float FastFallEffect(bool fastFallToggle) {
+        float bonusGravity = 0;
+        if (fastFallToggle) bonusGravity = 7f;
+        return bonusGravity;
     }
 }

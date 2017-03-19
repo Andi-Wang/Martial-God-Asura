@@ -199,8 +199,9 @@ namespace UnityStandardAssets._2D {
             //Calculate bonus stats from buffs
             float[] ironStrikesOutput = skill.IronStrikes_Passive(skillStateManager.ironStrikesStacks, timeSinceLastStrike);
             skillStateManager.ironStrikesStacks = (int)ironStrikesOutput[0];
-            object[] onslaughtOutput = skill.Onslaught(skillStateManager.onslaughtToggle, playerEntity.energy, playerEntity.maxEnergy);
-            skillStateManager.onslaughtToggle = (bool)onslaughtOutput[0];
+            skillStateManager.onslaughtToggle = skill.OnslaughtToggle(skillStateManager.onslaughtToggle, playerEntity.energy, playerEntity.maxEnergy);
+            skillStateManager.glideToggle = skill.GlideToggle(m_Rigidbody2D, skillStateManager.glideToggle, m_Grounded, false);
+            skillStateManager.fastFallToggle = skill.FastFallToggle(m_Rigidbody2D, skillStateManager.fastFallToggle, m_Grounded, false);
 
 
             //Bonus might
@@ -221,9 +222,13 @@ namespace UnityStandardAssets._2D {
             //Bonus movement speed
             buffEntity.maxSpeed = skill.Momentum_Passive(timeSinceLastStruck);
 
-            //Bonus animation speed
-            buffEntity.animationSpeed = (float)onslaughtOutput[1];
+            //Bonus gravity
+            buffEntity.gravity = skill.GlideEffect(skillStateManager.glideToggle) + skill.FastFallEffect(skillStateManager.fastFallToggle);
 
+            //Bonus animation speed
+            buffEntity.animationSpeed = skill.OnslaughtEffect(skillStateManager.onslaughtToggle);
+
+            m_Rigidbody2D.gravityScale = playerEntity.gravity + buffEntity.gravity;
             m_Anim.speed = playerEntity.animationSpeed + buffEntity.animationSpeed;
             addEnergy((playerEntity.energyRegen + buffEntity.energyRegen) * Time.deltaTime);
             addHealth((playerEntity.healthRegen + buffEntity.healthRegen) * Time.deltaTime);
@@ -249,8 +254,8 @@ namespace UnityStandardAssets._2D {
 
             //On the ground, so character can move
             if(m_Grounded) {
-                m_Rigidbody2D.gravityScale = 1.0f;
                 skillStateManager.secondJumpAvailable = true;
+                m_Rigidbody2D.gravityScale = 1f;
 
                 //Slidekick
                 if ((input.altMoveDown && m_Anim.GetBool("Crouch")) || skillStateManager.sliding) {
@@ -366,10 +371,11 @@ namespace UnityStandardAssets._2D {
                 m_Anim.SetFloat("Speed", Mathf.Abs(input.h));
 
                 if (input.vDown) {
-                    skill.FastFall(m_Rigidbody2D, input.h * (playerEntity.maxSpeed + buffEntity.maxSpeed));
+                    skillStateManager.fastFallToggle = skill.FastFallToggle(m_Rigidbody2D, skillStateManager.fastFallToggle, m_Grounded, true);
+                    skillStateManager.glideToggle = false;
                 }
                 else if (skillStateManager.airdashing || (skillStateManager.secondJumpAvailable && input.jumpDown)) {
-                    skillStateManager.airdashSpeed = skill.Airdash(m_Rigidbody2D, m_FacingRight, skillStateManager.airdashSpeed, skillStateManager.secondJumpAvailable && input.jumpDown);
+                    skillStateManager.airdashSpeed = skill.Airdash(m_Rigidbody2D, buffEntity, m_FacingRight, skillStateManager.airdashSpeed, skillStateManager.secondJumpAvailable && input.jumpDown);
                     skillStateManager.secondJumpAvailable = false;
                     if (skillStateManager.airdashSpeed > 0) {
                         skillStateManager.airdashing = true;
@@ -379,7 +385,8 @@ namespace UnityStandardAssets._2D {
                     }
                 }
                 else if (input.altMoveDown) {
-                    skill.Glide(m_Rigidbody2D, playerEntity.gravity, input.h * playerEntity.maxSpeed);
+                    skillStateManager.glideToggle = skill.GlideToggle(m_Rigidbody2D, skillStateManager.glideToggle, m_Grounded, true);
+                    skillStateManager.fastFallToggle = false;
                 }
                 else {
                     // Move the character
