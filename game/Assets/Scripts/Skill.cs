@@ -6,15 +6,116 @@ using UnityEngine.UI;
 public class Skill {
 
     public class SkillStateManager {
-        public bool backdashing = false;
-        public float backdashSpeed = 0f;
+        public bool dashing = false;
+        public float dashSpeed = 0f;
         public bool sliding = false;
         public float slideSpeed = 0f;
         public bool secondJumpAvailable = false;
         public bool airdashing = false;
         public float airdashSpeed = 0f;
         public float counter = 0f;
+        public int punchCounter = 0;
+        public int ironStrikesStacks = 0;
+
+        //currently set to true by default since there's no keybind to toggle this manually
+        public bool onslaughtToggle = true;
+        public Entity bonusStats = new Entity();
     }
+
+    //Grants bonus armor (percentage damage reduction) while dashing
+    //Call this regularly to update armor values
+    public int EvasiveManeuvers_Passive(bool isDashing) {
+        int bonusArmor = 0;
+        if (isDashing) {
+            bonusArmor = 50;
+        }
+        return bonusArmor;
+    }
+
+    //Build stacks by hitting enemies (probably melee attacks only)
+    //Grants bonus might (percentage damage bonus, currently for melee attacks only) and armor (percentage damage reduction) per stack
+    //Stacks fall off after not hitting any enemy for a certain period of time
+    //Call this regularly to update the number of stacks/might/armor
+    //Call this from PlayerHitbox with stacks+1 to increase stacks after a hit
+    public float[] IronStrikes_Passive(int stacks, float timeSinceLastStrike) {
+        int maxStacks = 6;
+        float bonusMightPerStack = 5;
+        float bonusArmorPerStack = 4;
+        float stackFalloffTime = 4f;
+
+        if (stacks > maxStacks) {
+            stacks = maxStacks;
+        }
+        else if(timeSinceLastStrike > stackFalloffTime) {
+            stacks = 0;
+        }
+
+        return new float[3] { (float)stacks, bonusMightPerStack * stacks, bonusArmorPerStack * stacks };
+    }
+
+    //After a brief period of not being struck, starts building up stacks that grant bonus movement speed (stacks fall off when struck)
+    //Call this regularly to update movespeed
+    public float Momentum_Passive(float timeSinceLastStruck) {
+        float bonusMovespeedPerStack = 0.5f;
+        int maxStacks = 5;
+        float timePerStack = 1f;
+        float minTime = 2f;
+
+        int stacks = 0;
+        if (timeSinceLastStruck > minTime) {
+            stacks = (int)(1 + (timeSinceLastStruck - minTime) / timePerStack);
+        }        
+        if(stacks > maxStacks) {
+            stacks = maxStacks;
+        }
+        
+        return stacks * bonusMovespeedPerStack;
+    }
+
+    //After a brief period of not being struck, regenerates health equal to the last source of damage over a duration
+    //Call this regularly to update health regeneration
+    public float FragileRegrowth_Passive(float timeSinceLastStruck, float lastDamageTaken) {
+        float minTime = 1f;
+        float duration = 5f;
+        float bonusHealthRegeneration = 0;
+
+        if(timeSinceLastStruck > minTime && timeSinceLastStruck < (minTime + duration)) {
+            bonusHealthRegeneration = lastDamageTaken / duration;
+        }
+
+        return bonusHealthRegeneration;
+    }
+
+
+    //Grants energy regen based on amount of missing energy (more regen when more energy is missing)
+    //Call this regularly to update energy regeneration
+    public float Renewal_Passive(float currentEnergy, float maxEnergy) {
+        float bonusEnergyRegenPerMissingEnergy = 0.01f;
+        float bonusEnergyRegen = (maxEnergy - currentEnergy) * bonusEnergyRegenPerMissingEnergy;
+        return bonusEnergyRegen;
+    }
+
+
+    //Speeds up animations (basically only affects attacks), but disables energy regeneration while toggled on
+    //Automatically untoggles when below a certain Energy threshold (% of max mana)
+    //Call this regularly to update toggle status
+    public object[] Onslaught(bool onslaughtToggle, float currentEnergy, float maxEnergy) {
+        float automaticDisableThreshold = 0.1f;
+        float bonusAnimationSpeed = 0;
+
+        if (currentEnergy / maxEnergy < automaticDisableThreshold) {
+            onslaughtToggle = false;
+        }
+
+        if(onslaughtToggle) {
+            bonusAnimationSpeed = 0.4f;
+        }
+
+        return new object[2] { (object)onslaughtToggle, (object)bonusAnimationSpeed };
+    }
+
+    
+
 
     //All-in-one method for different projectile types
     public float Projectile(Rigidbody2D body, bool facingRight, Rigidbody2D projectile, float counter, float frequencyMultiplier, float speed, float startDistance, int numProjectiles, float spread) {
@@ -52,33 +153,33 @@ public class Skill {
         return counter;
     }
 
-    public float Backdash(Rigidbody2D body, bool facingRight, float backdashSpeed, bool forceStart) {
+    public float Dash(Rigidbody2D body, bool facingRight, float dashSpeed, bool forceStart) {
 
-        float minSpeed = 6f;
-        float maxSpeed = 17f;
-        float decay = 1f;
+        float minSpeed = 12f;
+        float maxSpeed = 34f;
+        float decay = 2f;
         float assumedFPS = 60f;
 
-        if (forceStart || backdashSpeed > minSpeed) {
-            if (backdashSpeed == 0) {
-                backdashSpeed = maxSpeed;
+        if (forceStart || dashSpeed > minSpeed) {
+            if (dashSpeed == 0) {
+                dashSpeed = maxSpeed;
             }
             else {
-                backdashSpeed -= decay * Time.deltaTime * assumedFPS;
+                dashSpeed -= decay * Time.deltaTime * assumedFPS;
             }
 
             if (facingRight) {
-                body.velocity = new Vector2(-backdashSpeed, body.velocity.y);
+                body.velocity = new Vector2(dashSpeed, body.velocity.y);
             }
             else {
-                body.velocity = new Vector2(backdashSpeed, body.velocity.y);
+                body.velocity = new Vector2(-dashSpeed, body.velocity.y);
             }
         }
         else {
-            backdashSpeed = 0;
+            dashSpeed = 0;
         }
 
-        return backdashSpeed;
+        return dashSpeed;
     }
 
 
@@ -119,6 +220,7 @@ public class Skill {
         return slideSpeed;
     }
 
+    
 
     public float Airdash(Rigidbody2D body, bool facingRight, float airdashSpeed, bool forceStart) {
         float minSpeed = 12f;

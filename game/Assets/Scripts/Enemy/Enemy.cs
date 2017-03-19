@@ -57,7 +57,7 @@ public class Enemy : MonoBehaviour
         boxCollider = GetComponent<BoxCollider2D>();
         rb2D = GetComponent<Rigidbody2D>();
         //currentHealth = startingHealth;
-        enemyEntity = new Entity(startingHealth, 0f, 0f, 0f, 0f, 0f, 1f, 1f, 0f);
+        enemyEntity = new Entity(startingHealth, 0f, 0f, 0f, 0f, 0f, 0f, 1f, 1f, 0f);
         enemyAudio = GetComponent<AudioSource>();
     }
 

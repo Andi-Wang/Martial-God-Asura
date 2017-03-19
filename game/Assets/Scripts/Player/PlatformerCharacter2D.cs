@@ -13,7 +13,8 @@ namespace UnityStandardAssets._2D {
         public float flashSpeed = 2f;
 
         [SerializeField] private LayerMask m_WhatIsGround;                  // A mask determining what is ground to the character
-        [SerializeField] private Entity playerEntity = new Entity(100f, 100f, 0f, 5f, 0f, 500f, 10f, 1f, 0.7f);
+        [SerializeField] private Entity playerEntity = new Entity(100f, 100f, 0f, 5f, 0f, 0f, 500f, 10f, 1f, 0.7f);
+        public Entity buffEntity = new Entity();
         private Skill skill;
         private Skill.SkillStateManager skillStateManager = new Skill.SkillStateManager();
 
@@ -34,9 +35,18 @@ namespace UnityStandardAssets._2D {
         const float stunDurationWhenHit = 0.5f;
         const float knockbackForceWhenHit = 700f;
         const float airKnockdownVelocity = 6f;
-        float timeSinceLastHit = 1f;
+        float timeSinceLastStruck = 1f;
+        float lastDamageTaken = 0;
+        float timeSinceLastStrike = 1f;
         float stunned = 0;
         bool damaged = false;
+
+
+        public void strikeEnemy() {
+            timeSinceLastStrike = 0;
+            skillStateManager.ironStrikesStacks++;
+        }
+
 
         void Awake()
         {
@@ -60,26 +70,40 @@ namespace UnityStandardAssets._2D {
             }
             damaged = false;
         }
+
+        public float reduceDamageByArmor(float damage) {
+            float totalArmor = playerEntity.armor + buffEntity.armor;
+            return damage * 100 / (100 + totalArmor);
+        }
+
+        public float increaseDamageByMight(float damage) {
+            float totalMight = playerEntity.might + buffEntity.might;
+            return damage / 100 * (100 + totalMight);
+        }
+
         public void TakeDamage(float amount)
         {
+            amount = reduceDamageByArmor(amount);
+
             damaged = true;
 
-            if(timeSinceLastHit >= invincibilityDurationWhenHit) {
+            if(timeSinceLastStruck >= invincibilityDurationWhenHit) {
                 playerEntity.health -= amount;
+                lastDamageTaken = amount;
                 healthbar.fillAmount = playerEntity.health / playerEntity.maxHealth;
 
-                timeSinceLastHit = 0;
+                timeSinceLastStruck = 0;
                 stunned = stunDurationWhenHit;
 
                 skillStateManager = new Skill.SkillStateManager();
 
                 if(m_Grounded) {
-                    skillStateManager.backdashSpeed = skill.Backdash(m_Rigidbody2D, m_FacingRight, skillStateManager.backdashSpeed, true);
-                    if (skillStateManager.backdashSpeed > 0) {
-                        skillStateManager.backdashing = true;
+                    skillStateManager.dashSpeed = skill.Dash(m_Rigidbody2D, m_FacingRight, skillStateManager.dashSpeed, true);
+                    if (skillStateManager.dashSpeed > 0) {
+                        skillStateManager.dashing = true;
                     }
                     else {
-                        skillStateManager.backdashing = false;
+                        skillStateManager.dashing = false;
                     }
                 }
                 else {
@@ -171,9 +195,40 @@ namespace UnityStandardAssets._2D {
             //m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = false;
             //}
 
-            addEnergy(playerEntity.energyRegen * Time.deltaTime);
-            addHealth(playerEntity.healthRegen * Time.deltaTime);
-            timeSinceLastHit += Time.deltaTime;
+
+            //Calculate bonus stats from buffs
+            float[] ironStrikesOutput = skill.IronStrikes_Passive(skillStateManager.ironStrikesStacks, timeSinceLastStrike);
+            skillStateManager.ironStrikesStacks = (int)ironStrikesOutput[0];
+            object[] onslaughtOutput = skill.Onslaught(skillStateManager.onslaughtToggle, playerEntity.energy, playerEntity.maxEnergy);
+            skillStateManager.onslaughtToggle = (bool)onslaughtOutput[0];
+
+
+            //Bonus might
+            buffEntity.might = ironStrikesOutput[1];
+
+            //Bonus armor
+            buffEntity.armor = (ironStrikesOutput[2] + skill.EvasiveManeuvers_Passive(skillStateManager.dashing));
+
+            //Bonus health regeneration
+            buffEntity.healthRegen = skill.FragileRegrowth_Passive(timeSinceLastStruck, lastDamageTaken);
+
+            //Bonus energy regeneration (and animation speed)
+            buffEntity.energyRegen = skill.Renewal_Passive(playerEntity.energy, playerEntity.maxEnergy);
+            if(skillStateManager.onslaughtToggle) {
+                buffEntity.energyRegen = -playerEntity.energyRegen;
+            }
+
+            //Bonus movement speed
+            buffEntity.maxSpeed = skill.Momentum_Passive(timeSinceLastStruck);
+
+            //Bonus animation speed
+            buffEntity.animationSpeed = (float)onslaughtOutput[1];
+
+            m_Anim.speed = playerEntity.animationSpeed + buffEntity.animationSpeed;
+            addEnergy((playerEntity.energyRegen + buffEntity.energyRegen) * Time.deltaTime);
+            addHealth((playerEntity.healthRegen + buffEntity.healthRegen) * Time.deltaTime);
+            timeSinceLastStruck += Time.deltaTime;
+            timeSinceLastStrike += Time.deltaTime;
         }
 
 
@@ -222,14 +277,14 @@ namespace UnityStandardAssets._2D {
                     }
                 }
                 //Backdash
-                else if (input.altMoveDown || skillStateManager.backdashing) {
+                else if (input.altMoveDown || skillStateManager.dashing) {
                     m_Anim.SetBool("Crouch", false);
-                    skillStateManager.backdashSpeed = skill.Backdash(m_Rigidbody2D, m_FacingRight, skillStateManager.backdashSpeed, input.altMoveDown);
-                    if (skillStateManager.backdashSpeed > 0) {
-                        skillStateManager.backdashing = true;
+                    skillStateManager.dashSpeed = skill.Dash(m_Rigidbody2D, m_FacingRight, skillStateManager.dashSpeed, input.altMoveDown);
+                    if (skillStateManager.dashSpeed > 0) {
+                        skillStateManager.dashing = true;
                     }
                     else {
-                        skillStateManager.backdashing = false;
+                        skillStateManager.dashing = false;
                     }
                 }
 
@@ -291,7 +346,7 @@ namespace UnityStandardAssets._2D {
 					m_Anim.SetFloat ("Speed", Mathf.Abs (input.h));
 
 					// Move the character
-					m_Rigidbody2D.velocity = new Vector2 (input.h * playerEntity.maxSpeed, m_Rigidbody2D.velocity.y);
+					m_Rigidbody2D.velocity = new Vector2 (input.h * (playerEntity.maxSpeed + buffEntity.maxSpeed), m_Rigidbody2D.velocity.y);
 
 					// If the input is moving the player right and the player is facing left...
 					if (input.h > 0 && !m_FacingRight) {
@@ -311,7 +366,7 @@ namespace UnityStandardAssets._2D {
                 m_Anim.SetFloat("Speed", Mathf.Abs(input.h));
 
                 if (input.vDown) {
-                    skill.FastFall(m_Rigidbody2D, input.h * playerEntity.maxSpeed);
+                    skill.FastFall(m_Rigidbody2D, input.h * (playerEntity.maxSpeed + buffEntity.maxSpeed));
                 }
                 else if (skillStateManager.airdashing || (skillStateManager.secondJumpAvailable && input.jumpDown)) {
                     skillStateManager.airdashSpeed = skill.Airdash(m_Rigidbody2D, m_FacingRight, skillStateManager.airdashSpeed, skillStateManager.secondJumpAvailable && input.jumpDown);
