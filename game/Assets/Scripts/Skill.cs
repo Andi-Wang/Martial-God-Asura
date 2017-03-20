@@ -8,28 +8,55 @@ public class Skill {
 
 
     public class SkillStateManager {
-        public bool dashing = false;
-        public float dashSpeed = 0f;
-        public bool sliding = false;
-        public float slideSpeed = 0f;
+        
+        public float dashSpeed = 0;
+        public float backdashSpeed = 0;
+        public float slideSpeed = 0;
         public bool secondJumpAvailable = false;
-        public bool airdashing = false;
-        public float airdashSpeed = 0f;
+        
+        public float airdashSpeed = 0;
         public float counter = 0f;
         public int punchCounter = 0;
         public int ironStrikesStacks = 0;
 
         //currently set to true by default since there's no keybind to toggle this manually
-        public bool onslaughtToggle = true;
-        public bool glideToggle = false;
+        public bool onslaughtToggle = false;
         public bool fastFallToggle = false;
+
+        //Checks to see if anything (that needs to take place over multiple frames) is happening
+        public bool gliding = false;
+        public bool dashing = false;
+        public bool backdashing = false;
+        public bool sliding = false;
+        public bool airdashing = false;
+
+        public void getHit() {
+            dashing = false;
+            dashSpeed = 0;
+            backdashing = false;
+            backdashSpeed = 0;
+            sliding = false;
+            slideSpeed = 0;
+            airdashing = false;
+            airdashSpeed = 0;
+            gliding = false;
+            fastFallToggle = false;
+        }
+
+        public void land() {
+            airdashing = false;
+            airdashSpeed = 0;
+            gliding = false;
+            fastFallToggle = false;
+            secondJumpAvailable = true;
+        }
     }
 
     //Grants bonus armor (percentage damage reduction) while dashing
     //Call this regularly to update armor values
-    public int EvasiveManeuvers_Passive(bool isDashing) {
+    public int EvasiveManeuvers_Passive(bool dashing) {
         int bonusArmor = 0;
-        if (isDashing) {
+        if (dashing) {
             bonusArmor = 50;
         }
         return bonusArmor;
@@ -102,10 +129,10 @@ public class Skill {
     //Speeds up animations (basically only affects attacks), but disables energy regeneration while toggled on
     //Automatically untoggles when below a certain Energy threshold (% of max mana)
     //Call this regularly to update toggle status
-    public bool OnslaughtToggle(bool onslaughtToggle, float currentEnergy, float maxEnergy) {
-        float automaticDisableThreshold = 0.1f;
+    public bool OnslaughtToggle(bool onslaughtToggle, float currentEnergy) {
+        float automaticDisableThreshold = 10f;
 
-        if (currentEnergy / maxEnergy < automaticDisableThreshold) {
+        if (currentEnergy < automaticDisableThreshold) {
             onslaughtToggle = false;
         }
 
@@ -156,21 +183,23 @@ public class Skill {
         return counter;
     }
 
-    public float Dash(Rigidbody2D body, bool facingRight, float dashSpeed, bool forceStart) {
-
+    public float Dash(Rigidbody2D body, bool dashing, float dashSpeed, bool facingRight) {
         float minSpeed = 12f;
         float maxSpeed = 34f;
         float decay = 2f;
 
-        if (forceStart || dashSpeed > minSpeed) {
-            if (dashSpeed == 0) {
+        if(dashing) {
+            if(dashSpeed == 0) {
                 dashSpeed = maxSpeed;
             }
-            else {
+            else if(dashSpeed > minSpeed) {
                 dashSpeed -= decay * Time.deltaTime * assumedFPS;
             }
+            else {
+                dashSpeed = 0;
+            }
 
-            if (facingRight) {
+            if(facingRight) {
                 body.velocity = new Vector2(dashSpeed, body.velocity.y);
             }
             else {
@@ -183,29 +212,25 @@ public class Skill {
 
         return dashSpeed;
     }
+    public float Backdash(Rigidbody2D body, bool backdashing, float dashSpeed, bool facingRight) {
+        return Dash(body, backdashing, dashSpeed, !facingRight);
+    }
 
 
-    public float Slide(Rigidbody2D body, bool facingRight, float slideSpeed, bool forceStart, bool enhanced, bool slideCancel) {
+    public float Slide(Rigidbody2D body, bool sliding, float slideSpeed, bool facingRight) {
         float minSpeed = 6f;
         float maxSpeed = 17f;
-        float enhancementBoost = 7f;
-
-        if (enhanced) {
-            minSpeed += enhancementBoost;
-            maxSpeed += enhancementBoost;
-        }
-
         float decay = 1f;
 
-        if (enhanced && slideCancel) {
-            slideSpeed = 0;
-        }
-        else if (forceStart || slideSpeed > minSpeed) {
-            if (slideSpeed == 0) {
+        if (sliding) {
+            if(slideSpeed == 0) {
                 slideSpeed = maxSpeed;
             }
-            else {
+            else if(slideSpeed > minSpeed) {
                 slideSpeed -= decay * Time.deltaTime * assumedFPS;
+            }
+            else {
+                slideSpeed = 0;
             }
 
             if (facingRight) {
@@ -218,27 +243,30 @@ public class Skill {
         else {
             slideSpeed = 0;
         }
+
         return slideSpeed;
     }
 
     
 
-    public float Airdash(Rigidbody2D body, Entity buffEntity, bool facingRight, float airdashSpeed, bool forceStart) {
+    public float Airdash(Rigidbody2D body, bool airdashing, float airdashSpeed, bool facingRight) {
         float maxSpeed = 20f;
-        float minSpeed = Mathf.Min(16f + buffEntity.maxSpeed, maxSpeed);
-        float decay = (maxSpeed - minSpeed)/10;
+        float minSpeed = 16f;
+        float decay = 0.4f;
         float verticalSpeedModifier = 12f;
+        float verticalSpeedOffset = 0f;
 
-        if (forceStart || airdashSpeed > minSpeed) {
-            float verticalSpeedOffset = 0f;
-
+        if (airdashing) {          
             if (airdashSpeed == 0) {
                 airdashSpeed = maxSpeed;
                 verticalSpeedOffset = Mathf.Sqrt((airdashSpeed - minSpeed) / (maxSpeed - minSpeed)) * verticalSpeedModifier;
             }
-            else {
+            else if(airdashSpeed > minSpeed) {
                 verticalSpeedOffset = Mathf.Sqrt((airdashSpeed - minSpeed) / (maxSpeed - minSpeed)) * verticalSpeedModifier;
                 airdashSpeed -= decay * Time.deltaTime * assumedFPS;
+            }
+            else {
+                airdashSpeed = 0;
             }
 
             if (facingRight) {
@@ -256,35 +284,44 @@ public class Skill {
         return airdashSpeed;
     }
 
-    public bool GlideToggle(Rigidbody2D body, bool glideToggle, bool grounded, bool justActivated) {
+    /*
+    public bool GlideToggle(Rigidbody2D body, bool gliding, bool grounded, bool justActivated) {
         float castThreshold = 4f;
         float velocityMultiplier = 0f;
 
         if(justActivated) {
-            if(!glideToggle && body.velocity.y < castThreshold) {
-                glideToggle = true;
+            if(!gliding && body.velocity.y < castThreshold) {
+                gliding = true;
                 float newY = Mathf.Min(0, velocityMultiplier * body.velocity.y);
                 body.velocity = new Vector2(body.velocity.x, newY);
             }
             else {
-                glideToggle = false;
+                gliding = false;
             }
         }
         if(grounded) {
-            glideToggle = false;
+            gliding = false;
         }
 
-        return glideToggle;
+        return gliding;
     }
-    public float GlideEffect(bool glideToggle) {
-        float bonusGravity = 0;
-        if (glideToggle) bonusGravity = -0.93f;
-        return bonusGravity;
+    public void GlideActivated(Rigidbody2D body) {
+        float castThreshold = 4f;
+        float velocityMultiplier = 0f;
+        
+        if (body.velocity.y < castThreshold) {
+            float newY = Mathf.Min(0, velocityMultiplier * body.velocity.y);
+            body.velocity = new Vector2(body.velocity.x, newY);
+        }
+    }*/
+    public float GlideEffect() {
+        float maxFallSpeed = -0.12f;
+        return maxFallSpeed;
     }
 
 
     public bool FastFallToggle(Rigidbody2D body, bool fastFallToggle, bool grounded, bool justActivated) {
-        float castThreshold = 4f;
+        float castThreshold = 8f;
         float initialFallSpeed = -8f;
 
         if(grounded) {
@@ -299,7 +336,7 @@ public class Skill {
     }
     public float FastFallEffect(bool fastFallToggle) {
         float bonusGravity = 0;
-        if (fastFallToggle) bonusGravity = 7f;
+        if (fastFallToggle) bonusGravity = 6f;
         return bonusGravity;
     }
 }

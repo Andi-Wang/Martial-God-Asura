@@ -13,7 +13,7 @@ namespace UnityStandardAssets._2D {
         public float flashSpeed = 2f;
 
         [SerializeField] private LayerMask m_WhatIsGround;                  // A mask determining what is ground to the character
-        [SerializeField] private Entity playerEntity = new Entity(100f, 100f, 0f, 5f, 0f, 0f, 500f, 10f, 1f, 0.7f);
+        [SerializeField] private Entity playerEntity = new Entity(100f, 100f, 0f, 5f, 0f, 0f, 700f, 10f, 1f, 0.00001f); //very small crouch speed so the player can turn around when crouched
         public Entity buffEntity = new Entity();
         private Skill skill;
         private Skill.SkillStateManager skillStateManager = new Skill.SkillStateManager();
@@ -95,16 +95,12 @@ namespace UnityStandardAssets._2D {
                 timeSinceLastStruck = 0;
                 stunned = stunDurationWhenHit;
 
-                skillStateManager = new Skill.SkillStateManager();
+                //Interrupt certain actions like sliding
+                skillStateManager.getHit();
 
                 if(m_Grounded) {
-                    skillStateManager.dashSpeed = skill.Dash(m_Rigidbody2D, m_FacingRight, skillStateManager.dashSpeed, true);
-                    if (skillStateManager.dashSpeed > 0) {
-                        skillStateManager.dashing = true;
-                    }
-                    else {
-                        skillStateManager.dashing = false;
-                    }
+                    skillStateManager.backdashSpeed = skill.Backdash(m_Rigidbody2D, m_FacingRight, 0, true);
+                    skillStateManager.backdashing = true;
                 }
                 else {
                     m_Rigidbody2D.velocity = new Vector2(0, -airKnockdownVelocity);
@@ -133,6 +129,13 @@ namespace UnityStandardAssets._2D {
         public void addHealth(float amount) {
             playerEntity.health = Math.Min(playerEntity.health + amount, playerEntity.maxHealth);
             healthbar.fillAmount = playerEntity.health / playerEntity.maxHealth;
+        }
+        public bool energyCost(float cost) {
+            if (playerEntity.energy > cost) {
+                addEnergy(-cost);
+                return true;
+            }
+            else return false;
         }
 
         public float getHealth() {
@@ -199,8 +202,7 @@ namespace UnityStandardAssets._2D {
             //Calculate bonus stats from buffs
             float[] ironStrikesOutput = skill.IronStrikes_Passive(skillStateManager.ironStrikesStacks, timeSinceLastStrike);
             skillStateManager.ironStrikesStacks = (int)ironStrikesOutput[0];
-            skillStateManager.onslaughtToggle = skill.OnslaughtToggle(skillStateManager.onslaughtToggle, playerEntity.energy, playerEntity.maxEnergy);
-            skillStateManager.glideToggle = skill.GlideToggle(m_Rigidbody2D, skillStateManager.glideToggle, m_Grounded, false);
+            skillStateManager.onslaughtToggle = skill.OnslaughtToggle(skillStateManager.onslaughtToggle, playerEntity.energy);
             skillStateManager.fastFallToggle = skill.FastFallToggle(m_Rigidbody2D, skillStateManager.fastFallToggle, m_Grounded, false);
 
 
@@ -208,7 +210,10 @@ namespace UnityStandardAssets._2D {
             buffEntity.might = ironStrikesOutput[1];
 
             //Bonus armor
-            buffEntity.armor = (ironStrikesOutput[2] + skill.EvasiveManeuvers_Passive(skillStateManager.dashing));
+            buffEntity.armor = ironStrikesOutput[2];
+            if(stunned <= 0) {
+                buffEntity.armor += skill.EvasiveManeuvers_Passive(skillStateManager.dashing);
+            }
 
             //Bonus health regeneration
             buffEntity.healthRegen = skill.FragileRegrowth_Passive(timeSinceLastStruck, lastDamageTaken);
@@ -219,11 +224,11 @@ namespace UnityStandardAssets._2D {
                 buffEntity.energyRegen = -playerEntity.energyRegen;
             }
 
+            //Bonus gravity
+            buffEntity.gravity = skill.FastFallEffect(skillStateManager.fastFallToggle);
+
             //Bonus movement speed
             buffEntity.maxSpeed = skill.Momentum_Passive(timeSinceLastStruck);
-
-            //Bonus gravity
-            buffEntity.gravity = skill.GlideEffect(skillStateManager.glideToggle) + skill.FastFallEffect(skillStateManager.fastFallToggle);
 
             //Bonus animation speed
             buffEntity.animationSpeed = skill.OnslaughtEffect(skillStateManager.onslaughtToggle);
@@ -238,114 +243,164 @@ namespace UnityStandardAssets._2D {
 
 
         public void Move(Controls input) {
-            // If crouching, check to see if the character can stand up
-            if (!input.vDown && m_Anim.GetBool("Crouch")) {
-                // If the character has a ceiling preventing them from standing up, keep them crouching
-                if (Physics2D.OverlapCircle(m_CeilingCheck.position, k_CeilingRadius, m_WhatIsGround)) {
-                    input.vDown = true;
-                }
-            }
+            bool doNothing = false;
+
+            //Update crouching status; if there the player can't stand up because of a ceiling, the player continues crouching
+            if (Physics2D.OverlapCircle(m_CeilingCheck.position, k_CeilingRadius, m_WhatIsGround)) input.vDown = true;
+            m_Anim.SetBool("Crouch", input.vDown);
+
+
 
             //Stunlocked; inputs are ignored during this time
-            if(stunned > 0) {
+            if (stunned > 0) {
                 stunned -= Time.deltaTime;
                 input = new Controls();
             }
 
+            if ((skillStateManager.slideSpeed = skill.Slide(m_Rigidbody2D, skillStateManager.sliding, skillStateManager.slideSpeed, m_FacingRight)) == 0) {
+                skillStateManager.sliding = false;
+            }
+            else doNothing = true;
+
+            if ((skillStateManager.dashSpeed = skill.Dash(m_Rigidbody2D, skillStateManager.dashing, skillStateManager.dashSpeed, m_FacingRight)) == 0) {
+                skillStateManager.dashing = false;
+            }
+            else doNothing = true;
+
+            if ((skillStateManager.backdashSpeed = skill.Backdash(m_Rigidbody2D, skillStateManager.backdashing, skillStateManager.backdashSpeed, m_FacingRight)) == 0) {
+                skillStateManager.backdashing = false;
+            }
+            else doNothing = true;
+
+            if ((skillStateManager.airdashSpeed = skill.Airdash(m_Rigidbody2D, skillStateManager.airdashing, skillStateManager.airdashSpeed, m_FacingRight)) == 0) {
+                skillStateManager.airdashing = false;
+            }
+            else doNothing = true;
+
+
+            if (doNothing) {
+            }
             //On the ground, so character can move
-            if(m_Grounded) {
-                skillStateManager.secondJumpAvailable = true;
-                m_Rigidbody2D.gravityScale = 1f;
+            else if (m_Grounded) {
+                skillStateManager.land();
 
-                //Slidekick
-                if ((input.altMoveDown && m_Anim.GetBool("Crouch")) || skillStateManager.sliding) {
-                    bool enhanced = true;          //replace with a check to see if we have the slide enhancement passive
-                    bool slideCancel = false;
-
-                    if (enhanced && skillStateManager.sliding && input.altMoveUp) {
-                        slideCancel = true;
-                        //cancel the slidekick animation here and start the animation for the shockwave
-                    }
-
-                    skillStateManager.slideSpeed = skill.Slide(m_Rigidbody2D, m_FacingRight, skillStateManager.slideSpeed, input.altMoveDown, enhanced, slideCancel);
-
-                    if (skillStateManager.slideSpeed > 0) {
-                        if (!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("Low Kick") && !m_Anim.GetBool("BasicPunch") && !skillStateManager.sliding) {
-                            m_Anim.SetTrigger("LowKickT"); //Start kicking
-                            m_Anim.SetBool("BasicPunch", true); //Set BasicPunch to true because we are punching
-                            attacking = true; //Set attacking to true because we are attacking
-                        }
+                if(input.altMoveDown) {
+                    if (input.vDown) {
                         skillStateManager.sliding = true;
+                        m_Anim.SetTrigger("LowKickT"); //Start kicking
+                        m_Anim.SetBool("BasicPunch", true); //Set BasicPunch to true because we are punching
+                        attacking = true;
+                    }
+                    else if(input.vUp) {
                     }
                     else {
-                        skillStateManager.sliding = false;
-                    }
-                }
-                //Backdash
-                else if (input.altMoveDown || skillStateManager.dashing) {
-                    m_Anim.SetBool("Crouch", false);
-                    skillStateManager.dashSpeed = skill.Dash(m_Rigidbody2D, m_FacingRight, skillStateManager.dashSpeed, input.altMoveDown);
-                    if (skillStateManager.dashSpeed > 0) {
                         skillStateManager.dashing = true;
                     }
+                }
+                else if (input.altMoveHold) {
+                    if (input.vDown) {
+                    }
+                    else if (input.vUp) {
+                    }
                     else {
-                        skillStateManager.dashing = false;
                     }
                 }
-
-                else if (input.vUp) {
-                    if(input.fire1Down) {
+                else if (input.fire1Down) {
+                    if (input.vDown) {
+                    }
+                    else if (input.vUp) {
                         //Fireball nova; see Projectile function in Skill for a list of parameters
                         skill.Projectile(m_Rigidbody2D, m_FacingRight, m_fireball, 1, 0, 16, 2, 5, 20);
                     }
-                    else if(input.fire2Hold) {
-                        skillStateManager.counter = skill.Projectile(m_Rigidbody2D, m_FacingRight, m_fireball, skillStateManager.counter, 25, 20, 1, 1, 0);
-                    }
-                    else if(input.fire3Down) {
-                        skill.Projectile(m_Rigidbody2D, m_FacingRight, m_fireball, 1, 0, 8, 2, 1, 0);
+                    else {
+                        //Activates the punching hitbox and animation if we are not already punching;
+                        if (!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("Basic Punch") && !m_Anim.GetBool("BasicPunch")) {
+                            m_Anim.SetTrigger("BasicPunchT"); //Start punching
+                            m_Anim.SetBool("BasicPunch", true); //Set BasicPunch to true because we are punching
+                            attacking = true; //Set attacking to true because we are attacking
+                        }
                     }
                 }
-                //Activates the punching hitbox and animation if we are not already punching;
-                else if (input.fire1Down) {
-                    addEnergy(-10);
-                    if (!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("Basic Punch") && !m_Anim.GetBool("BasicPunch")) {
-                        m_Anim.SetTrigger("BasicPunchT"); //Start punching
-                        m_Anim.SetBool("BasicPunch", true); //Set BasicPunch to true because we are punching
-                        attacking = true; //Set attacking to true because we are attacking
+                else if (input.fire1Hold) {
+                    if (input.vDown) {
                     }
-
-                    //m_Rigidbody2D.gameObject.transform.Find("PunchHitbox").GetComponent<Collider2D>().enabled = true;
+                    else if (input.vUp) {
+                    }
+                    else {
+                    }
                 }
                 else if (input.fire2Down) {
-                    //Add kick stuff here
-					if (!m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Flip Kick") && !m_Anim.GetBool ("BasicPunch")) {
-						m_Anim.SetTrigger ("FlipKickT"); //Start punching
-						m_Anim.SetBool ("BasicPunch", true); //Set BasicPunch to true because we are punching
-						attacking = true; //Set attacking to true because we are attacking
-					}
+                    if (input.vDown) {
+                    }
+                    else if (input.vUp) {
+                    }
+                    else {
+                        //Add kick stuff here
+                        if (!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("Flip Kick") && !m_Anim.GetBool("BasicPunch")) {
+                            m_Anim.SetTrigger("FlipKickT"); //Start punching
+                            m_Anim.SetBool("BasicPunch", true); //Set BasicPunch to true because we are punching
+                            attacking = true; //Set attacking to true because we are attacking
+                        }
+                    }
+                }
+                else if (input.fire2Hold) {
+                    if (input.vDown) {
+                    }
+                    else if (input.vUp) {
+                        skillStateManager.counter = skill.Projectile(m_Rigidbody2D, m_FacingRight, m_fireball, skillStateManager.counter, 25, 20, 1, 1, 0);
+                    }
+                    else {
+                    }
                 }
                 else if (input.fire3Down) {
-                    //Add block stuff here
-					if (!m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Block") && !m_Anim.GetBool ("BasicPunch")) {
-						m_Anim.SetTrigger ("BlockT"); //Start punching
-						m_Anim.SetBool ("BasicPunch", true); //Set BasicPunch to true because we are punching
-						attacking = true; //Set attacking to true because we are attacking
-					}
+                    if (input.vDown) {
+                        skillStateManager.onslaughtToggle = !skillStateManager.onslaughtToggle;
+                    }
+                    else if (input.vUp) {
+                        skill.Projectile(m_Rigidbody2D, m_FacingRight, m_fireball, 1, 0, 8, 2, 1, 0);
+                    }
+                    else {
+                        //Add block stuff here
+                        if (!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("Block") && !m_Anim.GetBool("BasicPunch")) {
+                            m_Anim.SetTrigger("BlockT"); //Start punching
+                            m_Anim.SetBool("BasicPunch", true); //Set BasicPunch to true because we are punching
+                            attacking = true; //Set attacking to true because we are attacking
+                        }
+                    }
+                }
+                else if (input.fire3Hold) {
+                    if (input.vDown) {
+                    }
+                    else if (input.vUp) {
+                    }
+                    else {
+                    }
                 }
                 // If the player should jump...
-                else if (m_Grounded && input.jumpDown && m_Anim.GetBool ("Ground")) {
-				    // Add a vertical force to the player.
-					m_Grounded = false;
-					m_Anim.SetBool ("Ground", false);
-					m_Rigidbody2D.AddForce (new Vector2 (0f, playerEntity.jumpForce));
-				}
+                else if (input.jumpDown) {
+                    if (input.vDown) {
+                    }
+                    else if (input.vUp) {
+                    }
+                    else {
+                    }
+                    // Add a vertical force to the player.
+                    m_Grounded = false;
+                    m_Anim.SetBool("Ground", false);
+                    m_Rigidbody2D.AddForce(new Vector2(0f, playerEntity.jumpForce));
+                }
+                else if (input.jumpHold) {
+                    if (input.vDown) {
+                    }
+                    else if (input.vUp) {
+                    }
+                    else {
+                    }
+                }
                 //Perform movement commands if we are not currently attacking
                 else if (!attacking) {
 					// Reduce the speed if crouching by the crouchSpeed multiplier
 					input.h = (input.vDown ? input.h * playerEntity.crouchSpeed : input.h);
-
-					// Set whether or not the character is crouching in the animator
-					m_Anim.SetBool ("Crouch", input.vDown);
 
 					// The Speed animator parameter is set to the absolute value of the horizontal input.
 					m_Anim.SetFloat ("Speed", Mathf.Abs (input.h));
@@ -353,42 +408,97 @@ namespace UnityStandardAssets._2D {
 					// Move the character
 					m_Rigidbody2D.velocity = new Vector2 (input.h * (playerEntity.maxSpeed + buffEntity.maxSpeed), m_Rigidbody2D.velocity.y);
 
-					// If the input is moving the player right and the player is facing left...
+					// If the input is moving the player right and the player is facing left, flip the player
 					if (input.h > 0 && !m_FacingRight) {
-						// ... flip the player.
 						Flip ();
 					}
-                    // Otherwise if the input is moving the player left and the player is facing right...
+                    // Otherwise if the input is moving the player left and the player is facing right, flip the player
                     else if (input.h < 0 && m_FacingRight) {
-						// ... flip the player.
 						Flip ();
 					}
 				}
             }
             //In the air
             else {
-                // The Speed animator parameter is set to the absolute value of the horizontal input.
-                m_Anim.SetFloat("Speed", Mathf.Abs(input.h));
-
-                if (input.vDown) {
-                    skillStateManager.fastFallToggle = skill.FastFallToggle(m_Rigidbody2D, skillStateManager.fastFallToggle, m_Grounded, true);
-                    skillStateManager.glideToggle = false;
-                }
-                else if (skillStateManager.airdashing || (skillStateManager.secondJumpAvailable && input.jumpDown)) {
-                    skillStateManager.airdashSpeed = skill.Airdash(m_Rigidbody2D, buffEntity, m_FacingRight, skillStateManager.airdashSpeed, skillStateManager.secondJumpAvailable && input.jumpDown);
-                    skillStateManager.secondJumpAvailable = false;
-                    if (skillStateManager.airdashSpeed > 0) {
+                if (input.altMoveDown) {
+                    if(skillStateManager.secondJumpAvailable) {
                         skillStateManager.airdashing = true;
+                        skillStateManager.secondJumpAvailable = false;
+                        skillStateManager.fastFallToggle = false;
+                    }
+                }
+                else if (input.altMoveHold) {
+                    if (m_Rigidbody2D.velocity.y > 0) {
                     }
                     else {
-                        skillStateManager.airdashing = false;
                     }
                 }
-                else if (input.altMoveDown) {
-                    skillStateManager.glideToggle = skill.GlideToggle(m_Rigidbody2D, skillStateManager.glideToggle, m_Grounded, true);
-                    skillStateManager.fastFallToggle = false;
+                else if (input.fire1Down) {
+                    if (m_Rigidbody2D.velocity.y > 0) {
+                    }
+                    else {
+                    }
+                }
+                else if (input.fire1Hold) {
+                    if (m_Rigidbody2D.velocity.y > 0) {
+                    }
+                    else {
+                    }
+                }
+                else if (input.fire2Down) {
+                    if (m_Rigidbody2D.velocity.y > 0) {
+                    }
+                    else {
+                    }
+                }
+                else if (input.fire2Hold) {
+                    if (m_Rigidbody2D.velocity.y > 0) {
+                    }
+                    else {
+                    }
+                }
+                else if (input.fire3Down) {
+                    if (m_Rigidbody2D.velocity.y > 0) {
+                    }
+                    else {
+                    }
+                }
+                else if (input.fire3Hold) {
+                    if (m_Rigidbody2D.velocity.y > 0) {
+                    }
+                    else {
+                    }
+                }
+                // If the player should jump...
+                else if (input.jumpDown) {
+
+                }
+                else if (input.jumpHold) {
+                    if (m_Rigidbody2D.velocity.y > 0) {
+                    }
+                    else {
+                        skillStateManager.gliding = true;
+                        skillStateManager.fastFallToggle = false;
+                    }
+                }
+                else if(input.vDown) {
+                    if (skillStateManager.fastFallToggle = skill.FastFallToggle(m_Rigidbody2D, skillStateManager.fastFallToggle, m_Grounded, true)) {
+                        skillStateManager.gliding = false;
+                    }
                 }
                 else {
+                    skillStateManager.gliding = false;
+                }
+
+                if(true) {
+                    //If gliding, cap fall speed
+                    if(skillStateManager.gliding && m_Rigidbody2D.velocity.y < skill.GlideEffect()) {
+                        m_Rigidbody2D.velocity = new Vector2(m_Rigidbody2D.velocity.x, skill.GlideEffect());
+                    }                    
+                    
+                    // The Speed animator parameter is set to the absolute value of the horizontal input.
+                    m_Anim.SetFloat("Speed", Mathf.Abs(input.h));
+
                     // Move the character
                     if (input.h != 0) {
                         m_Rigidbody2D.velocity = new Vector2(input.h * playerEntity.maxSpeed, m_Rigidbody2D.velocity.y);
@@ -398,14 +508,12 @@ namespace UnityStandardAssets._2D {
                     }
 
 
-                    // If the input is moving the player right and the player is facing left...
+                    // If the input is moving the player right and the player is facing left, flip the player
                     if (input.h > 0 && !m_FacingRight) {
-                        // ... flip the player.
                         Flip();
                     }
-                    // Otherwise if the input is moving the player left and the player is facing right...
+                    // Otherwise if the input is moving the player left and the player is facing right, flip the player
                     else if (input.h < 0 && m_FacingRight) {
-                        // ... flip the player.
                         Flip();
                     }
                 }
