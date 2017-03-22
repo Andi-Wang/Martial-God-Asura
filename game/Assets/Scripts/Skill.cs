@@ -15,7 +15,8 @@ public class Skill {
         public bool secondJumpAvailable = false;
         
         public float airdashSpeed = 0;
-        public float counter = 0f;
+        public float channelCounter = 0;
+        public float fireballCounter = 0;
         public int punchCounter = 0;
         public int ironStrikesStacks = 0;
 
@@ -29,6 +30,7 @@ public class Skill {
         public bool backdashing = false;
         public bool sliding = false;
         public bool airdashing = false;
+        public bool holdCasting = false;
 
         public void getHit() {
             dashing = false;
@@ -181,6 +183,10 @@ public class Skill {
         }
 
         return counter;
+    }
+    public static float FireballEffect() {
+        float damage = 5;
+        return damage;
     }
 
     public float Dash(Rigidbody2D body, bool dashing, float dashSpeed, bool facingRight) {

@@ -239,6 +239,7 @@ namespace UnityStandardAssets._2D {
             addHealth((playerEntity.healthRegen + buffEntity.healthRegen) * Time.deltaTime);
             timeSinceLastStruck += Time.deltaTime;
             timeSinceLastStrike += Time.deltaTime;
+            skillStateManager.fireballCounter += Time.deltaTime;
         }
 
 
@@ -248,8 +249,6 @@ namespace UnityStandardAssets._2D {
             //Update crouching status; if there the player can't stand up because of a ceiling, the player continues crouching
             if (Physics2D.OverlapCircle(m_CeilingCheck.position, k_CeilingRadius, m_WhatIsGround)) input.vDown = true;
             m_Anim.SetBool("Crouch", input.vDown);
-
-
 
             //Stunlocked; inputs are ignored during this time
             if (stunned > 0) {
@@ -286,10 +285,6 @@ namespace UnityStandardAssets._2D {
 
                 if(input.altMoveDown) {
                     if (input.vDown) {
-                        skillStateManager.sliding = true;
-                        m_Anim.SetTrigger("LowKickT"); //Start kicking
-                        m_Anim.SetBool("BasicPunch", true); //Set BasicPunch to true because we are punching
-                        attacking = true;
                     }
                     else if(input.vUp) {
                     }
@@ -307,10 +302,19 @@ namespace UnityStandardAssets._2D {
                 }
                 else if (input.fire1Down) {
                     if (input.vDown) {
+                        //Slidekick
+                        skillStateManager.sliding = true;
+                        m_Anim.SetTrigger("LowKickT"); //Start kicking
+                        m_Anim.SetBool("BasicPunch", true); //Set BasicPunch to true because we are punching
+                        attacking = true;
                     }
                     else if (input.vUp) {
-                        //Fireball nova; see Projectile function in Skill for a list of parameters
-                        skill.Projectile(m_Rigidbody2D, m_FacingRight, m_fireball, 1, 0, 16, 2, 5, 20);
+                        //Crescent Kick
+                        if (!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("Flip Kick") && !m_Anim.GetBool("BasicPunch")) {
+                            m_Anim.SetTrigger("FlipKickT"); //Start punching
+                            m_Anim.SetBool("BasicPunch", true); //Set BasicPunch to true because we are punching
+                            attacking = true; //Set attacking to true because we are attacking
+                        }
                     }
                     else {
                         //Activates the punching hitbox and animation if we are not already punching;
@@ -329,73 +333,150 @@ namespace UnityStandardAssets._2D {
                     else {
                     }
                 }
-                else if (input.fire2Down) {
-                    if (input.vDown) {
+                //Note that fire2Up is used instead of fire2Down
+                else if (input.fire2Up) {
+                    if(skillStateManager.holdCasting) {
+                        //Don't also cast this skill if a hold-cast skill was used
+                        skillStateManager.holdCasting = false;
+                        skillStateManager.channelCounter = 0;
+                    }
+                    else if (input.vDown) {
+                        //Water Dragon
+                        //skill.Projectile(m_Rigidbody2D, m_FacingRight, Rigidbody2D projectile, 1, 0, 0, 1, 1, 0);
                     }
                     else if (input.vUp) {
                     }
                     else {
-                        //Add kick stuff here
-                        if (!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("Flip Kick") && !m_Anim.GetBool("BasicPunch")) {
-                            m_Anim.SetTrigger("FlipKickT"); //Start punching
+                        bool combo = false;
+                        if(skillStateManager.fireballCounter < 1) {
+                            m_Anim.speed += 1;
+                            combo = true;
+                        }
+
+                        if (!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("Basic Punch") && !m_Anim.GetBool("BasicPunch")) {
+                            m_Anim.SetTrigger("BasicPunchT"); //Start punching
                             m_Anim.SetBool("BasicPunch", true); //Set BasicPunch to true because we are punching
                             attacking = true; //Set attacking to true because we are attacking
+
+
+                            //Fireball
+                            skill.Projectile(m_Rigidbody2D, m_FacingRight, m_fireball, 1, 0, 12, 2, 1, 0);
+                            skillStateManager.fireballCounter = 0;
+                        }
+
+                        if(combo) {
+                            m_Anim.speed -= 1;
                         }
                     }
                 }
-                else if (input.fire2Hold) {
-                    if (input.vDown) {
-                    }
-                    else if (input.vUp) {
-                        skillStateManager.counter = skill.Projectile(m_Rigidbody2D, m_FacingRight, m_fireball, skillStateManager.counter, 25, 20, 1, 1, 0);
-                    }
-                    else {
+                else if (input.fire2Hold && !skillStateManager.holdCasting) {
+                    //Play channel animation here
+                    Channel();
+
+                    float threshold = 0.8f;
+                    skillStateManager.channelCounter += Time.deltaTime;
+                    if(skillStateManager.channelCounter > threshold) {
+                        skillStateManager.holdCasting = true;
+
+
+                        if (input.vDown) {
+                            //Iceberg
+                            //skill.Projectile(m_Rigidbody2D, m_FacingRight, Rigidbody2D projectile, 1, 0, 7, 2, 1, 0);
+                        }
+                        else if (input.vUp) {
+                            //Call Lightning
+                            //skill.Projectile(m_Rigidbody2D, m_FacingRight, Rigidbody2D projectile, 1, 0, 0, 3, 1, 0);
+                        }
+                        else {
+                            //Meteor
+                            //skill.Projectile(m_Rigidbody2D, m_FacingRight, Rigidbody2D projectile, 1, 0, 0, 4, 1, 0);
+                        }
                     }
                 }
-                else if (input.fire3Down) {
-                    if (input.vDown) {
+                //Note that fire3Up is used instead of fire3Down
+                else if (input.fire3Up) {
+                    if (skillStateManager.holdCasting) {
+                        //Don't also cast this skill if a hold-cast skill was used
+                        skillStateManager.holdCasting = false;
+                        skillStateManager.channelCounter = 0;
+                    }
+                    else if (input.vDown) {
+                        //Barrier Sigil
+                        //skill.Projectile(m_Rigidbody2D, m_FacingRight, Rigidbody2D projectile, 1, 0, 0, 0, 1, 0);
+                    }
+                    else if (input.vUp) {
+                        //Draining Sigil
+                        //skill.Projectile(m_Rigidbody2D, m_FacingRight, Rigidbody2D projectile, 1, 0, 0, 0, 1, 0);
+                    }
+                    else {
+                        //Lesser Spirit Bolt
+                        //skill.Projectile(m_Rigidbody2D, m_FacingRight, Rigidbody2D projectile, 1, 0, 20, 2, 1, 0);
+                    }
+                }
+                else if (input.fire3Hold && !skillStateManager.holdCasting) {
+                    //Play channel animation here
+                    Channel();
+
+                    float threshold = 0.8f;
+                    skillStateManager.channelCounter += Time.deltaTime;
+                    if (skillStateManager.channelCounter > threshold) {
+                        skillStateManager.holdCasting = true;
+                        
+                        if (input.vDown) {
+                        }
+                        else if (input.vUp) {
+                            //Teleport Sigil
+                            
+                        }
+                        else {
+                            //Greater Spirit Bolt
+                            //skill.Projectile(m_Rigidbody2D, m_FacingRight, Rigidbody2D projectile, 1, 0, 20, 2, 1, 0);
+                        }
+                    }
+                }
+                else if (input.fire4Up) {
+                    if (skillStateManager.holdCasting) {
+                        //Don't also cast this skill if a hold-cast skill was used
+                        skillStateManager.holdCasting = false;
+                        skillStateManager.channelCounter = 0;
+                    }
+                    else if (input.vDown) {
+                    }
+                    else if (input.vUp) {
+                        //Onslaught
                         skillStateManager.onslaughtToggle = !skillStateManager.onslaughtToggle;
                     }
-                    else if (input.vUp) {
-                        skill.Projectile(m_Rigidbody2D, m_FacingRight, m_fireball, 1, 0, 8, 2, 1, 0);
-                    }
                     else {
-                        //Add block stuff here
-                        if (!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("Block") && !m_Anim.GetBool("BasicPunch")) {
-                            m_Anim.SetTrigger("BlockT"); //Start punching
-                            m_Anim.SetBool("BasicPunch", true); //Set BasicPunch to true because we are punching
-                            attacking = true; //Set attacking to true because we are attacking
-                        }
                     }
                 }
-                else if (input.fire3Hold) {
-                    if (input.vDown) {
-                    }
-                    else if (input.vUp) {
-                    }
-                    else {
+                else if (input.fire4Hold && !skillStateManager.holdCasting) {
+                    //Play channel animation here
+                    Channel();
+
+                    float threshold = 0.8f;
+                    skillStateManager.channelCounter += Time.deltaTime;
+                    if (skillStateManager.channelCounter > threshold) {
+                        skillStateManager.holdCasting = true;
+                        
+                        if (input.vDown) {
+                            //Summon Skeletal Dragon
+                        }
+                        else if (input.vUp) {
+                            //Summon Shadow Bat/Ghoul
+                        }
+                        else {
+                            //Summon Spirit Wolf
+                        }
                     }
                 }
                 // If the player should jump...
                 else if (input.jumpDown) {
-                    if (input.vDown) {
-                    }
-                    else if (input.vUp) {
-                    }
-                    else {
-                    }
                     // Add a vertical force to the player.
                     m_Grounded = false;
                     m_Anim.SetBool("Ground", false);
                     m_Rigidbody2D.AddForce(new Vector2(0f, playerEntity.jumpForce));
                 }
                 else if (input.jumpHold) {
-                    if (input.vDown) {
-                    }
-                    else if (input.vUp) {
-                    }
-                    else {
-                    }
                 }
                 //Perform movement commands if we are not currently attacking
                 else if (!attacking) {
@@ -428,55 +509,39 @@ namespace UnityStandardAssets._2D {
                     }
                 }
                 else if (input.altMoveHold) {
-                    if (m_Rigidbody2D.velocity.y > 0) {
-                    }
-                    else {
-                    }
                 }
                 else if (input.fire1Down) {
-                    if (m_Rigidbody2D.velocity.y > 0) {
+                    if (skillStateManager.fastFallToggle) {
+                        //Swooping Strike
+                    }
+                    if(input.vUp) {
+                        //Crescent Kick; currently an animation bug or something preventing it from being used
+                        if (!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("Flip Kick") && !m_Anim.GetBool("BasicPunch")) {
+                            m_Anim.SetTrigger("FlipKickT"); //Start punching
+                            m_Anim.SetBool("BasicPunch", true); //Set BasicPunch to true because we are punching
+                            attacking = true; //Set attacking to true because we are attacking
+                        }
                     }
                     else {
+                        //Cyclone Kick
                     }
                 }
                 else if (input.fire1Hold) {
-                    if (m_Rigidbody2D.velocity.y > 0) {
-                    }
-                    else {
-                    }
                 }
                 else if (input.fire2Down) {
-                    if (m_Rigidbody2D.velocity.y > 0) {
-                    }
-                    else {
-                    }
+                    //Shark Crescent
+                    //skill.Projectile(m_Rigidbody2D, m_FacingRight, Rigidbody2D projectile, 1, 0, 0, 0, 1, 0);
                 }
                 else if (input.fire2Hold) {
-                    if (m_Rigidbody2D.velocity.y > 0) {
-                    }
-                    else {
-                    }
                 }
                 else if (input.fire3Down) {
-                    if (m_Rigidbody2D.velocity.y > 0) {
-                    }
-                    else {
-                    }
                 }
                 else if (input.fire3Hold) {
-                    if (m_Rigidbody2D.velocity.y > 0) {
-                    }
-                    else {
-                    }
                 }
-                // If the player should jump...
                 else if (input.jumpDown) {
-
                 }
                 else if (input.jumpHold) {
-                    if (m_Rigidbody2D.velocity.y > 0) {
-                    }
-                    else {
+                    if (m_Rigidbody2D.velocity.y < 0) {
                         skillStateManager.gliding = true;
                         skillStateManager.fastFallToggle = false;
                     }
@@ -518,6 +583,11 @@ namespace UnityStandardAssets._2D {
                     }
                 }
             }
+        }
+
+        //Stop horizontal movement and play an animation when channeling a skill
+        private void Channel() {
+            m_Rigidbody2D.velocity = new Vector2(0, m_Rigidbody2D.velocity.y);
         }
 
         private void Flip() {

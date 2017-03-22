@@ -29,6 +29,10 @@ public class Controls {
     public bool fire3Down;
     public bool fire3Hold;
 
+    public bool fire4Up;
+    public bool fire4Down;
+    public bool fire4Hold;
+
     public void resetButtonDown() {
         altMoveDown = false;
         altMoveUp = false;
@@ -38,14 +42,11 @@ public class Controls {
         fire1Up = false;
         fire2Up = false;
         fire3Up = false;
+        fire4Up = false;
 
         fire1Down = false;
         fire2Down = false;
         fire3Down = false;
-
-        /*
-        fire1Hold = false;
-        fire2Hold = false;
-        fire3Hold = false;*/
+        fire4Down = false;
     }
 }

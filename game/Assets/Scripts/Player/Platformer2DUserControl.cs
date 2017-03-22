@@ -77,6 +77,9 @@ namespace UnityStandardAssets._2D
             if (!input.fire3Up) {
                 input.fire3Up = CrossPlatformInputManager.GetButtonUp("Fire3");
             }
+            if (!input.fire4Up) {
+                input.fire4Up = CrossPlatformInputManager.GetButtonUp("Fire4");
+            }
 
             if (!input.fire1Down) {
                 input.fire1Down = CrossPlatformInputManager.GetButtonDown("Fire1");
@@ -87,17 +90,9 @@ namespace UnityStandardAssets._2D
             if (!input.fire3Down) {
                 input.fire3Down = CrossPlatformInputManager.GetButtonDown("Fire3");
             }
-
-            /*
-            if(!input.fire1Hold) {
-                input.fire1Hold = CrossPlatformInputManager.GetButton("Fire1");
+            if (!input.fire4Down) {
+                input.fire4Down = CrossPlatformInputManager.GetButtonDown("Fire4");
             }
-            if (!input.fire2Hold) {
-                input.fire2Hold = CrossPlatformInputManager.GetButton("Fire2");
-            }
-            if (!input.fire3Hold) {
-                input.fire3Hold = CrossPlatformInputManager.GetButton("Fire3");
-            }*/
         }
 
 
@@ -118,6 +113,7 @@ namespace UnityStandardAssets._2D
             input.fire1Hold = CrossPlatformInputManager.GetButton("Fire1");
             input.fire2Hold = CrossPlatformInputManager.GetButton("Fire2");
             input.fire3Hold = CrossPlatformInputManager.GetButton("Fire3");
+            input.fire4Hold = CrossPlatformInputManager.GetButton("Fire4");
 
             m_Character.Move(input);
             input.resetButtonDown();
