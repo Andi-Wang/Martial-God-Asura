@@ -1,24 +1,19 @@
 fileFormatVersion: 2
-guid: 2bde7a4d92a14ac46a712c6b54d7c8a3
-timeCreated: 1490383866
+guid: 0da84c6fab3b5f44c9495f351f90e10e
+timeCreated: 1490381436
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: mcpunch_0
-    21300002: mcpunch_1
-    21300004: mcpunch_2
-    21300006: mcpunch_3
-    21300008: mcpunch_4
-    21300010: mcpunch_5
-    21300012: mcpunch_6
-    21300014: mcpunch_7
-    21300016: mcpunch_8
-    21300018: mcpunch_9
-    21300020: mcpunch_10
-    21300022: mcpunch_11
-    21300024: mcpunch_12
-    21300026: mcpunch_13
-    21300028: mcpunch_14
+    21300000: waterdragon_0
+    21300002: waterdragon_1
+    21300004: waterdragon_2
+    21300006: waterdragon_3
+    21300008: waterdragon_4
+    21300010: waterdragon_5
+    21300012: waterdragon_6
+    21300014: waterdragon_7
+    21300016: waterdragon_8
+    21300018: waterdragon_10
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -68,130 +63,130 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: mcpunch_0
+      name: waterdragon_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 12
-        width: 55
-        height: 66
+        y: 131
+        width: 79
+        height: 19
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: mcpunch_1
+      name: waterdragon_1
       rect:
         serializedVersion: 2
-        x: 72
-        y: 12
-        width: 70
-        height: 62
+        x: 91
+        y: 124
+        width: 112
+        height: 74
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: mcpunch_2
+      name: waterdragon_2
       rect:
         serializedVersion: 2
-        x: 170
-        y: 10
-        width: 54
-        height: 67
+        x: 226
+        y: 119
+        width: 135
+        height: 87
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: mcpunch_3
+      name: waterdragon_3
       rect:
         serializedVersion: 2
-        x: 254
-        y: 10
-        width: 74
-        height: 64
+        x: 383
+        y: 118
+        width: 127
+        height: 82
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: mcpunch_4
+      name: waterdragon_4
       rect:
         serializedVersion: 2
-        x: 341
-        y: 10
-        width: 95
-        height: 64
+        x: 523
+        y: 112
+        width: 131
+        height: 100
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: mcpunch_5
+      name: waterdragon_5
       rect:
         serializedVersion: 2
-        x: 443
-        y: 9
-        width: 95
-        height: 63
+        x: 663
+        y: 120
+        width: 127
+        height: 90
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: mcpunch_6
+      name: waterdragon_6
       rect:
         serializedVersion: 2
-        x: 549
-        y: 7
-        width: 83
-        height: 64
+        x: 806
+        y: 117
+        width: 124
+        height: 80
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: mcpunch_8
+      name: waterdragon_7
       rect:
         serializedVersion: 2
-        x: 642
-        y: 7
-        width: 95
-        height: 65
+        x: 10
+        y: 16
+        width: 127
+        height: 69
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: mcpunch_10
+      name: waterdragon_8
       rect:
         serializedVersion: 2
-        x: 744
-        y: 8
-        width: 88
-        height: 63
+        x: 153
+        y: 15
+        width: 125
+        height: 68
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: mcpunch_11
+      name: waterdragon_10
       rect:
         serializedVersion: 2
-        x: 837
-        y: 6
-        width: 101
-        height: 64
+        x: 302
+        y: 22
+        width: 123
+        height: 61
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}

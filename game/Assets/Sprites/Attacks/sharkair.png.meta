@@ -1,24 +1,24 @@
 fileFormatVersion: 2
-guid: 2bde7a4d92a14ac46a712c6b54d7c8a3
-timeCreated: 1490383866
+guid: ef6f9822cb8e106459a19397ed512013
+timeCreated: 1490381258
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: mcpunch_0
-    21300002: mcpunch_1
-    21300004: mcpunch_2
-    21300006: mcpunch_3
-    21300008: mcpunch_4
-    21300010: mcpunch_5
-    21300012: mcpunch_6
-    21300014: mcpunch_7
-    21300016: mcpunch_8
-    21300018: mcpunch_9
-    21300020: mcpunch_10
-    21300022: mcpunch_11
-    21300024: mcpunch_12
-    21300026: mcpunch_13
-    21300028: mcpunch_14
+    21300000: sharkair_0
+    21300002: sharkair_1
+    21300004: sharkair_2
+    21300006: sharkair_3
+    21300008: sharkair_4
+    21300010: sharkair_5
+    21300012: sharkair_6
+    21300014: sharkair_7
+    21300016: sharkair_8
+    21300018: sharkair_9
+    21300020: sharkair_10
+    21300022: sharkair_11
+    21300024: sharkair_12
+    21300026: sharkair_13
+    21300028: sharkair_14
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -68,12 +68,38 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: mcpunch_0
+      name: sharkair_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 12
-        width: 55
+        x: 7
+        y: 373
+        width: 138
+        height: 35
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sharkair_1
+      rect:
+        serializedVersion: 2
+        x: 158
+        y: 363
+        width: 148
+        height: 50
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sharkair_2
+      rect:
+        serializedVersion: 2
+        x: 322
+        y: 361
+        width: 165
         height: 66
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -81,117 +107,156 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: mcpunch_1
+      name: sharkair_3
       rect:
         serializedVersion: 2
-        x: 72
+        x: 495
+        y: 355
+        width: 186
+        height: 86
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sharkair_4
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 215
+        width: 195
+        height: 101
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sharkair_5
+      rect:
+        serializedVersion: 2
+        x: 250
+        y: 219
+        width: 199
+        height: 124
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sharkair_6
+      rect:
+        serializedVersion: 2
+        x: 480
+        y: 199
+        width: 201
+        height: 137
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sharkair_7
+      rect:
+        serializedVersion: 2
+        x: 728
+        y: 187
+        width: 218
+        height: 155
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sharkair_8
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 16
+        width: 201
+        height: 164
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sharkair_9
+      rect:
+        serializedVersion: 2
+        x: 239
+        y: 60
+        width: 194
+        height: 114
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sharkair_10
+      rect:
+        serializedVersion: 2
+        x: 450
+        y: 57
+        width: 191
+        height: 114
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sharkair_11
+      rect:
+        serializedVersion: 2
+        x: 692
+        y: 66
+        width: 147
+        height: 85
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sharkair_12
+      rect:
+        serializedVersion: 2
+        x: 219
+        y: 14
+        width: 139
+        height: 29
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sharkair_13
+      rect:
+        serializedVersion: 2
+        x: 417
         y: 12
-        width: 70
-        height: 62
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_2
-      rect:
-        serializedVersion: 2
-        x: 170
-        y: 10
-        width: 54
-        height: 67
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_3
-      rect:
-        serializedVersion: 2
-        x: 254
-        y: 10
-        width: 74
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_4
-      rect:
-        serializedVersion: 2
-        x: 341
-        y: 10
         width: 95
-        height: 64
+        height: 28
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: mcpunch_5
+      name: sharkair_14
       rect:
         serializedVersion: 2
-        x: 443
-        y: 9
-        width: 95
-        height: 63
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_6
-      rect:
-        serializedVersion: 2
-        x: 549
-        y: 7
-        width: 83
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_8
-      rect:
-        serializedVersion: 2
-        x: 642
-        y: 7
-        width: 95
-        height: 65
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_10
-      rect:
-        serializedVersion: 2
-        x: 744
-        y: 8
-        width: 88
-        height: 63
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_11
-      rect:
-        serializedVersion: 2
-        x: 837
-        y: 6
-        width: 101
-        height: 64
+        x: 593
+        y: 13
+        width: 44
+        height: 26
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}

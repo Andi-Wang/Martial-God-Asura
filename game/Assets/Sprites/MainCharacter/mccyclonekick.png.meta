@@ -1,24 +1,19 @@
 fileFormatVersion: 2
-guid: 2bde7a4d92a14ac46a712c6b54d7c8a3
-timeCreated: 1490383866
+guid: f951f680fd5c88944abc53b9cae14c9f
+timeCreated: 1490379759
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: mcpunch_0
-    21300002: mcpunch_1
-    21300004: mcpunch_2
-    21300006: mcpunch_3
-    21300008: mcpunch_4
-    21300010: mcpunch_5
-    21300012: mcpunch_6
-    21300014: mcpunch_7
-    21300016: mcpunch_8
-    21300018: mcpunch_9
-    21300020: mcpunch_10
-    21300022: mcpunch_11
-    21300024: mcpunch_12
-    21300026: mcpunch_13
-    21300028: mcpunch_14
+    21300000: mccyclonekick_0
+    21300002: mccyclonekick_1
+    21300004: mccyclonekick_3
+    21300006: mccyclonekick_4
+    21300008: mccyclonekick_5
+    21300010: mccyclonekick_6
+    21300012: mccyclonekick_7
+    21300014: mccyclonekick_8
+    21300016: mccyclonekick_9
+    21300018: mccyclonekick_10
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -68,132 +63,132 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: mcpunch_0
+      name: mccyclonekick_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 12
-        width: 55
-        height: 66
+        y: 35
+        width: 60
+        height: 57
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: mcpunch_1
+      name: mccyclonekick_1
       rect:
         serializedVersion: 2
-        x: 72
-        y: 12
-        width: 70
+        x: 94
+        y: 11
+        width: 43
+        height: 84
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: mccyclonekick_3
+      rect:
+        serializedVersion: 2
+        x: 159
+        y: 26
+        width: 56
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: mccyclonekick_4
+      rect:
+        serializedVersion: 2
+        x: 253
+        y: 26
+        width: 40
         height: 62
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: mcpunch_2
+      name: mccyclonekick_5
       rect:
         serializedVersion: 2
-        x: 170
-        y: 10
-        width: 54
-        height: 67
+        x: 340
+        y: 29
+        width: 124
+        height: 62
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: mcpunch_3
+      name: mccyclonekick_6
       rect:
         serializedVersion: 2
-        x: 254
-        y: 10
-        width: 74
-        height: 64
+        x: 498
+        y: 30
+        width: 105
+        height: 58
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: mcpunch_4
+      name: mccyclonekick_7
       rect:
         serializedVersion: 2
-        x: 341
-        y: 10
-        width: 95
-        height: 64
+        x: 613
+        y: 30
+        width: 85
+        height: 59
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: mcpunch_5
+      name: mccyclonekick_8
       rect:
         serializedVersion: 2
-        x: 443
-        y: 9
-        width: 95
-        height: 63
+        x: 718
+        y: 27
+        width: 59
+        height: 59
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: mcpunch_6
+      name: mccyclonekick_9
       rect:
         serializedVersion: 2
-        x: 549
-        y: 7
-        width: 83
-        height: 64
+        x: 798
+        y: 0
+        width: 53
+        height: 95
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: mcpunch_8
+      name: mccyclonekick_10
       rect:
         serializedVersion: 2
-        x: 642
-        y: 7
-        width: 95
-        height: 65
+        x: 873
+        y: 5
+        width: 60
+        height: 62
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_10
-      rect:
-        serializedVersion: 2
-        x: 744
-        y: 8
-        width: 88
-        height: 63
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_11
-      rect:
-        serializedVersion: 2
-        x: 837
-        y: 6
-        width: 101
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0

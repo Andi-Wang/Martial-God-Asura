@@ -1,24 +1,21 @@
 fileFormatVersion: 2
-guid: 2bde7a4d92a14ac46a712c6b54d7c8a3
-timeCreated: 1490383866
+guid: cef2b648727f691439bf5d1512154968
+timeCreated: 1490380304
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: mcpunch_0
-    21300002: mcpunch_1
-    21300004: mcpunch_2
-    21300006: mcpunch_3
-    21300008: mcpunch_4
-    21300010: mcpunch_5
-    21300012: mcpunch_6
-    21300014: mcpunch_7
-    21300016: mcpunch_8
-    21300018: mcpunch_9
-    21300020: mcpunch_10
-    21300022: mcpunch_11
-    21300024: mcpunch_12
-    21300026: mcpunch_13
-    21300028: mcpunch_14
+    21300000: meteor_0
+    21300002: meteor_1
+    21300004: meteor_2
+    21300006: meteor_3
+    21300008: meteor_4
+    21300010: meteor_6
+    21300012: meteor_8
+    21300014: meteor_9
+    21300016: meteor_12
+    21300018: meteor_17
+    21300020: meteor_20
+    21300022: meteor_25
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -68,130 +65,156 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: mcpunch_0
+      name: meteor_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 12
-        width: 55
-        height: 66
+        x: 19
+        y: 212
+        width: 18
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: meteor_1
+      rect:
+        serializedVersion: 2
+        x: 59
+        y: 185
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: meteor_2
+      rect:
+        serializedVersion: 2
+        x: 136
+        y: 144
+        width: 100
+        height: 77
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: mcpunch_1
+      name: meteor_3
       rect:
         serializedVersion: 2
-        x: 72
-        y: 12
-        width: 70
-        height: 62
+        x: 255
+        y: 126
+        width: 86
+        height: 110
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: mcpunch_2
+      name: meteor_4
       rect:
         serializedVersion: 2
-        x: 170
+        x: 350
+        y: 128
+        width: 91
+        height: 97
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: meteor_6
+      rect:
+        serializedVersion: 2
+        x: 15
+        y: 177
+        width: 26
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: meteor_8
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 135
+        width: 39
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: meteor_9
+      rect:
+        serializedVersion: 2
+        x: 59
+        y: 134
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: meteor_12
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 66
+        width: 57
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: meteor_17
+      rect:
+        serializedVersion: 2
+        x: 195
+        y: 2
+        width: 71
+        height: 108
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: meteor_20
+      rect:
+        serializedVersion: 2
+        x: 79
+        y: 18
+        width: 90
+        height: 75
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: meteor_25
+      rect:
+        serializedVersion: 2
+        x: 342
         y: 10
-        width: 54
-        height: 67
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_3
-      rect:
-        serializedVersion: 2
-        x: 254
-        y: 10
-        width: 74
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_4
-      rect:
-        serializedVersion: 2
-        x: 341
-        y: 10
-        width: 95
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_5
-      rect:
-        serializedVersion: 2
-        x: 443
-        y: 9
-        width: 95
-        height: 63
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_6
-      rect:
-        serializedVersion: 2
-        x: 549
-        y: 7
-        width: 83
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_8
-      rect:
-        serializedVersion: 2
-        x: 642
-        y: 7
-        width: 95
-        height: 65
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_10
-      rect:
-        serializedVersion: 2
-        x: 744
-        y: 8
-        width: 88
-        height: 63
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_11
-      rect:
-        serializedVersion: 2
-        x: 837
-        y: 6
-        width: 101
-        height: 64
+        width: 56
+        height: 96
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}

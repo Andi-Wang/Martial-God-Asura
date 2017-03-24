@@ -1,0 +1,535 @@
+fileFormatVersion: 2
+guid: 53a2449e4ddbaab409ad2b82a4db9991
+timeCreated: 1490380564
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: shadowghoul_0
+    21300002: shadowghoul_1
+    21300004: shadowghoul_2
+    21300006: shadowghoul_3
+    21300008: shadowghoul_4
+    21300010: shadowghoul_5
+    21300012: shadowghoul_6
+    21300014: shadowghoul_7
+    21300016: shadowghoul_8
+    21300018: shadowghoul_10
+    21300020: shadowghoul_11
+    21300022: shadowghoul_12
+    21300024: shadowghoul_13
+    21300026: shadowghoul_14
+    21300028: shadowghoul_15
+    21300030: shadowghoul_16
+    21300032: shadowghoul_17
+    21300034: shadowghoul_18
+    21300036: shadowghoul_19
+    21300038: shadowghoul_20
+    21300040: shadowghoul_21
+    21300042: shadowghoul_22
+    21300044: shadowghoul_23
+    21300046: shadowghoul_25
+    21300048: shadowghoul_26
+    21300050: shadowghoul_27
+    21300052: shadowghoul_28
+    21300054: shadowghoul_29
+    21300056: shadowghoul_30
+    21300058: shadowghoul_31
+    21300060: shadowghoul_32
+    21300062: shadowghoul_33
+    21300064: shadowghoul_9
+    21300066: shadowghoul_24
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 7
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  allowsAlphaSplitting: 0
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 32
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: shadowghoul_0
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 238
+        width: 53
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_1
+      rect:
+        serializedVersion: 2
+        x: 70
+        y: 237
+        width: 54
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_2
+      rect:
+        serializedVersion: 2
+        x: 137
+        y: 237
+        width: 53
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_3
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 237
+        width: 54
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_4
+      rect:
+        serializedVersion: 2
+        x: 265
+        y: 237
+        width: 53
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_5
+      rect:
+        serializedVersion: 2
+        x: 326
+        y: 237
+        width: 53
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_6
+      rect:
+        serializedVersion: 2
+        x: 397
+        y: 237
+        width: 53
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_7
+      rect:
+        serializedVersion: 2
+        x: 463
+        y: 237
+        width: 54
+        height: 61
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_8
+      rect:
+        serializedVersion: 2
+        x: 528
+        y: 237
+        width: 52
+        height: 62
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_10
+      rect:
+        serializedVersion: 2
+        x: 588
+        y: 237
+        width: 52
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_11
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 165
+        width: 80
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_12
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 165
+        width: 79
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_13
+      rect:
+        serializedVersion: 2
+        x: 190
+        y: 165
+        width: 77
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_14
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 89
+        width: 49
+        height: 55
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_15
+      rect:
+        serializedVersion: 2
+        x: 71
+        y: 89
+        width: 52
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_16
+      rect:
+        serializedVersion: 2
+        x: 135
+        y: 89
+        width: 51
+        height: 51
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_17
+      rect:
+        serializedVersion: 2
+        x: 196
+        y: 89
+        width: 52
+        height: 51
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_18
+      rect:
+        serializedVersion: 2
+        x: 258
+        y: 89
+        width: 67
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_19
+      rect:
+        serializedVersion: 2
+        x: 338
+        y: 89
+        width: 66
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_20
+      rect:
+        serializedVersion: 2
+        x: 422
+        y: 89
+        width: 74
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_21
+      rect:
+        serializedVersion: 2
+        x: 508
+        y: 89
+        width: 68
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_22
+      rect:
+        serializedVersion: 2
+        x: 585
+        y: 89
+        width: 57
+        height: 53
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_23
+      rect:
+        serializedVersion: 2
+        x: 656
+        y: 89
+        width: 57
+        height: 57
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_25
+      rect:
+        serializedVersion: 2
+        x: 18
+        y: 8
+        width: 52
+        height: 47
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_26
+      rect:
+        serializedVersion: 2
+        x: 84
+        y: 6
+        width: 55
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_27
+      rect:
+        serializedVersion: 2
+        x: 158
+        y: 9
+        width: 49
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_28
+      rect:
+        serializedVersion: 2
+        x: 220
+        y: 13
+        width: 47
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_29
+      rect:
+        serializedVersion: 2
+        x: 282
+        y: 16
+        width: 38
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_30
+      rect:
+        serializedVersion: 2
+        x: 335
+        y: 19
+        width: 25
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_31
+      rect:
+        serializedVersion: 2
+        x: 380
+        y: 26
+        width: 10
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_32
+      rect:
+        serializedVersion: 2
+        x: 417
+        y: 30
+        width: 5
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_33
+      rect:
+        serializedVersion: 2
+        x: 444
+        y: 27
+        width: 10
+        height: 10
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_9
+      rect:
+        serializedVersion: 2
+        x: 470
+        y: 26
+        width: 12
+        height: 12
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: shadowghoul_24
+      rect:
+        serializedVersion: 2
+        x: 495
+        y: 25
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

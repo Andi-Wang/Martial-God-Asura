@@ -1,24 +1,19 @@
 fileFormatVersion: 2
-guid: 2bde7a4d92a14ac46a712c6b54d7c8a3
-timeCreated: 1490383866
+guid: d73600bd1441f494eb1fd907e14cce1d
+timeCreated: 1490380022
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: mcpunch_0
-    21300002: mcpunch_1
-    21300004: mcpunch_2
-    21300006: mcpunch_3
-    21300008: mcpunch_4
-    21300010: mcpunch_5
-    21300012: mcpunch_6
-    21300014: mcpunch_7
-    21300016: mcpunch_8
-    21300018: mcpunch_9
-    21300020: mcpunch_10
-    21300022: mcpunch_11
-    21300024: mcpunch_12
-    21300026: mcpunch_13
-    21300028: mcpunch_14
+    21300000: fireball2_0
+    21300002: fireball2_1
+    21300004: fireball2_2
+    21300006: fireball2_3
+    21300008: fireball2_4
+    21300010: fireball2_5
+    21300012: fireball2_6
+    21300014: fireball2_7
+    21300016: fireball2_8
+    21300018: fireball2_9
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -68,132 +63,132 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: mcpunch_0
+      name: fireball2_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 12
-        width: 55
-        height: 66
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_1
-      rect:
-        serializedVersion: 2
-        x: 72
-        y: 12
-        width: 70
-        height: 62
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_2
-      rect:
-        serializedVersion: 2
-        x: 170
-        y: 10
-        width: 54
-        height: 67
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_3
-      rect:
-        serializedVersion: 2
-        x: 254
-        y: 10
+        x: 7
+        y: 190
         width: 74
-        height: 64
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: fireball2_1
+      rect:
+        serializedVersion: 2
+        x: 85
+        y: 190
+        width: 76
+        height: 35
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: fireball2_2
+      rect:
+        serializedVersion: 2
+        x: 165
+        y: 191
+        width: 79
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: fireball2_3
+      rect:
+        serializedVersion: 2
+        x: 249
+        y: 191
+        width: 77
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: fireball2_4
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 107
+        width: 78
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: fireball2_5
+      rect:
+        serializedVersion: 2
+        x: 87
+        y: 107
+        width: 75
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: fireball2_6
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 13
+        width: 59
+        height: 58
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: mcpunch_4
+      name: fireball2_7
       rect:
         serializedVersion: 2
-        x: 341
-        y: 10
-        width: 95
-        height: 64
+        x: 32
+        y: 16
+        width: 48
+        height: 47
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: mcpunch_5
+      name: fireball2_8
       rect:
         serializedVersion: 2
-        x: 443
-        y: 9
-        width: 95
-        height: 63
+        x: 198
+        y: 18
+        width: 44
+        height: 51
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: mcpunch_6
+      name: fireball2_9
       rect:
         serializedVersion: 2
-        x: 549
-        y: 7
-        width: 83
-        height: 64
+        x: 293
+        y: 25
+        width: 33
+        height: 38
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_8
-      rect:
-        serializedVersion: 2
-        x: 642
-        y: 7
-        width: 95
-        height: 65
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_10
-      rect:
-        serializedVersion: 2
-        x: 744
-        y: 8
-        width: 88
-        height: 63
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_11
-      rect:
-        serializedVersion: 2
-        x: 837
-        y: 6
-        width: 101
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0

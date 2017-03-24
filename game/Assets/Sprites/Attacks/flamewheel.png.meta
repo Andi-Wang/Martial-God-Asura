@@ -1,24 +1,18 @@
 fileFormatVersion: 2
-guid: 2bde7a4d92a14ac46a712c6b54d7c8a3
-timeCreated: 1490383866
+guid: 025722f56a6f708488e65047cd3d67c8
+timeCreated: 1490380067
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: mcpunch_0
-    21300002: mcpunch_1
-    21300004: mcpunch_2
-    21300006: mcpunch_3
-    21300008: mcpunch_4
-    21300010: mcpunch_5
-    21300012: mcpunch_6
-    21300014: mcpunch_7
-    21300016: mcpunch_8
-    21300018: mcpunch_9
-    21300020: mcpunch_10
-    21300022: mcpunch_11
-    21300024: mcpunch_12
-    21300026: mcpunch_13
-    21300028: mcpunch_14
+    21300000: flamewheel_1
+    21300002: flamewheel_2
+    21300004: flamewheel_3
+    21300006: flamewheel_4
+    21300008: flamewheel_5
+    21300010: flamewheel_6
+    21300012: flamewheel_7
+    21300014: flamewheel_8
+    21300016: flamewheel_10
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -68,132 +62,119 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: mcpunch_0
+      name: flamewheel_1
       rect:
         serializedVersion: 2
-        x: 0
-        y: 12
-        width: 55
-        height: 66
+        x: 53
+        y: 76
+        width: 148
+        height: 143
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: mcpunch_1
+      name: flamewheel_2
       rect:
         serializedVersion: 2
-        x: 72
-        y: 12
+        x: 233
+        y: 84
+        width: 165
+        height: 106
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: flamewheel_3
+      rect:
+        serializedVersion: 2
+        x: 435
+        y: 47
+        width: 122
+        height: 157
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: flamewheel_4
+      rect:
+        serializedVersion: 2
+        x: 597
+        y: 52
+        width: 84
+        height: 135
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: flamewheel_5
+      rect:
+        serializedVersion: 2
+        x: 729
+        y: 64
+        width: 163
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: flamewheel_6
+      rect:
+        serializedVersion: 2
+        x: 929
+        y: 49
+        width: 145
+        height: 118
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: flamewheel_7
+      rect:
+        serializedVersion: 2
+        x: 1151
+        y: 28
         width: 70
-        height: 62
+        height: 164
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: flamewheel_8
+      rect:
+        serializedVersion: 2
+        x: 1277
+        y: 86
+        width: 109
+        height: 42
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: mcpunch_2
+      name: flamewheel_10
       rect:
         serializedVersion: 2
-        x: 170
-        y: 10
-        width: 54
-        height: 67
+        x: 1412
+        y: 66
+        width: 66
+        height: 79
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_3
-      rect:
-        serializedVersion: 2
-        x: 254
-        y: 10
-        width: 74
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_4
-      rect:
-        serializedVersion: 2
-        x: 341
-        y: 10
-        width: 95
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_5
-      rect:
-        serializedVersion: 2
-        x: 443
-        y: 9
-        width: 95
-        height: 63
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_6
-      rect:
-        serializedVersion: 2
-        x: 549
-        y: 7
-        width: 83
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_8
-      rect:
-        serializedVersion: 2
-        x: 642
-        y: 7
-        width: 95
-        height: 65
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_10
-      rect:
-        serializedVersion: 2
-        x: 744
-        y: 8
-        width: 88
-        height: 63
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: mcpunch_11
-      rect:
-        serializedVersion: 2
-        x: 837
-        y: 6
-        width: 101
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
