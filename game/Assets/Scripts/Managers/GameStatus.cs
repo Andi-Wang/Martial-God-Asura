@@ -11,6 +11,7 @@ public class GameStatus {
     
     public List<Enemy> enemies;
     public Player playerStat;
+    public SkillTree skillTree;
 
     public GameStatus()
     {
@@ -21,7 +22,6 @@ public class GameStatus {
 [System.Serializable]
 public class Player
 {
-    public Skills skills;
     public float playerPosX;
     public float playerPosY;
     public Entity playerEntity;

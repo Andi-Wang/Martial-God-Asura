@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[System.Serializable]
 public class SkillTree {
     const int NUM_SKILL_TREE_BRANCHES = 9;
     const int NUM_SKILL_TREE_TIERS = 3;

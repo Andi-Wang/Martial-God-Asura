@@ -65,7 +65,7 @@ public class SkillTreeUI : MonoBehaviour {
     // Use this for initialization
     void Start () {
         // normally, populate the array with previously-saved character skill data; still need to save it, too
-        tree = new SkillTree();
+        tree = GameManager.instance.skillTree;
 
 
         Button[] temp1 = martialArtsTree.GetComponentsInChildren<Button>(true);

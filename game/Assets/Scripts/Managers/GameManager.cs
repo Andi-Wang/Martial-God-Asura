@@ -15,12 +15,14 @@ public class GameManager : MonoBehaviour
     public int subLevel;
     public int currentRoom;
 
+    public SkillTree skillTree;
+
     HUDNotificationManager notiManager;
     private Text levelText;                                 //Text to display current level number.
     private GameObject levelImage;                          //Image to block out level as levels are being set up, background for levelText.
 
     private Player playerStat;                                                 //private BoardManager boardScript;						//Store a reference to our BoardManager which will set up the level.
-    private Skills skills;
+   // private Skills skills;
     private List<Enemy> enemies;                            //List of all Enemy units, used to issue them move commands.
     private bool doingSetup = true;                         //Boolean to check if we're setting up board, prevent Player from moving during setup.
     Transform player;
@@ -42,7 +44,7 @@ public class GameManager : MonoBehaviour
         //these should changed if load from data
         enemies = new List<Enemy>();
         playerStat = new Player();
-        skills = new Skills();
+        skillTree = new SkillTree();
 
         subLevel = 0;
 
@@ -75,24 +77,8 @@ public class GameManager : MonoBehaviour
 		//While doingSetup is true the player can't move, prevent player from moving while title card is up.
 		doingSetup = true;
         playersTurn = false;
-
-        findNotificationManager();
-
-        // find ladderManager
-        ladderManager = GameObject.Find("TrapDoorTriggers").GetComponent<LadderManager>();
  
         subLevelComplete = false;
-
-        // assign player position
-        GameObject p = GameObject.FindGameObjectWithTag("Player");
-        player = p.transform;
-        playerScript = p.GetComponent<UnityStandardAssets._2D.PlatformerCharacter2D>();
-
-        if (startFromLoad)
-        {
-            SetupFromLoad();
-            startFromLoad = false;
-        }
 
         if (level > 0)
         {
@@ -138,6 +124,20 @@ public class GameManager : MonoBehaviour
         {
             level = 1;
             subLevel++;
+
+            // assign player position
+            GameObject p = GameObject.FindGameObjectWithTag("Player");
+            player = p.transform;
+            playerScript = p.GetComponent<UnityStandardAssets._2D.PlatformerCharacter2D>();
+
+            findNotificationManager();
+            ladderManager = GameObject.Find("TrapDoorTriggers").GetComponent<LadderManager>();
+
+            if (startFromLoad)
+            {
+                SetupFromLoad();
+                startFromLoad = false;
+            }
 
             InitGame();
         }
@@ -196,11 +196,9 @@ public class GameManager : MonoBehaviour
 
     void SetupFromLoad()
     {
-        playerScript.PlayerEntity = gs.playerStat.playerEntity;
-        player.position = new Vector3(gs.playerStat.playerPosX, gs.playerStat.playerPosY);
+        playerScript.PlayerEntity = playerStat.playerEntity;
+        player.position = new Vector3(playerStat.playerPosX, playerStat.playerPosY);
 
-        //setup skills gs.playerStat.skills;
-        
         //setup enemies gs.enemies = enemies;// null enemies cause serializable exception
         for(int i = 0; i < gs.ladderUnlocked.Length; ++i)
         {
@@ -221,18 +219,11 @@ public class GameManager : MonoBehaviour
         playerStat.playerEntity = playerScript.PlayerEntity;
         playerStat.playerPosX = player.position.x;
         playerStat.playerPosY = player.position.y;
-
-        // dummy skills for save game
-        skills.AddSkill("Back Dash", 1, true);
-        skills.AddSkill("Glide", 1, true);
-        skills.AddSkill("Fast Fall", 1, true);
-        skills.AddSkill("Punch", 1, true);
-        playerStat.skills = skills;
-
         gs.playerStat = playerStat;
         //gs.enemies = enemies;// null enemies cause serializable exception
         gs.sceneNumber = SceneManager.GetActiveScene().buildIndex;
         gs.ladderUnlocked = ladderManager.GetUnlockedLadder();
+        gs.skillTree = skillTree;
         
         ProgressSL.save(gs);
     }
@@ -243,6 +234,9 @@ public class GameManager : MonoBehaviour
 
         if (gs != null)
         {
+            skillTree = gs.skillTree;
+            playerStat = gs.playerStat;
+
             startFromLoad = true;
             if (gs.sceneNumber != SceneManager.GetActiveScene().buildIndex)
             {
@@ -250,7 +244,7 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                Debug.Log("in the right scene");
+                Debug.Log("in the correct scene");
                 InitGame();
             }
         }
