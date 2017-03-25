@@ -141,6 +141,10 @@ public class GameManager : MonoBehaviour
 
             InitGame();
         }
+        else
+        {
+            level = -1;
+        }
     }
 
     bool findNotificationManager()
