@@ -7,6 +7,7 @@ public class UnlockLadder : MonoBehaviour {
     public int ladderId;
 
     bool entered;
+    bool animating;
     Animator anim;
 
     void Awake()
@@ -14,13 +15,15 @@ public class UnlockLadder : MonoBehaviour {
         anim = GameObject.FindObjectOfType<Camera>().GetComponent<Animator>();
 
         entered = false;
+        animating = false;
     }
 
     void Update()
     {
-        if (Input.GetButtonUp("Interact") && entered == true)
+        if (Input.GetButtonUp("Interact") && entered && !animating)
         {
             anim.SetTrigger("LadderUnlock" + ladderId);
+            animating = true;
         }
     }
 
