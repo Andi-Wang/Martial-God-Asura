@@ -22,7 +22,7 @@ public class ToggleHintUI : MonoBehaviour {
 
     void OnLevelLoaded(Scene scene, LoadSceneMode mode)
     {
-        
+        findHintUI();
     }
 
     public void toggleHint(float x = 0, float y = -999)
