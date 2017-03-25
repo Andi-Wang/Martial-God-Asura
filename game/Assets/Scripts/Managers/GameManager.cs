@@ -123,7 +123,7 @@ public class GameManager : MonoBehaviour
         if (scene.buildIndex>=2)
         {
             level = 1;
-            subLevel++;
+            subLevel = scene.buildIndex - 1;
 
             // assign player position
             GameObject p = GameObject.FindGameObjectWithTag("Player");
@@ -222,6 +222,7 @@ public class GameManager : MonoBehaviour
         gs.playerStat = playerStat;
         //gs.enemies = enemies;// null enemies cause serializable exception
         gs.sceneNumber = SceneManager.GetActiveScene().buildIndex;
+        gs.subLevel = subLevel;
         gs.ladderUnlocked = ladderManager.GetUnlockedLadder();
         gs.skillTree = skillTree;
         
@@ -236,6 +237,7 @@ public class GameManager : MonoBehaviour
         {
             skillTree = gs.skillTree;
             playerStat = gs.playerStat;
+            subLevel = gs.subLevel;
 
             startFromLoad = true;
             if (gs.sceneNumber != SceneManager.GetActiveScene().buildIndex)

@@ -8,6 +8,7 @@ public class GameStatus {
     //current scene,activated ladder,enemies --snapshot,time if multiple saved game
     public int sceneNumber;
     public bool[] ladderUnlocked;
+    public int subLevel;
     
     public List<Enemy> enemies;
     public Player playerStat;
