@@ -8,8 +8,6 @@ public class PuzzleEnemyController : Enemy {
 
     private bool caughtPlayer;
 
-    
-
     void Awake()
     {
         caughtPlayer = false;
@@ -20,7 +18,6 @@ public class PuzzleEnemyController : Enemy {
 
     // Use this for initialization
     void Start () {
-        
         changeState(idleState);
     }
 
