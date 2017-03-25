@@ -14,8 +14,8 @@ public class GameManager : MonoBehaviour
     public int level;
     public int subLevel;
     public int currentRoom;
-    public HUDNotificationManager notiManager;
 
+    HUDNotificationManager notiManager;
     private Text levelText;                                 //Text to display current level number.
     private GameObject levelImage;                          //Image to block out level as levels are being set up, background for levelText.
 
@@ -44,7 +44,7 @@ public class GameManager : MonoBehaviour
         playerStat = new Player();
         skills = new Skills();
 
-        subLevel = 1;
+        subLevel = 0;
 
         findNotificationManager();
 
@@ -62,11 +62,11 @@ public class GameManager : MonoBehaviour
 
     void OnEnable()
     {
-        SceneManager.sceneLoaded += OnLevelLoaded;
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
     void OnDisable()
     {
-        SceneManager.sceneLoaded -= OnLevelLoaded;
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
 	//Initializes the game for each level.
@@ -130,7 +130,7 @@ public class GameManager : MonoBehaviour
 		enemies.Clear();
     }
 		
-	void OnLevelLoaded(Scene scene, LoadSceneMode mode)
+	void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         // scene 0 ~ 2 level number is -1 0 1, later unchange
         // scene 2~4 sublevel 1 2 3

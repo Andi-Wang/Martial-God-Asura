@@ -1,7 +1,0 @@
-diff a/game/Assets/Scripts/UI/TitleScreenCamera.cs.meta b/game/Assets/Scripts/UI/TitleScreenCamera.cs.meta	(rejected hunks)
-@@ -1,5 +1,4 @@
- fileFormatVersion: 2
--guid: 62e811dd23e38dd45a7a9e8081228d99
- guid: e9a44c54e9c4dff46887e488100bfff4
- timeCreated: 1486879374
- licenseType: Free
