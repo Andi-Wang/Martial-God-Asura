@@ -16,7 +16,7 @@ public class LadderTrigger : MonoBehaviour
    
     void Awake()
     {
-        hintUIController = GameObject.FindGameObjectWithTag("GameController").GetComponent<ToggleHintUI>();
+        hintUIController = GameObject.Find("HintCanvas").GetComponent<ToggleHintUI>();
         hintUIController.toggleHint();
         
         ladderTag = gameObject.tag;

@@ -9,7 +9,7 @@ public class NPCInteract : MonoBehaviour {
 
     // Use this for initialization
     void Awake () {
-        hintUIController = GameObject.FindGameObjectWithTag("GameController").GetComponent<ToggleHintUI>();
+        hintUIController = GameObject.Find("HintCanvas").GetComponent<ToggleHintUI>();
         hintUIController.toggleHint();
 
         showing = false;

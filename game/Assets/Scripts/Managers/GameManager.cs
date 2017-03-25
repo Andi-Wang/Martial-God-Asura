@@ -44,12 +44,11 @@ public class GameManager : MonoBehaviour
         playerStat = new Player();
         skills = new Skills();
 
-        //DontDestroyOnLoad(gameObject);
-        //Call the InitGame function to initialize the first level 
-        if (level >= 0)
-        {
-            InitGame();
-        }
+        subLevel = 1;
+
+        findNotificationManager();
+
+        DontDestroyOnLoad(gameObject);
     }
 
     void Update()
@@ -61,19 +60,29 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnLevelLoaded;
+    }
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnLevelLoaded;
+    }
+
 	//Initializes the game for each level.
 	void InitGame()
 	{
 		//While doingSetup is true the player can't move, prevent player from moving while title card is up.
 		doingSetup = true;
         playersTurn = false;
-        
+
+        findNotificationManager();
+
         // find ladderManager
-        if (level > 0)
-        {
-            ladderManager = GameObject.Find("TrapDoorTriggers").GetComponent<LadderManager>();
-        }
-        
+        ladderManager = GameObject.Find("TrapDoorTriggers").GetComponent<LadderManager>();
+ 
+        subLevelComplete = false;
+
         // assign player position
         GameObject p = GameObject.FindGameObjectWithTag("Player");
         player = p.transform;
@@ -121,9 +130,36 @@ public class GameManager : MonoBehaviour
 		enemies.Clear();
     }
 		
-		
-	//Hides black image used between levels
-	void HideLevelImage()
+	void OnLevelLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // scene 0 ~ 2 level number is -1 0 1, later unchange
+        // scene 2~4 sublevel 1 2 3
+        if (scene.buildIndex>=2)
+        {
+            level = 1;
+            subLevel++;
+
+            InitGame();
+        }
+    }
+
+    bool findNotificationManager()
+    {
+        if (notiManager != null)
+            return true;
+
+        GameObject obj = GameObject.Find("NotificationPanel");
+        if (obj != null)
+        {
+            notiManager = obj.GetComponent<HUDNotificationManager>();
+            return true;
+        }
+
+        return false;
+    }
+
+    //Hides black image used between levels
+    void HideLevelImage()
 	{
 		//Disable the levelImage gameObject.
 		levelImage.SetActive(false);

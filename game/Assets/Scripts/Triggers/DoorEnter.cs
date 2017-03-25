@@ -10,7 +10,7 @@ public class DoorEnter : MonoBehaviour {
 
     void Awake()
     {
-        hintUIController = GameObject.FindGameObjectWithTag("GameController").GetComponent<ToggleHintUI>();
+        hintUIController = GameObject.Find("HintCanvas").GetComponent<ToggleHintUI>();
         hintUIController.toggleHint();
         entered = false;
     }
