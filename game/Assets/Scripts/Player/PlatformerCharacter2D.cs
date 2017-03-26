@@ -488,6 +488,7 @@ namespace UnityStandardAssets._2D {
                     // Add a vertical force to the player.
                     m_Grounded = false;
                     m_Anim.SetBool("Ground", false);
+					m_Anim.SetTrigger("JumpT");
                     m_Rigidbody2D.AddForce(new Vector2(0f, playerEntity.jumpForce));
                 }
                 else if (input.jumpHold) {
@@ -527,18 +528,27 @@ namespace UnityStandardAssets._2D {
                 else if (input.fire1Down) {
                     if (skillStateManager.fastFallToggle) {
                         //Swooping Strike
+						if (!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("Soaring Kick") && !m_Anim.GetBool("BasicPunch")) {
+							m_Anim.SetTrigger("SoarKickT"); //Start punching
+							m_Anim.SetBool("BasicPunch", true); //Set BasicPunch to true because we are punching
+							attacking = true; //Set attacking to true because we are attacking
+						}
                     }
-                    if(input.vUp) {
-                        //Crescent Kick; currently an animation bug or something preventing it from being used
-                        if (!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("Flip Kick") && !m_Anim.GetBool("BasicPunch")) {
-                            m_Anim.SetTrigger("FlipKickT"); //Start punching
-                            m_Anim.SetBool("BasicPunch", true); //Set BasicPunch to true because we are punching
-                            attacking = true; //Set attacking to true because we are attacking
-                        }
-                    }
-                    else {
-                        //Cyclone Kick
-                    }
+					if (input.vUp) {
+						//Crescent Kick; currently an animation bug or something preventing it from being used
+						if (!m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Flip Kick") && !m_Anim.GetBool ("BasicPunch")) {
+							m_Anim.SetTrigger ("FlipKickT"); //Start punching
+							m_Anim.SetBool ("BasicPunch", true); //Set BasicPunch to true because we are punching
+							attacking = true; //Set attacking to true because we are attacking
+						}
+					} else {
+						//Cyclone Kick
+						if (!m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Spin Kick") && !m_Anim.GetBool ("BasicPunch")) {
+							m_Anim.SetTrigger ("SpinKickT"); //Start punching
+							m_Anim.SetBool ("BasicPunch", true); //Set BasicPunch to true because we are punching
+							attacking = true; //Set attacking to true because we are attacking
+						}
+					}
                 }
                 else if (input.fire1Hold) {
                 }
