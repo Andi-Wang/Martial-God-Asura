@@ -17,8 +17,9 @@ public class DialogDisplayManager : MonoBehaviour {
     Text dialogText;
     public int currentDialog = -1;
     bool displayed = false;
+    private IEnumerator coroutine;
 
-	private string str = "";
+    private string str = "";
     
     public static DialogDisplayManager Instance()
     {
@@ -54,7 +55,9 @@ public class DialogDisplayManager : MonoBehaviour {
 			}
 
 			yield return new WaitForSeconds(0.05F);
+
 		}
+        playerTalking = false;
 	}
 
     public bool displayNext()
@@ -64,25 +67,39 @@ public class DialogDisplayManager : MonoBehaviour {
             return false;
         }
 
-        displaying = true;
         GameManager.instance.playersTurn = false;
-        currentDialog++;
-        if (currentDialog >= testDialog.Length)
-        {
-            gameObject.SetActive(false);
-            displayed = true;
-            displaying = false;
-            GameManager.instance.playersTurn = true;
-            return false;
-        }
 
-        if (!gameObject.activeInHierarchy)
+        if (playerTalking)
         {
-            gameObject.SetActive(true);
-        }
-        
-		StartCoroutine( AnimateText(testDialog[currentDialog]) );
+            StopCoroutine(coroutine);
+            dialogText.text = testDialog[currentDialog];
 
-        return true;
+            playerTalking = false;
+            return true;
+        }
+        else
+        {
+            displaying = true;
+            currentDialog++;
+            if (currentDialog >= testDialog.Length)
+            {
+                gameObject.SetActive(false);
+                displayed = true;
+                displaying = false;
+                GameManager.instance.playersTurn = true;
+                return false;
+            }
+            
+            if (!gameObject.activeInHierarchy)
+            {
+                gameObject.SetActive(true);
+            }
+
+            coroutine = AnimateText(testDialog[currentDialog]);
+
+            StartCoroutine(coroutine);
+
+            return true;
+        }
     }
 }
