@@ -178,6 +178,11 @@ public class Skill {
                 float ydeg = Mathf.Sin(angle * Mathf.Deg2Rad);
 
                 Rigidbody2D clone = Rigidbody2D.Instantiate(projectile, new Vector2(body.transform.position.x + xdeg * startDistance, body.transform.position.y + ydeg * startDistance), Quaternion.AngleAxis(angle, Vector3.forward)) as Rigidbody2D;
+
+                if(!facingRight) {
+                    clone.transform.localScale = new Vector3(clone.transform.localScale.x, clone.transform.localScale.y * -1, 0);
+                }
+
                 clone.velocity = speed * new Vector2(xdeg, ydeg);
             }
         }

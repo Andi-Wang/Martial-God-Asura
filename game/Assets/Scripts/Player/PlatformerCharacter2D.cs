@@ -7,7 +7,20 @@ namespace UnityStandardAssets._2D {
     public class PlatformerCharacter2D : MonoBehaviour {
         public Image healthbar;
         public Image energybar;
-        public Rigidbody2D m_fireball;
+        public GameObject m_Fireball2;
+        public GameObject m_WaterDragon;
+        public GameObject m_Iceberg;
+        public GameObject m_Lightning;
+        public GameObject m_Meteor;
+        public GameObject m_SharkAir;
+        public GameObject m_BarrierSigil;
+        public GameObject m_DrainingSigil;
+        public GameObject m_TeleportSigil;
+        public GameObject m_LesserSpiritbolt;
+        public GameObject m_Tornado;
+        public GameObject m_Flamewheel;
+        public GameObject m_EtherealFist;
+
         public Image damageImage;
         public Color flashColour = new Color(1f, 0, 0, 0.3f);
         public float flashSpeed = 2f;
@@ -343,7 +356,7 @@ namespace UnityStandardAssets._2D {
                     }
                     else if (input.vDown) {
                         //Water Dragon
-                        //skill.Projectile(m_Rigidbody2D, m_FacingRight, Rigidbody2D projectile, 1, 0, 0, 1, 1, 0);
+                        skill.Projectile(m_Rigidbody2D, m_FacingRight, m_WaterDragon.GetComponent<Rigidbody2D>(), 1, 0, 0, 1, 1, 0);
                     }
                     else if (input.vUp) {
                     }
@@ -361,7 +374,7 @@ namespace UnityStandardAssets._2D {
 
 
                             //Fireball
-                            skill.Projectile(m_Rigidbody2D, m_FacingRight, m_fireball, 1, 0, 12, 2, 1, 0);
+                            skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Fireball2.GetComponent<Rigidbody2D>(), 1, 0, 12, 2, 1, 0);
                             skillStateManager.fireballCounter = 0;
                         }
 
@@ -382,15 +395,15 @@ namespace UnityStandardAssets._2D {
 
                         if (input.vDown) {
                             //Iceberg
-                            //skill.Projectile(m_Rigidbody2D, m_FacingRight, Rigidbody2D projectile, 1, 0, 7, 2, 1, 0);
+                            skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Iceberg.GetComponent<Rigidbody2D>(), 1, 0, 7, 2, 1, 0);
                         }
                         else if (input.vUp) {
                             //Call Lightning
-                            //skill.Projectile(m_Rigidbody2D, m_FacingRight, Rigidbody2D projectile, 1, 0, 0, 3, 1, 0);
+                            skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Lightning.GetComponent<Rigidbody2D>(), 1, 0, 0, 3, 1, 0);
                         }
                         else {
                             //Meteor
-                            //skill.Projectile(m_Rigidbody2D, m_FacingRight, Rigidbody2D projectile, 1, 0, 0, 4, 1, 0);
+                            skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Meteor.GetComponent<Rigidbody2D>(), 1, 0, 0, 4, 1, 0);
                         }
                     }
                 }
@@ -403,15 +416,15 @@ namespace UnityStandardAssets._2D {
                     }
                     else if (input.vDown) {
                         //Barrier Sigil
-                        //skill.Projectile(m_Rigidbody2D, m_FacingRight, Rigidbody2D projectile, 1, 0, 0, 0, 1, 0);
+                        skill.Projectile(m_Rigidbody2D, m_FacingRight, m_BarrierSigil.GetComponent<Rigidbody2D>(), 1, 0, 0, 0, 1, 0);
                     }
                     else if (input.vUp) {
                         //Draining Sigil
-                        //skill.Projectile(m_Rigidbody2D, m_FacingRight, Rigidbody2D projectile, 1, 0, 0, 0, 1, 0);
+                        skill.Projectile(m_Rigidbody2D, m_FacingRight, m_DrainingSigil.GetComponent<Rigidbody2D>(), 1, 0, 0, 0, 1, 0);
                     }
                     else {
                         //Lesser Spirit Bolt
-                        //skill.Projectile(m_Rigidbody2D, m_FacingRight, Rigidbody2D projectile, 1, 0, 20, 2, 1, 0);
+                        skill.Projectile(m_Rigidbody2D, m_FacingRight, m_LesserSpiritbolt.GetComponent<Rigidbody2D>(), 1, 0, 20, 2, 1, 0);
                     }
                 }
                 else if (input.fire3Hold && !skillStateManager.holdCasting) {
@@ -531,7 +544,7 @@ namespace UnityStandardAssets._2D {
                 }
                 else if (input.fire2Down) {
                     //Shark Crescent
-                    //skill.Projectile(m_Rigidbody2D, m_FacingRight, Rigidbody2D projectile, 1, 0, 0, 0, 1, 0);
+                    skill.Projectile(m_Rigidbody2D, m_FacingRight, m_SharkAir.GetComponent<Rigidbody2D>(), 1, 0, 0, 0, 1, 0);
                 }
                 else if (input.fire2Hold) {
                 }
