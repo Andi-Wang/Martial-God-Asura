@@ -161,6 +161,7 @@ namespace UnityStandardAssets._2D {
             if (!GameManager.instance.playersTurn)
             {
                 m_Rigidbody2D.velocity = new Vector2(0, m_Rigidbody2D.velocity.y);
+                m_Anim.SetFloat("Speed", 0f);
             }
 
             // The player is grounded if a circlecast to the groundcheck position hits anything designated as ground
