@@ -1,13 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using UnityEngine.UI;
 
 public class PickupTrigger : MonoBehaviour {
     GameObject hintCanvas;
     private bool entered;
+    bool pickedup = false;
     ToggleHintUI hintUIController;
     public SkillTreeUI skillTreeUI;
-    public int categoryId, branchId, tierId, skillId;
+    public int categoryId, buttonId;
 
     void Awake()
     {
@@ -19,22 +21,26 @@ public class PickupTrigger : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-        if (Input.GetButtonUp("Interact") && entered == true)
+        if (Input.GetButtonUp("Interact") && entered && !pickedup)
         {
-            entered = false;
+            pickedup = true;
 
             hintUIController.toggleHint();
+
+            GameManager.instance.playersTurn = false;
 
             // let the player know he/she got a skill
             GameManager.instance.displayNotification("You got a skill scroll!");
 
-            Invoke("ActivateSkill", 1);
+            Invoke("ActivateSkill", 0.8f);
 
             // we can go to next level now
             GameManager.instance.SubLevelComplete = true;
 
             //TODO: update repository
             gameObject.SetActive(false);
+
+            GameManager.instance.playersTurn = true;
         }
     }
 
@@ -59,11 +65,10 @@ public class PickupTrigger : MonoBehaviour {
 
         skillTreeUI.ActivateCategory(categoryId);
 
-        Invoke("activateSkillDelay", 1);
-    }
-
-    void activateSkillDelay()
-    {
-        GameManager.instance.skillTree.setSkillTrue(branchId, tierId, skillId);
+        Button skillbutton = skillTreeUI.GetButton(buttonId);
+        if (skillbutton == null)
+            Debug.Log("button is null");
+        else
+            skillbutton.onClick.Invoke();
     }
 }

@@ -63,7 +63,7 @@ public class SkillTreeUI : MonoBehaviour {
 
 
     // Use this for initialization
-    void Start () {
+    void Awake () {
         // normally, populate the array with previously-saved character skill data; still need to save it, too
         tree = GameManager.instance.skillTree;
 
@@ -184,6 +184,11 @@ public class SkillTreeUI : MonoBehaviour {
             default:
                 Debug.Log("Invalid skill category index: " + index);break;
         }
+    }
+
+    public Button GetButton(int idx)
+    {
+        return buttons[idx];
     }
 
 	private float originalWidth = 640.0f;  // define here the original resolution
