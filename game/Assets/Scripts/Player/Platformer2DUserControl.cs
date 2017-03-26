@@ -40,18 +40,7 @@ namespace UnityStandardAssets._2D
 
             if (Input.GetButtonUp("Cancel"))
             {
-                if (gamePaused) {
-                    gamePaused = false;
-                    //pauseMenu.ToggleMenu(false);
-                    skillMenu.SetActive(false);
-                    GameManager.Resume();
-                }
-                else {
-                    gamePaused = true;
-                    //pauseMenu.ToggleMenu(true);
-                    skillMenu.SetActive(true);
-                    GameManager.Pause();
-                }
+                ToggleSkillMenu();
             }
 
             // Read button down inputs in Update so button presses aren't missed.
@@ -128,5 +117,21 @@ namespace UnityStandardAssets._2D
         {
             Time.timeScale = 1;
         }*/
+
+        public void ToggleSkillMenu()
+        {
+            if (gamePaused)
+            {
+                gamePaused = false;
+                skillMenu.SetActive(false);
+                GameManager.Resume();
+            }
+            else
+            {
+                gamePaused = true;
+                skillMenu.SetActive(true);
+                GameManager.Pause();
+            }
+        }
     }
 }

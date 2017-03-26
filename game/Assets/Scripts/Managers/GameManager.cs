@@ -27,10 +27,12 @@ public class GameManager : MonoBehaviour
     private bool doingSetup = true;                         //Boolean to check if we're setting up board, prevent Player from moving during setup.
     Transform player;
     UnityStandardAssets._2D.PlatformerCharacter2D playerScript;
+    UnityStandardAssets._2D.Platformer2DUserControl userCtrl;
     LadderManager ladderManager;
     static bool startFromLoad = false;
     static GameStatus gs;
     bool subLevelComplete = false;
+    
 
     //Awake is always called before any Start functions
     void Awake()
@@ -129,6 +131,7 @@ public class GameManager : MonoBehaviour
             GameObject p = GameObject.FindGameObjectWithTag("Player");
             player = p.transform;
             playerScript = p.GetComponent<UnityStandardAssets._2D.PlatformerCharacter2D>();
+            userCtrl = p.GetComponent<UnityStandardAssets._2D.Platformer2DUserControl>();
 
             findNotificationManager();
             ladderManager = GameObject.Find("TrapDoorTriggers").GetComponent<LadderManager>();
@@ -260,7 +263,7 @@ public class GameManager : MonoBehaviour
     {
         playersTurn = false;
 
-        notiManager.Display("The enemy has seen you");
+        displayNotification("The enemy has seen you");
 
         float puzzleStartX = RoomManager.Instance.GetXMax(roomNum) - 2f;
 
@@ -269,6 +272,13 @@ public class GameManager : MonoBehaviour
         playersTurn = true;
     }
 
+    public void displayNotification(string str)
+    {
+        if (notiManager != null)
+        {
+            notiManager.Display(str);
+        }
+    }
     void transformPlayer()
     {
         
@@ -304,6 +314,11 @@ public class GameManager : MonoBehaviour
         {
             subLevelComplete = value;
         }
+    }
+
+    public void ToggleSkillMenu()
+    {
+        userCtrl.ToggleSkillMenu();
     }
 }
 

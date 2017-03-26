@@ -174,6 +174,18 @@ public class SkillTreeUI : MonoBehaviour {
         }
 	}
 
+    public void ActivateCategory(int index)
+    {
+        switch(index)
+        {
+            case 1: martialArtsToggle.isOn = true; break;
+            case 2: cultivationToggle.isOn = true; break;
+            case 3: spiritualToggle.isOn = true; break;
+            default:
+                Debug.Log("Invalid skill category index: " + index);break;
+        }
+    }
+
 	private float originalWidth = 640.0f;  // define here the original resolution
 	private float originalHeight = 400.0f; // you used to create the GUI contents 
 	private Vector3 scale;
