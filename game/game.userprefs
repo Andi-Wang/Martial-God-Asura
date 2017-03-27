@@ -9,7 +9,7 @@
       <File FileName="Assets\Scripts\Player\Platformer2DUserControl.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\Enemy\Enemy.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\Enemy\AttackState.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\Player\PlatformerCharacter2D.cs" Line="534" Column="67" />
+      <File FileName="Assets\Scripts\Player\PlatformerCharacter2D.cs" Line="162" Column="27" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

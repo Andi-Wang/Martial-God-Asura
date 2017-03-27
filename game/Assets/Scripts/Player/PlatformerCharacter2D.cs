@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using System.Collections;
 
 namespace UnityStandardAssets._2D {
     public class PlatformerCharacter2D : MonoBehaviour {
@@ -168,6 +169,11 @@ namespace UnityStandardAssets._2D {
             //playerAudio.Play();
         }
 
+		IEnumerator Cooldown() {
+			yield return new WaitForSeconds (0.5f);
+			m_Anim.SetBool ("BasicPunch", false);
+		}
+
         private void FixedUpdate() {
             m_Grounded = false;
 
@@ -191,10 +197,9 @@ namespace UnityStandardAssets._2D {
             m_Anim.SetFloat("vSpeed", m_Rigidbody2D.velocity.y);
 
             // Set attacking to false in Basic Punch to prevent buffered input from overriding command
-			if (m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Basic Punch") || m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Flip Kick") || m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Block")){
+			if (m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Basic Punch") || m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Flip Kick") || m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Block")) {
 				attacking = false;
-			}
-			else if (m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Low Kick")) {
+			} else if (m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Low Kick")) {
 				attacking = false;
 			}
 			// Set BasicPunch to false in Idle to ensure no interrupt during Basic Punch animation
@@ -555,6 +560,7 @@ namespace UnityStandardAssets._2D {
 							m_Anim.SetBool ("BasicPunch", true); //Set BasicPunch to true because we are punching
 							attacking = true; //Set attacking to true because we are attacking
                             skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Tornado, 1, 0, 6, 1, 1, 0);
+							StartCoroutine ("Cooldown");
                         }
                         
                     }
