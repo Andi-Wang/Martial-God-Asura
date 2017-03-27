@@ -32,6 +32,10 @@ public class Skill {
         public bool airdashing = false;
         public bool holdCasting = false;
 
+        //Holds the teleport sigil
+        public bool teleportSigilExists = false;
+        public GameObject teleportSigil;
+
         public void getHit() {
             dashing = false;
             dashSpeed = 0;
@@ -150,7 +154,7 @@ public class Skill {
 
 
     //All-in-one method for different projectile types
-    public float Projectile(Rigidbody2D body, bool facingRight, Rigidbody2D projectile, float counter, float frequencyMultiplier, float speed, float startDistance, int numProjectiles, float spread) {
+    public float Projectile(Rigidbody2D body, bool facingRight, GameObject projectilePrefab, float counter, float frequencyMultiplier, float speed, float startDistance, int numProjectiles, float spread) {
         //Counter and frequency multiplier are used for held-down skills (determines the number of times per second a new projectile is made while the key is held down)
         //Speed is projectile travel speed, startDistance is where the projectile starts in relation to the player (horizontal), numProjectiles is the number of projectiles fired by one call (affected by spread)
         //Spread is the maximum angle of projectile trajectory (above and below the horizontal)
@@ -162,6 +166,8 @@ public class Skill {
         //Flame Lance call:       skill.Projectile(m_Rigidbody2D, m_FacingRight, m_flamelance, 1, 0, 0, 1, 1, 0);
 
         //m_flamelance and m_iceball prefabs not created yet
+
+        Rigidbody2D projectile = projectilePrefab.GetComponent<Rigidbody2D>();
 
         counter += Time.deltaTime * frequencyMultiplier;
 
@@ -180,7 +186,7 @@ public class Skill {
                 Rigidbody2D clone = Rigidbody2D.Instantiate(projectile, new Vector2(body.transform.position.x + xdeg * startDistance, body.transform.position.y + ydeg * startDistance), Quaternion.AngleAxis(angle, Vector3.forward)) as Rigidbody2D;
 
                 if(!facingRight) {
-                    clone.transform.localScale = new Vector3(clone.transform.localScale.x, clone.transform.localScale.y * -1, 0);
+                    clone.transform.localScale = new Vector2(clone.transform.localScale.x, clone.transform.localScale.y * -1);
                 }
 
                 clone.velocity = speed * new Vector2(xdeg, ydeg);
@@ -189,9 +195,29 @@ public class Skill {
 
         return counter;
     }
-    public static float FireballEffect() {
-        float damage = 5;
-        return damage;
+    public void StaticProjectile(Rigidbody2D body, bool facingRight, GameObject projectilePrefab, float startX, float startY) {
+        Rigidbody2D projectile = projectilePrefab.GetComponent<Rigidbody2D>();
+        if(!facingRight) { startX *= -1; }
+
+        Rigidbody2D clone = Rigidbody2D.Instantiate(projectile, new Vector2(body.transform.position.x + startX, body.transform.position.y + startY), new Quaternion()) as Rigidbody2D;
+        if (!facingRight) {
+            clone.transform.localScale = new Vector2(clone.transform.localScale.x * -1, clone.transform.localScale.y);
+        }
+    }
+
+    public GameObject TeleportSigil(Rigidbody2D body, bool facingRight, GameObject projectilePrefab) {
+        Rigidbody2D projectile = projectilePrefab.GetComponent<Rigidbody2D>();
+
+        Rigidbody2D clone = Rigidbody2D.Instantiate(projectile, body.transform.position, new Quaternion()) as Rigidbody2D;
+        if(!facingRight) {
+            clone.transform.localScale = new Vector2(clone.transform.localScale.x * -1, clone.transform.localScale.y);
+        }
+
+        return clone.gameObject;
+    }
+    public void TeleportToSigil(Rigidbody2D body, GameObject sigil) {
+        body.position = sigil.GetComponent<Rigidbody2D>().position;
+        Object.Destroy(sigil);
     }
 
     public float Dash(Rigidbody2D body, bool dashing, float dashSpeed, bool facingRight) {

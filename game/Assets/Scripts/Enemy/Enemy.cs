@@ -8,7 +8,7 @@ public class Enemy : MonoBehaviour
 {
     public Entity enemyEntity;
 
-    public Rigidbody2D m_fireball;
+    public GameObject m_fireball;
 
     public float speed = 3f;
     public float chaseSpeed;

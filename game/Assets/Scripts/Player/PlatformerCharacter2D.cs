@@ -356,7 +356,7 @@ namespace UnityStandardAssets._2D {
                     }
                     else if (input.vDown) {
                         //Water Dragon
-                        skill.Projectile(m_Rigidbody2D, m_FacingRight, m_WaterDragon.GetComponent<Rigidbody2D>(), 1, 0, 0, 1, 1, 0);
+                        skill.Projectile(m_Rigidbody2D, m_FacingRight, m_WaterDragon, 1, 0, 2, 2, 1, 0);
                     }
                     else if (input.vUp) {
                     }
@@ -374,7 +374,7 @@ namespace UnityStandardAssets._2D {
 
 
                             //Fireball
-                            skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Fireball2.GetComponent<Rigidbody2D>(), 1, 0, 12, 2, 1, 0);
+                            skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Fireball2, 1, 0, 12, 2, 1, 0);
                             skillStateManager.fireballCounter = 0;
                         }
 
@@ -395,15 +395,15 @@ namespace UnityStandardAssets._2D {
 
                         if (input.vDown) {
                             //Iceberg
-                            skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Iceberg.GetComponent<Rigidbody2D>(), 1, 0, 7, 2, 1, 0);
+                            skill.StaticProjectile(m_Rigidbody2D, m_FacingRight, m_Iceberg, 1.5f, 1.5f);
                         }
                         else if (input.vUp) {
                             //Call Lightning
-                            skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Lightning.GetComponent<Rigidbody2D>(), 1, 0, 0, 3, 1, 0);
+                            skill.StaticProjectile(m_Rigidbody2D, m_FacingRight, m_Lightning, 3, 2);
                         }
                         else {
                             //Meteor
-                            skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Meteor.GetComponent<Rigidbody2D>(), 1, 0, 0, 4, 1, 0);
+                            skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Meteor, 1, 0, 0, 4, 1, 0);
                         }
                     }
                 }
@@ -416,15 +416,15 @@ namespace UnityStandardAssets._2D {
                     }
                     else if (input.vDown) {
                         //Barrier Sigil
-                        skill.Projectile(m_Rigidbody2D, m_FacingRight, m_BarrierSigil.GetComponent<Rigidbody2D>(), 1, 0, 0, 0, 1, 0);
+                        skill.Projectile(m_Rigidbody2D, m_FacingRight, m_BarrierSigil, 1, 0, 0, 0, 1, 0);
                     }
                     else if (input.vUp) {
                         //Draining Sigil
-                        skill.Projectile(m_Rigidbody2D, m_FacingRight, m_DrainingSigil.GetComponent<Rigidbody2D>(), 1, 0, 0, 0, 1, 0);
+                        skill.Projectile(m_Rigidbody2D, m_FacingRight, m_DrainingSigil, 1, 0, 0, 0, 1, 0);
                     }
                     else {
                         //Lesser Spirit Bolt
-                        skill.Projectile(m_Rigidbody2D, m_FacingRight, m_LesserSpiritbolt.GetComponent<Rigidbody2D>(), 1, 0, 20, 2, 1, 0);
+                        skill.Projectile(m_Rigidbody2D, m_FacingRight, m_LesserSpiritbolt, 1, 0, 20, -3, 1, 0);
                     }
                 }
                 else if (input.fire3Hold && !skillStateManager.holdCasting) {
@@ -440,7 +440,14 @@ namespace UnityStandardAssets._2D {
                         }
                         else if (input.vUp) {
                             //Teleport Sigil
-                            
+                            if(skillStateManager.teleportSigilExists) {
+                                skill.TeleportToSigil(m_Rigidbody2D, skillStateManager.teleportSigil);
+                                skillStateManager.teleportSigilExists = false;
+                            }
+                            else {
+                                skillStateManager.teleportSigil = skill.TeleportSigil(m_Rigidbody2D, m_FacingRight, m_TeleportSigil);
+                                skillStateManager.teleportSigilExists = true;
+                            }
                         }
                         else {
                             //Greater Spirit Bolt
@@ -547,14 +554,16 @@ namespace UnityStandardAssets._2D {
 							m_Anim.SetTrigger ("SpinKickT"); //Start punching
 							m_Anim.SetBool ("BasicPunch", true); //Set BasicPunch to true because we are punching
 							attacking = true; //Set attacking to true because we are attacking
-						}
-					}
+                            skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Tornado, 1, 0, 6, 1, 1, 0);
+                        }
+                        
+                    }
                 }
                 else if (input.fire1Hold) {
                 }
                 else if (input.fire2Down) {
                     //Shark Crescent
-                    skill.Projectile(m_Rigidbody2D, m_FacingRight, m_SharkAir.GetComponent<Rigidbody2D>(), 1, 0, 0, 0, 1, 0);
+                    skill.StaticProjectile(m_Rigidbody2D, m_FacingRight, m_SharkAir, 0, -1);
                 }
                 else if (input.fire2Hold) {
                 }
