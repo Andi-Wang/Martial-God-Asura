@@ -35,6 +35,7 @@ public class Skill {
         //Holds the teleport sigil
         public bool teleportSigilExists = false;
         public GameObject teleportSigil;
+        public bool teleportFacingRight;
 
         public void getHit() {
             dashing = false;
@@ -207,12 +208,7 @@ public class Skill {
 
     public GameObject TeleportSigil(Rigidbody2D body, bool facingRight, GameObject projectilePrefab) {
         Rigidbody2D projectile = projectilePrefab.GetComponent<Rigidbody2D>();
-
         Rigidbody2D clone = Rigidbody2D.Instantiate(projectile, body.transform.position, new Quaternion()) as Rigidbody2D;
-        if(!facingRight) {
-            clone.transform.localScale = new Vector2(clone.transform.localScale.x * -1, clone.transform.localScale.y);
-        }
-
         return clone.gameObject;
     }
     public void TeleportToSigil(Rigidbody2D body, GameObject sigil) {

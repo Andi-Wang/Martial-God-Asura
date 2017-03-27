@@ -198,7 +198,7 @@ namespace UnityStandardAssets._2D {
 				attacking = false;
 			}
 			// Set BasicPunch to false in Idle to ensure no interrupt during Basic Punch animation
-			else if (m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Idle") || m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Crouch")) {
+			else if (m_Anim.GetCurrentAnimatorStateInfo(0).IsName("Jumping") || m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Idle") || m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Crouch")) {
 				m_Anim.SetBool ("BasicPunch", false);
 			}
 
@@ -439,13 +439,15 @@ namespace UnityStandardAssets._2D {
                         if (input.vDown) {
                         }
                         else if (input.vUp) {
-                            //Teleport Sigil
+                            //Teleport Sigil (creation and reactivation)
                             if(skillStateManager.teleportSigilExists) {
+                                if (m_FacingRight != skillStateManager.teleportFacingRight) { Flip(); }
                                 skill.TeleportToSigil(m_Rigidbody2D, skillStateManager.teleportSigil);
                                 skillStateManager.teleportSigilExists = false;
                             }
                             else {
                                 skillStateManager.teleportSigil = skill.TeleportSigil(m_Rigidbody2D, m_FacingRight, m_TeleportSigil);
+                                skillStateManager.teleportFacingRight = m_FacingRight;
                                 skillStateManager.teleportSigilExists = true;
                             }
                         }
@@ -554,7 +556,7 @@ namespace UnityStandardAssets._2D {
 							m_Anim.SetTrigger ("SpinKickT"); //Start punching
 							m_Anim.SetBool ("BasicPunch", true); //Set BasicPunch to true because we are punching
 							attacking = true; //Set attacking to true because we are attacking
-                            skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Tornado, 1, 0, 6, 1, 1, 0);
+                            //skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Tornado, 1, 0, 6, 1, 1, 0);
                         }
                         
                     }
