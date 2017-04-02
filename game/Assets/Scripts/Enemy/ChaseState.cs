@@ -40,10 +40,6 @@ public class ChaseState : EnemyState {
                 enemy.changeState(enemy.rangedAttackState);
             }
         }
-        else if (enemy.TargetInMeleeRange() && !canMelee && !enemy.dashing)
-        {
-            enemy.dashing = true;
-        }
         //If melee on CD but in melee range
         else if (enemy.TargetInMeleeRange() && !canMelee)
         {

@@ -64,9 +64,6 @@ public class Enemy : MonoBehaviour
     public Rigidbody2D rb2D;
     private bool e_FacingRight = true;
 
-    private Skill.SkillStateManager skillStateManager = new Skill.SkillStateManager();
-    private Skill skill = new Skill();
-
     public bool dashing;
 
     void Awake()
@@ -133,26 +130,6 @@ public class Enemy : MonoBehaviour
         else if (enemyEntity.health <= 0)
         {
             Death();
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        if (dashing)
-            backDash();
-    }
-
-    public void setDashSpeed(float f)
-    {
-        skillStateManager.backdashSpeed = f;
-    }
-
-    public void backDash()
-    {
-        if ((skillStateManager.backdashSpeed = skill.Backdash(rb2D, skillStateManager.backdashing, skillStateManager.backdashSpeed, e_FacingRight)) == 0)
-        {
-            skillStateManager.backdashing = false;
-            dashing = false;
         }
     }
 
