@@ -4,27 +4,32 @@ using System.Collections;
 public class ChaseState : EnemyState {
 
     private Enemy enemy;
-    private bool canMelee;
-    private bool canRanged;
+    private bool canMelee = false;
+    private bool canRanged = false;
 
     public void Execute()
     {
+        //Get player position
         enemy.setPlayerPos();
 
+        //Update melee and ranged cooldowns
         if (enemy.canMeleeAttack && !canMelee)
             canMelee = enemy.updateMeleeCD();
         if (enemy.canRangeAttack && !canRanged)
             canRanged = enemy.updateRangeCD();
 
-        if (GameManager.instance.currentRoom != RoomManager.Instance.findRoomId(enemy.transform.position.x, enemy.transform.position.y))
+        //Check if player left room
+        if (GameManager.instance.currentRoom != RoomManager.Instance.findRoomId(enemy.transform.position.x, enemy.transform.position.y) && !enemy.isGhost)
         {
             enemy.changeState(enemy.patrolState);
         }
+        //If can melee, melee
         else if (enemy.TargetInMeleeRange() && enemy.canMeleeAttack && canMelee)
         {
             canMelee = false;
             enemy.changeState(enemy.attackState);
         }
+        //If can ranged, ranged
         else if (enemy.TargetInRange() && enemy.canRangeAttack && canRanged)
         {
             canRanged = false;
@@ -35,22 +40,34 @@ public class ChaseState : EnemyState {
                 enemy.changeState(enemy.rangedAttackState);
             }
         }
-
+        else if (enemy.TargetInMeleeRange() && !canMelee && !enemy.dashing)
+        {
+            enemy.dashing = true;
+        }
+        //If melee on CD but in melee range
         else if (enemy.TargetInMeleeRange() && !canMelee)
         {
             enemy.animator.SetBool("Moving", false);
         }
+        //If the unit is a ghost
+        else if (enemy.isGhost)
+        {
+            if (enemy.disToPlayer() < 30f)
+                enemy.ghostMove();
+            else
+                enemy.changeState(enemy.patrolState);
+        }
+        //Look at player and move
         else
         {
-            enemy.LookAtTarget();
             enemy.Move();
         }
-
-        if (Mathf.Abs(enemy.getPlayerPos().y - enemy.transform.position.y) > 8)
+        //Check if player has gone up a floor
+        if (Mathf.Abs(enemy.getPlayerPos().y - enemy.transform.position.y) > 8 && !enemy.isGhost)
         {
             enemy.changeState(enemy.patrolState);
         }
-
+        //If can't move, just look at him all scary like
         if (!enemy.canMove)
             enemy.LookAtTarget();
     }
@@ -67,5 +84,6 @@ public class ChaseState : EnemyState {
     {
 
     }
+
 }
 

@@ -41,6 +41,7 @@ public class Enemy : MonoBehaviour
     public float nextMeleeTime;
     public bool canMeleeAttack = true;
 
+    public bool isGhost = false;
     public bool isBoss = false;
     public bool canMove = true;
 
@@ -63,13 +64,17 @@ public class Enemy : MonoBehaviour
     public Rigidbody2D rb2D;
     private bool e_FacingRight = true;
 
+    private Skill.SkillStateManager skillStateManager = new Skill.SkillStateManager();
+    private Skill skill = new Skill();
+
+    public bool dashing;
+
     void Awake()
     {
         player = GameObject.FindGameObjectWithTag("Player");
         playerPos = player.transform.position;
         boxCollider = GetComponent<BoxCollider2D>();
         rb2D = GetComponent<Rigidbody2D>();
-        //currentHealth = startingHealth;
         enemyEntity = new Entity(startingHealth, 0f, 0f, 0f, 0f, 0f, 0f, 1f, 1f, 0f);
         enemyAudio = GetComponent<AudioSource>();
     }
@@ -131,6 +136,26 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    private void FixedUpdate()
+    {
+        if (dashing)
+            backDash();
+    }
+
+    public void setDashSpeed(float f)
+    {
+        skillStateManager.backdashSpeed = f;
+    }
+
+    public void backDash()
+    {
+        if ((skillStateManager.backdashSpeed = skill.Backdash(rb2D, skillStateManager.backdashing, skillStateManager.backdashSpeed, e_FacingRight)) == 0)
+        {
+            skillStateManager.backdashing = false;
+            dashing = false;
+        }
+    }
+
     public void changeState(EnemyState newState)
     {
         if (state != null)
@@ -175,11 +200,16 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    public float disToPlayer()
+    {
+        return Mathf.Sqrt(Mathf.Pow(player.transform.position.x - transform.position.x, 2) + Mathf.Pow(player.transform.position.y - transform.position.y, 2));
+    }
+
     public bool TargetInMeleeRange()
     {
         if (player != null)
         {
-            float totalDis = Mathf.Sqrt(Mathf.Pow(player.transform.position.x - transform.position.x, 2) + Mathf.Pow(player.transform.position.y - transform.position.y, 2));
+            float totalDis = disToPlayer();
             if (Mathf.Abs(totalDis) <= AttackRange)
                 return true;
             else
@@ -192,7 +222,7 @@ public class Enemy : MonoBehaviour
     {
         if (player != null)
         {
-            float totalDis = Mathf.Sqrt(Mathf.Pow(player.transform.position.x - transform.position.x, 2) + Mathf.Pow(player.transform.position.y - transform.position.y,2));
+            float totalDis = disToPlayer();
             if (Mathf.Abs(totalDis) <= RangeAttackRange)
                 return true;
             else
@@ -239,11 +269,15 @@ public class Enemy : MonoBehaviour
     {
         if (isDead)
             return;
-        if (canBeInterrupted) { 
+
+        if (canBeInterrupted)
+        {
             animator.SetTrigger("Hit");
         }
         else
-            this.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+        {
+            rb2D.velocity = Vector2.zero;
+        }
 
         if (!isImmune)
         {
@@ -285,9 +319,16 @@ public class Enemy : MonoBehaviour
     {
         if (canMove)
         {
+            LookAtTarget();
             animator.SetBool("Moving", true);
             transform.Translate(getDirection() * speed * Time.deltaTime, Space.World);
         }
+    }
+
+    public void ghostMove()
+    {
+        LookAtTarget();
+        transform.position = Vector3.MoveTowards(transform.position, player.transform.position, chaseSpeed * Time.deltaTime);
     }
 
     public Vector2 getDirection()

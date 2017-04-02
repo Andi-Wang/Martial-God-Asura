@@ -7,6 +7,7 @@ public class AttackState : EnemyState
     public void Execute()
     {
         Attack();
+        enemy.setDashSpeed(20f);
         enemy.changeState(enemy.chaseState);
     }
 
