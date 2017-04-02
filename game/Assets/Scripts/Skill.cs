@@ -6,6 +6,59 @@ using UnityEngine.UI;
 public class Skill {
     const int assumedFPS = 60;
 
+    public class CooldownManager {
+        public const float fireballCooldown = 1f;
+        public const float fireballReducedCooldown = 0.3f;
+        public float fireballTimer = 0f;
+
+        public const float waterDragonCooldown = 0.5f;
+        public float waterDragonTimer = 0f;
+
+        public const float icebergCooldown = 2f;
+        public float icebergTimer = 0f;
+
+        public const float callLightningCooldown = 2f;
+        public float callLightningTimer = 0f;
+
+        public const float meteorCooldown = 2f;
+        public float meteorTimer = 0f;
+
+        public const float barrierSigilCooldown = 5f;
+        public float barrierSigilTimer = 0f;
+
+        public const float drainingSigilCooldown = 2f;
+        public float drainingSigilTimer = 0f;
+
+        public const float teleportSigilCooldown = 5f;
+        public float teleportSigilTimer = 0f;
+
+        public const float lesserSpiritboldCooldown = 1f;
+        public float lesserSpiritboltTimer = 0f;
+
+        public const float onslaughtToggleCooldown = 0.3f;
+        public float onslaughtToggleTimer = 0f;
+
+        public const float cycloneKickTornadoCooldown = 0.45f;
+        public float cycloneKickTornadoTimer = 0f;
+
+        public const float airSharkCooldown = 0.5f;
+        public float airSharkTimer = 0f;
+
+        public void Tick(float amount) {
+            fireballTimer -= amount;
+            waterDragonTimer -= amount;
+            icebergTimer -= amount;
+            callLightningTimer -= amount;
+            meteorTimer -= amount;
+            barrierSigilTimer -= amount;
+            drainingSigilTimer -= amount;
+            teleportSigilTimer -= amount;
+            lesserSpiritboltTimer -= amount;
+            onslaughtToggleTimer -= amount;
+            cycloneKickTornadoTimer -= amount;
+            airSharkTimer -= amount;
+        }
+    }
 
     public class SkillStateManager {
         
@@ -15,8 +68,8 @@ public class Skill {
         public bool secondJumpAvailable = false;
         
         public float airdashSpeed = 0;
-        public float channelCounter = 0;
-        public float fireballCounter = 0;
+        public float channelTimer = 0;
+        public int fireballCounter = 0;
         public int punchCounter = 0;
         public int ironStrikesStacks = 0;
 
@@ -58,6 +111,18 @@ public class Skill {
             secondJumpAvailable = true;
         }
     }
+
+    public const float fireballCost = 15f;
+    public const float waterDragonCost = 20f;
+    public const float icebergCost = 35f;
+    public const float callLightningCost = 40f;
+    public const float meteorCost = 40f;
+    public const float barrierSigilCost = 25f;
+    public const float drainingSigilCost = 20f;
+    public const float teleportSigilCost = 35f;
+    public const float lesserSpiritboltCost = 15f;
+    public const float cycloneKickTornadoCost = 0f;
+    public const float airSharkCost = 20f;
 
     //Grants bonus armor (percentage damage reduction) while dashing
     //Call this regularly to update armor values
@@ -127,7 +192,7 @@ public class Skill {
     //Grants energy regen based on amount of missing energy (more regen when more energy is missing)
     //Call this regularly to update energy regeneration
     public float Renewal_Passive(float currentEnergy, float maxEnergy) {
-        float bonusEnergyRegenPerMissingEnergy = 0.01f;
+        float bonusEnergyRegenPerMissingEnergy = 0.1f;
         float bonusEnergyRegen = (maxEnergy - currentEnergy) * bonusEnergyRegenPerMissingEnergy;
         return bonusEnergyRegen;
     }

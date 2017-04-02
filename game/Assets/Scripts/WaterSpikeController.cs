@@ -36,7 +36,7 @@ public class WaterSpikeController : MonoBehaviour {
     {
         if (other.tag == "Player")
         {
-            playerScript.TakeDamage(m_maxDamage);
+            playerScript.TakeDamage(transform.GetComponentInParent<Rigidbody2D>(), m_maxDamage);
             damaging = true;
         }
     }

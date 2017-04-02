@@ -27,10 +27,11 @@ namespace UnityStandardAssets._2D {
         public float flashSpeed = 2f;
 
         [SerializeField] private LayerMask m_WhatIsGround;                  // A mask determining what is ground to the character
-        [SerializeField] private Entity playerEntity = new Entity(100f, 100f, 0f, 5f, 0f, 0f, 700f, 10f, 1f, 0.00001f); //very small crouch speed so the player can turn around when crouched
+        [SerializeField] private Entity playerEntity = new Entity(100f, 100f, 0f, 25f, 0f, 0f, 700f, 10f, 1f, 0.00001f); //very small crouch speed so the player can turn around when crouched
         public Entity buffEntity = new Entity();
         private Skill skill;
         private Skill.SkillStateManager skillStateManager = new Skill.SkillStateManager();
+        private Skill.CooldownManager cooldownManager = new Skill.CooldownManager();
 
         private Transform m_GroundCheck;    // A position marking where to check if the player is grounded.
         const float k_GroundedRadius = .2f; // Radius of the overlap circle to determine if grounded
@@ -49,9 +50,11 @@ namespace UnityStandardAssets._2D {
         const float stunDurationWhenHit = 0.5f;
         const float knockbackForceWhenHit = 700f;
         const float airKnockdownVelocity = 6f;
+        const float energyRegenCooldown = 1.5f;
         float timeSinceLastStruck = 1f;
         float lastDamageTaken = 0;
         float timeSinceLastStrike = 1f;
+        float timeSinceLastEnergyUse = 1f;
         float stunned = 0;
         bool damaged = false;
 
@@ -62,8 +65,7 @@ namespace UnityStandardAssets._2D {
         }
 
 
-        void Awake()
-        {
+        void Awake() {
             skill = new Skill();
             // Setting up references.
             m_GroundCheck = transform.Find("GroundCheck");
@@ -72,8 +74,7 @@ namespace UnityStandardAssets._2D {
             m_Rigidbody2D = GetComponent<Rigidbody2D>();
             isDead = false;
         }
-        void Update()
-        {
+        void Update() {
             if (damaged)
             {
                 damageImage.color = flashColour;
@@ -95,13 +96,12 @@ namespace UnityStandardAssets._2D {
             return damage / 100 * (100 + totalMight);
         }
 
-        public void TakeDamage(float amount)
-        {
+        public void TakeDamage(Rigidbody2D source, float amount) {
             amount = reduceDamageByArmor(amount);
 
-            damaged = true;
-
             if(timeSinceLastStruck >= invincibilityDurationWhenHit) {
+                damaged = true;
+
                 playerEntity.health -= amount;
                 lastDamageTaken = amount;
                 healthbar.fillAmount = playerEntity.health / playerEntity.maxHealth;
@@ -109,17 +109,19 @@ namespace UnityStandardAssets._2D {
                 timeSinceLastStruck = 0;
                 stunned = stunDurationWhenHit;
 
+                bool fromRight = source.position.x > m_Rigidbody2D.position.x;
+
                 //Interrupt certain actions like sliding
                 skillStateManager.getHit();
 
                 if(m_Grounded) {
-                    skillStateManager.backdashSpeed = skill.Backdash(m_Rigidbody2D, m_FacingRight, 0, true);
+                    skillStateManager.backdashSpeed = skill.Backdash(m_Rigidbody2D, true, 0, fromRight);
                     skillStateManager.backdashing = true;
                 }
                 else {
                     m_Rigidbody2D.velocity = new Vector2(0, -airKnockdownVelocity);
 
-                    if (m_FacingRight) {
+                    if (fromRight) {
                         m_Rigidbody2D.AddForce(new Vector2(-knockbackForceWhenHit, 0));
                     }
                     else {
@@ -130,8 +132,7 @@ namespace UnityStandardAssets._2D {
             }
 
             //TODO: player hurt sound,animation
-            if (playerEntity.health <= 0 && !isDead)
-            {
+            if (playerEntity.health <= 0 && !isDead) {
                 Death();
             }
         }
@@ -147,6 +148,7 @@ namespace UnityStandardAssets._2D {
         public bool energyCost(float cost) {
             if (playerEntity.energy > cost) {
                 addEnergy(-cost);
+                timeSinceLastEnergyUse = 0f;
                 return true;
             }
             else return false;
@@ -196,6 +198,7 @@ namespace UnityStandardAssets._2D {
             // Set the vertical animation
             m_Anim.SetFloat("vSpeed", m_Rigidbody2D.velocity.y);
 
+            
             // Set attacking to false in Basic Punch to prevent buffered input from overriding command
 			if (m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Basic Punch") || m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Flip Kick") || m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Block")) {
 				attacking = false;
@@ -205,6 +208,7 @@ namespace UnityStandardAssets._2D {
 			// Set BasicPunch to false in Idle to ensure no interrupt during Basic Punch animation
 			else if (m_Anim.GetCurrentAnimatorStateInfo(0).IsName("Jumping") || m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Idle") || m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Crouch")) {
 				m_Anim.SetBool ("BasicPunch", false);
+                attacking = false;
 			}
 
             //Add kick and block anim stuff here
@@ -254,11 +258,12 @@ namespace UnityStandardAssets._2D {
 
             m_Rigidbody2D.gravityScale = playerEntity.gravity + buffEntity.gravity;
             m_Anim.speed = playerEntity.animationSpeed + buffEntity.animationSpeed;
-            addEnergy((playerEntity.energyRegen + buffEntity.energyRegen) * Time.deltaTime);
-            addHealth((playerEntity.healthRegen + buffEntity.healthRegen) * Time.deltaTime);
-            timeSinceLastStruck += Time.deltaTime;
-            timeSinceLastStrike += Time.deltaTime;
-            skillStateManager.fireballCounter += Time.deltaTime;
+            if (timeSinceLastEnergyUse > energyRegenCooldown) { addEnergy((playerEntity.energyRegen + buffEntity.energyRegen) * Time.fixedDeltaTime); }
+            addHealth((playerEntity.healthRegen + buffEntity.healthRegen) * Time.fixedDeltaTime);
+            timeSinceLastStruck += Time.fixedDeltaTime;
+            timeSinceLastStrike += Time.fixedDeltaTime;
+            timeSinceLastEnergyUse += Time.fixedDeltaTime;
+            cooldownManager.Tick(Time.fixedDeltaTime);
         }
 
 
@@ -271,7 +276,7 @@ namespace UnityStandardAssets._2D {
 
             //Stunlocked; inputs are ignored during this time
             if (stunned > 0) {
-                stunned -= Time.deltaTime;
+                stunned -= Time.fixedDeltaTime;
                 input = new Controls();
             }
 
@@ -354,37 +359,38 @@ namespace UnityStandardAssets._2D {
                 }
                 //Note that fire2Up is used instead of fire2Down
                 else if (input.fire2Up) {
-                    if(skillStateManager.holdCasting) {
+                    skillStateManager.channelTimer = 0;
+                    if (skillStateManager.holdCasting) {
                         //Don't also cast this skill if a hold-cast skill was used
                         skillStateManager.holdCasting = false;
-                        skillStateManager.channelCounter = 0;
                     }
                     else if (input.vDown) {
                         //Water Dragon
-                        skill.Projectile(m_Rigidbody2D, m_FacingRight, m_WaterDragon, 1, 0, 2, 2, 1, 0);
+                        if(cooldownManager.waterDragonTimer < 0) {
+                            if(energyCost(Skill.waterDragonCost)) {
+                                cooldownManager.waterDragonTimer = Skill.CooldownManager.waterDragonCooldown;
+                                skill.Projectile(m_Rigidbody2D, m_FacingRight, m_WaterDragon, 1, 0, 2, 2, 1, 0);
+                            }
+                        }
                     }
                     else if (input.vUp) {
                     }
                     else {
-                        bool combo = false;
-                        if(skillStateManager.fireballCounter < 1) {
-                            m_Anim.speed += 1;
-                            combo = true;
-                        }
-
-                        if (!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("Basic Punch") && !m_Anim.GetBool("BasicPunch")) {
-                            m_Anim.SetTrigger("BasicPunchT"); //Start punching
-                            m_Anim.SetBool("BasicPunch", true); //Set BasicPunch to true because we are punching
-                            attacking = true; //Set attacking to true because we are attacking
-
-
-                            //Fireball
-                            skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Fireball2, 1, 0, 12, 2, 1, 0);
+                        //Fireball
+                        if (cooldownManager.fireballTimer < Skill.CooldownManager.fireballReducedCooldown - Skill.CooldownManager.fireballCooldown) {
                             skillStateManager.fireballCounter = 0;
                         }
-
-                        if(combo) {
-                            m_Anim.speed -= 1;
+                        if(cooldownManager.fireballTimer < 0) {
+                            if(energyCost(Skill.fireballCost)) {
+                                if (skillStateManager.fireballCounter++ > 1) {
+                                    skillStateManager.fireballCounter = 0;
+                                    cooldownManager.fireballTimer = Skill.CooldownManager.fireballCooldown;
+                                }
+                                else {
+                                    cooldownManager.fireballTimer = Skill.CooldownManager.fireballReducedCooldown;
+                                }
+                                skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Fireball2, 1, 0, 12, 2, 1, 0);
+                            }
                         }
                     }
                 }
@@ -393,43 +399,73 @@ namespace UnityStandardAssets._2D {
                     Channel();
 
                     float threshold = 0.8f;
-                    skillStateManager.channelCounter += Time.deltaTime;
-                    if(skillStateManager.channelCounter > threshold) {
-                        skillStateManager.holdCasting = true;
-
-
+                    skillStateManager.channelTimer += Time.fixedDeltaTime;
+                    if(skillStateManager.channelTimer > threshold) {
                         if (input.vDown) {
                             //Iceberg
-                            skill.StaticProjectile(m_Rigidbody2D, m_FacingRight, m_Iceberg, 1.5f, 1.5f);
+                            if(cooldownManager.icebergTimer < 0) {
+                                if(energyCost(Skill.icebergCost)) {
+                                    skillStateManager.holdCasting = true;
+                                    cooldownManager.icebergTimer = Skill.CooldownManager.icebergCooldown;
+                                    skill.StaticProjectile(m_Rigidbody2D, m_FacingRight, m_Iceberg, 1.5f, 1.5f);
+                                }
+                            }
                         }
                         else if (input.vUp) {
                             //Call Lightning
-                            skill.StaticProjectile(m_Rigidbody2D, m_FacingRight, m_Lightning, 3, 2);
+                            if(cooldownManager.callLightningTimer < 0) {
+                                if(energyCost(Skill.callLightningCost)) {
+                                    skillStateManager.holdCasting = true;
+                                    cooldownManager.callLightningTimer = Skill.CooldownManager.callLightningCooldown;
+                                    skill.StaticProjectile(m_Rigidbody2D, m_FacingRight, m_Lightning, 3, 2);
+                                }
+                            }
                         }
                         else {
                             //Meteor
-                            skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Meteor, 1, 0, 0, 4, 1, 0);
+                            if(cooldownManager.meteorTimer < 0) {
+                                if(energyCost(Skill.meteorCost)) {
+                                    skillStateManager.holdCasting = true;
+                                    cooldownManager.meteorTimer = Skill.CooldownManager.meteorCooldown;
+                                    skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Meteor, 1, 0, 0, 4, 1, 0);
+                                }
+                            }
                         }
                     }
                 }
                 //Note that fire3Up is used instead of fire3Down
                 else if (input.fire3Up) {
+                    skillStateManager.channelTimer = 0;
                     if (skillStateManager.holdCasting) {
                         //Don't also cast this skill if a hold-cast skill was used
                         skillStateManager.holdCasting = false;
-                        skillStateManager.channelCounter = 0;
                     }
                     else if (input.vDown) {
                         //Barrier Sigil
-                        skill.Projectile(m_Rigidbody2D, m_FacingRight, m_BarrierSigil, 1, 0, 0, 0, 1, 0);
+                        if(cooldownManager.barrierSigilTimer < 0) {
+                            if(energyCost(Skill.barrierSigilCost)) {
+                                cooldownManager.barrierSigilTimer = Skill.CooldownManager.barrierSigilCooldown;
+                                skill.Projectile(m_Rigidbody2D, m_FacingRight, m_BarrierSigil, 1, 0, 0, 0, 1, 0);
+                            }
+                        }
                     }
                     else if (input.vUp) {
                         //Draining Sigil
-                        skill.Projectile(m_Rigidbody2D, m_FacingRight, m_DrainingSigil, 1, 0, 0, 0, 1, 0);
+                        if(cooldownManager.drainingSigilTimer < 0) {
+                            if(energyCost(Skill.drainingSigilCost)) {
+                                cooldownManager.drainingSigilTimer = Skill.CooldownManager.drainingSigilCooldown;
+                                skill.Projectile(m_Rigidbody2D, m_FacingRight, m_DrainingSigil, 1, 0, 0, 0, 1, 0);
+                            }
+                        }
                     }
                     else {
                         //Lesser Spirit Bolt
-                        skill.Projectile(m_Rigidbody2D, m_FacingRight, m_LesserSpiritbolt, 1, 0, 20, -3, 1, 0);
+                        if(cooldownManager.lesserSpiritboltTimer < 0) {
+                            if(energyCost(Skill.lesserSpiritboltCost)) {
+                                cooldownManager.lesserSpiritboltTimer = Skill.CooldownManager.lesserSpiritboldCooldown;
+                                skill.Projectile(m_Rigidbody2D, m_FacingRight, m_LesserSpiritbolt, 1, 0, 20, -3, 1, 0);
+                            }
+                        }
                     }
                 }
                 else if (input.fire3Hold && !skillStateManager.holdCasting) {
@@ -437,8 +473,8 @@ namespace UnityStandardAssets._2D {
                     Channel();
 
                     float threshold = 0.8f;
-                    skillStateManager.channelCounter += Time.deltaTime;
-                    if (skillStateManager.channelCounter > threshold) {
+                    skillStateManager.channelTimer += Time.fixedDeltaTime;
+                    if (skillStateManager.channelTimer > threshold) {
                         skillStateManager.holdCasting = true;
                         
                         if (input.vDown) {
@@ -450,10 +486,13 @@ namespace UnityStandardAssets._2D {
                                 skill.TeleportToSigil(m_Rigidbody2D, skillStateManager.teleportSigil);
                                 skillStateManager.teleportSigilExists = false;
                             }
-                            else {
-                                skillStateManager.teleportSigil = skill.TeleportSigil(m_Rigidbody2D, m_FacingRight, m_TeleportSigil);
-                                skillStateManager.teleportFacingRight = m_FacingRight;
-                                skillStateManager.teleportSigilExists = true;
+                            else if(cooldownManager.teleportSigilTimer < 0) {
+                                if(energyCost(Skill.teleportSigilCost)) {
+                                    cooldownManager.teleportSigilTimer = Skill.CooldownManager.teleportSigilCooldown;
+                                    skillStateManager.teleportSigil = skill.TeleportSigil(m_Rigidbody2D, m_FacingRight, m_TeleportSigil);
+                                    skillStateManager.teleportFacingRight = m_FacingRight;
+                                    skillStateManager.teleportSigilExists = true;
+                                }
                             }
                         }
                         else {
@@ -463,16 +502,19 @@ namespace UnityStandardAssets._2D {
                     }
                 }
                 else if (input.fire4Up) {
+                    skillStateManager.channelTimer = 0;
                     if (skillStateManager.holdCasting) {
                         //Don't also cast this skill if a hold-cast skill was used
                         skillStateManager.holdCasting = false;
-                        skillStateManager.channelCounter = 0;
                     }
                     else if (input.vDown) {
                     }
                     else if (input.vUp) {
                         //Onslaught
-                        skillStateManager.onslaughtToggle = !skillStateManager.onslaughtToggle;
+                        if(cooldownManager.onslaughtToggleTimer < 0) {
+                            cooldownManager.onslaughtToggleTimer = Skill.CooldownManager.onslaughtToggleCooldown;
+                            skillStateManager.onslaughtToggle = !skillStateManager.onslaughtToggle;
+                        }
                     }
                     else {
                     }
@@ -482,8 +524,8 @@ namespace UnityStandardAssets._2D {
                     Channel();
 
                     float threshold = 0.8f;
-                    skillStateManager.channelCounter += Time.deltaTime;
-                    if (skillStateManager.channelCounter > threshold) {
+                    skillStateManager.channelTimer += Time.fixedDeltaTime;
+                    if (skillStateManager.channelTimer > threshold) {
                         skillStateManager.holdCasting = true;
                         
                         if (input.vDown) {
@@ -560,19 +602,26 @@ namespace UnityStandardAssets._2D {
 						if (!m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Spin Kick") && !m_Anim.GetBool ("BasicPunch")) {
 							m_Anim.SetTrigger ("SpinKickT"); //Start punching
 							m_Anim.SetBool ("BasicPunch", true); //Set BasicPunch to true because we are punching
-							attacking = true; //Set attacking to true because we are attacking
-
-                            skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Tornado, 1, 0, 6, 1, 1, 0);
-							StartCoroutine ("Cooldown");
+                            if(cooldownManager.cycloneKickTornadoTimer < 0) {
+                                if(energyCost(Skill.cycloneKickTornadoCost)) {
+                                    cooldownManager.cycloneKickTornadoTimer = Skill.CooldownManager.cycloneKickTornadoCooldown;
+                                    skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Tornado, 1, 0, 6, 1, 1, 0);
+                                }
+                            }                            
+                            attacking = true; //Set attacking to true because we are attacking
                         }
-                        
                     }
                 }
                 else if (input.fire1Hold) {
                 }
                 else if (input.fire2Down) {
                     //Shark Crescent
-                    skill.StaticProjectile(m_Rigidbody2D, m_FacingRight, m_SharkAir, 0, -1);
+                    if(cooldownManager.airSharkTimer < 0) {
+                        if(energyCost(Skill.airSharkCost)) {
+                            cooldownManager.airSharkTimer = Skill.CooldownManager.airSharkCooldown;
+                            skill.StaticProjectile(m_Rigidbody2D, m_FacingRight, m_SharkAir, 0, -1);
+                        }
+                    }                    
                 }
                 else if (input.fire2Hold) {
                 }
