@@ -7,11 +7,14 @@ public class PatrolState : EnemyState {
 
     public void Execute()
     {
+        enemy.setPlayerPos();
+        float dis = Mathf.Sqrt(Mathf.Pow(enemy.getPlayerPos().x - enemy.transform.position.x, 2) + Mathf.Pow(enemy.getPlayerPos().y - enemy.transform.position.y, 2));
+
         Vector3 raycastStartPoint = enemy.transform.position + new Vector3(enemy.getDirection().x, 0);
         RaycastHit2D hit = Physics2D.Raycast(raycastStartPoint, enemy.getDirection());
-        if (hit.collider != null)
+        if (hit.collider != null || dis < enemy.detectionRange)
         {
-            if (hit.collider.gameObject.tag == "Player")
+            if (hit.collider.gameObject.tag == "Player" || dis < enemy.detectionRange)
                 enemy.changeState(enemy.chaseState); 
             else if (hit.distance <= 2)
                 enemy.Flip();

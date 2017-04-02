@@ -10,6 +10,7 @@ public class RangedAttackState : EnemyState
     public void Execute()
     {
         Attack();
+        enemy.rangeCDCheck(true);
         enemy.changeState(enemy.chaseState);
     }
 

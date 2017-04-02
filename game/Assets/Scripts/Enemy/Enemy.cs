@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
 
@@ -32,11 +32,24 @@ public class Enemy : MonoBehaviour
 
     private float AttackRange = 1.5f;
     private float RangeAttackRange = 12f;
-    private float RangedAttackCD = 4f;
-    private float LastRangeTime = 4f;
-    private bool canRangeAttack = true;
+
+    public float rangedAttackCD = 4f;
+    private float nextRangeTime;
+    public bool canRangeAttack = true;
+
+    public float meleeAttackCD = 1f;
+    public float nextMeleeTime;
+    public bool canMeleeAttack = true;
+
     public bool isBoss = false;
     public bool canMove = true;
+
+    public bool canBeInterrupted;
+
+    public bool isImmune = false;
+
+    private bool hasMeleeAttacked = true;
+    private bool hasRangedAttacked = true;
 
     AudioSource enemyAudio;
     public Collider2D attackBox;
@@ -68,17 +81,24 @@ public class Enemy : MonoBehaviour
         //This allows the GameManager to issue movement commands.
         GameManager.instance.AddEnemyToList(this);
 
+        currentHealth = startingHealth;
+
+        nextRangeTime = rangedAttackCD;
+        nextMeleeTime = meleeAttackCD;
+
         if (!canMove)
             AttackRange = 3f;
 
         baseSpeed = speed;
         if (isBoss)
         {
-            chaseSpeed = speed + 2f;
+            if(chaseSpeed == 0)
+                chaseSpeed = speed + 2f;
         }
         else
         {
-            chaseSpeed = speed + 1f;
+            if(chaseSpeed == 0)
+                chaseSpeed = speed + 1f;
         }
 
         patrolState = new PatrolState();
@@ -86,7 +106,7 @@ public class Enemy : MonoBehaviour
         chaseState = new ChaseState();
         rangedAttackState = new RangedAttackState();
         animator = GetComponent<Animator>();
-        if (canMove == true)
+        if (canMove)
         {
             changeState(patrolState);
         }
@@ -181,45 +201,63 @@ public class Enemy : MonoBehaviour
         return false;
     }
 
-    public void updateRangeCD()
+    public bool updateRangeCD()
     {
-        LastRangeTime += Time.deltaTime;
-        if (LastRangeTime >= RangedAttackCD)
+        if (Time.time > nextRangeTime)
         {
-            canRangeAttack = true;
-            LastRangeTime = 0;
+            hasRangedAttacked = false;
+            nextRangeTime = Time.time + rangedAttackCD;
+            return true;
         }
         else
-            canRangeAttack = false;
+            return false;
     }
 
-    public bool rangeCDCheck()
+    public void rangeCDCheck(bool tf)
     {
-        updateRangeCD();
-        return canRangeAttack;
+        hasRangedAttacked = tf;
+    }
+
+    public bool updateMeleeCD()
+    {
+        if (Time.time > nextMeleeTime)
+        {
+            hasMeleeAttacked = false;
+            nextMeleeTime = Time.time + meleeAttackCD;
+            return true;
+        }
+        else
+            return false;
+    }
+
+    public void meleeCDCheck(bool tf)
+    {
+        hasMeleeAttacked = tf;
     }
 
     public virtual void TakeDamage(float amount)
     {
         if (isDead)
             return;
+        if (canBeInterrupted) { 
+            animator.SetTrigger("Hit");
+        }
+        else
+            this.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
 
-        
-        enemyAudio.Play();//TODO:hurt audio
-        animator.SetTrigger("Hit");
-
-        enemyEntity.health -= amount;
-        healthbar.fillAmount = enemyEntity.health / enemyEntity.maxHealth;
-
-        //hitParticles.transform.position = hitPoint;
-        //hitParticles.Play();
+        if (!isImmune)
+        {
+            enemyAudio.Play();
+            enemyEntity.health -= amount;
+            healthbar.fillAmount = enemyEntity.health / enemyEntity.maxHealth;
+        }
 
         if (enemyEntity.health <= 0)
         {
             Death();
         }
 
-        changeState(attackState);
+        changeState(chaseState);
     }
 
     void Death()
@@ -266,4 +304,3 @@ public class Enemy : MonoBehaviour
         transform.localScale = new Vector3(transform.localScale.x * -1, 1, 1);
     }
 }
-
