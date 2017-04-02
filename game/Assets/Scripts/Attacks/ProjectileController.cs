@@ -31,22 +31,22 @@ namespace UnityStandardAssets._2D {
             }
         }
 
-        public virtual void setLifespan() {
+        protected virtual void setLifespan() {
             lifespan = 0.7f;
         }
 
-        public virtual void setDamage() {
+        protected virtual void setDamage() {
             damage = 5f;
         }
 
-        public virtual void setMisc() {
+        protected virtual void setMisc() {
         }
 
-        public virtual void setTargetMask() {
+        protected virtual void setTargetMask() {
             targetMask = LayerMask.NameToLayer("Enemy");
         }
 
-        public virtual void effects(Enemy enemyScript) {
+        protected virtual void effects(Enemy enemyScript) {
             enemyScript.TakeDamage(damage);
             Destroy(gameObject);
         }

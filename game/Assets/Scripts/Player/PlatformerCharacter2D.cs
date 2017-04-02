@@ -313,7 +313,9 @@ namespace UnityStandardAssets._2D {
                     else if(input.vUp) {
                     }
                     else {
-                        skillStateManager.dashing = true;
+                        if(energyCost(Skill.dashCost)) {
+                            skillStateManager.dashing = true;
+                        }
                     }
                 }
                 else if (input.altMoveHold) {
@@ -327,17 +329,23 @@ namespace UnityStandardAssets._2D {
                 else if (input.fire1Down) {
                     if (input.vDown) {
                         //Slidekick
-                        skillStateManager.sliding = true;
-                        m_Anim.SetTrigger("LowKickT"); //Start kicking
-                        m_Anim.SetBool("BasicPunch", true); //Set BasicPunch to true because we are punching
-                        attacking = true;
+                        if(cooldownManager.slideKickTimer < 0) {
+                            cooldownManager.slideKickTimer = Skill.CooldownManager.slideKickCooldown;
+                            skillStateManager.sliding = true;
+                            m_Anim.SetTrigger("LowKickT"); //Start kicking
+                            m_Anim.SetBool("BasicPunch", true); //Set BasicPunch to true because we are punching
+                            attacking = true;
+                        }
                     }
                     else if (input.vUp) {
                         //Crescent Kick
                         if (!m_Anim.GetCurrentAnimatorStateInfo(0).IsName("Flip Kick") && !m_Anim.GetBool("BasicPunch")) {
-                            m_Anim.SetTrigger("FlipKickT"); //Start punching
-                            m_Anim.SetBool("BasicPunch", true); //Set BasicPunch to true because we are punching
-                            attacking = true; //Set attacking to true because we are attacking
+                            if (cooldownManager.flipKickTimer < 0) {
+                                cooldownManager.flipKickTimer = Skill.CooldownManager.flipKickCooldown;
+                                m_Anim.SetTrigger("FlipKickT"); //Start punching
+                                m_Anim.SetBool("BasicPunch", true); //Set BasicPunch to true because we are punching
+                                attacking = true; //Set attacking to true because we are attacking
+                            }
                         }
                     }
                     else {
@@ -369,7 +377,7 @@ namespace UnityStandardAssets._2D {
                         if(cooldownManager.waterDragonTimer < 0) {
                             if(energyCost(Skill.waterDragonCost)) {
                                 cooldownManager.waterDragonTimer = Skill.CooldownManager.waterDragonCooldown;
-                                skill.Projectile(m_Rigidbody2D, m_FacingRight, m_WaterDragon, 1, 0, 2, 2, 1, 0);
+                                skill.Projectile(m_Rigidbody2D, m_FacingRight, m_WaterDragon, 2f, 0f, 2f, 0f);
                             }
                         }
                     }
@@ -389,7 +397,7 @@ namespace UnityStandardAssets._2D {
                                 else {
                                     cooldownManager.fireballTimer = Skill.CooldownManager.fireballReducedCooldown;
                                 }
-                                skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Fireball2, 1, 0, 12, 2, 1, 0);
+                                skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Fireball2, 2f, 0f, 12f, 0f);
                             }
                         }
                     }
@@ -407,7 +415,7 @@ namespace UnityStandardAssets._2D {
                                 if(energyCost(Skill.icebergCost)) {
                                     skillStateManager.holdCasting = true;
                                     cooldownManager.icebergTimer = Skill.CooldownManager.icebergCooldown;
-                                    skill.StaticProjectile(m_Rigidbody2D, m_FacingRight, m_Iceberg, 1.5f, 1.5f);
+                                    skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Iceberg, 1.5f, 1.5f, 10f, 0f);
                                 }
                             }
                         }
@@ -417,7 +425,7 @@ namespace UnityStandardAssets._2D {
                                 if(energyCost(Skill.callLightningCost)) {
                                     skillStateManager.holdCasting = true;
                                     cooldownManager.callLightningTimer = Skill.CooldownManager.callLightningCooldown;
-                                    skill.StaticProjectile(m_Rigidbody2D, m_FacingRight, m_Lightning, 3, 2);
+                                    skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Lightning, 3f, 2f, 0f, 0f);
                                 }
                             }
                         }
@@ -427,7 +435,7 @@ namespace UnityStandardAssets._2D {
                                 if(energyCost(Skill.meteorCost)) {
                                     skillStateManager.holdCasting = true;
                                     cooldownManager.meteorTimer = Skill.CooldownManager.meteorCooldown;
-                                    skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Meteor, 1, 0, 0, 4, 1, 0);
+                                    skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Meteor, -2f, 3f, 8f,-3.8f);
                                 }
                             }
                         }
@@ -445,7 +453,7 @@ namespace UnityStandardAssets._2D {
                         if(cooldownManager.barrierSigilTimer < 0) {
                             if(energyCost(Skill.barrierSigilCost)) {
                                 cooldownManager.barrierSigilTimer = Skill.CooldownManager.barrierSigilCooldown;
-                                skill.Projectile(m_Rigidbody2D, m_FacingRight, m_BarrierSigil, 1, 0, 0, 0, 1, 0);
+                                skill.Projectile(m_Rigidbody2D, m_FacingRight, m_BarrierSigil, 0f, 0f, 0f, 0f);
                             }
                         }
                     }
@@ -454,7 +462,7 @@ namespace UnityStandardAssets._2D {
                         if(cooldownManager.drainingSigilTimer < 0) {
                             if(energyCost(Skill.drainingSigilCost)) {
                                 cooldownManager.drainingSigilTimer = Skill.CooldownManager.drainingSigilCooldown;
-                                skill.Projectile(m_Rigidbody2D, m_FacingRight, m_DrainingSigil, 1, 0, 0, 0, 1, 0);
+                                skill.Projectile(m_Rigidbody2D, m_FacingRight, m_DrainingSigil, 0f, 0f, 0f, 0f);
                             }
                         }
                     }
@@ -463,7 +471,7 @@ namespace UnityStandardAssets._2D {
                         if(cooldownManager.lesserSpiritboltTimer < 0) {
                             if(energyCost(Skill.lesserSpiritboltCost)) {
                                 cooldownManager.lesserSpiritboltTimer = Skill.CooldownManager.lesserSpiritboldCooldown;
-                                skill.Projectile(m_Rigidbody2D, m_FacingRight, m_LesserSpiritbolt, 1, 0, 20, -3, 1, 0);
+                                skill.Projectile(m_Rigidbody2D, m_FacingRight, m_LesserSpiritbolt, -3f, 0f, 20f, 0f);
                             }
                         }
                     }
@@ -497,7 +505,7 @@ namespace UnityStandardAssets._2D {
                         }
                         else {
                             //Greater Spirit Bolt
-                            //skill.Projectile(m_Rigidbody2D, m_FacingRight, Rigidbody2D projectile, 1, 0, 20, 2, 1, 0);
+                            //skill.Projectile(m_Rigidbody2D, m_FacingRight, Rigidbody2D projectile, -3f, 0f, 20f, 0f);
                         }
                     }
                 }
@@ -572,11 +580,19 @@ namespace UnityStandardAssets._2D {
             }
             //In the air
             else {
+                if(skillStateManager.swoopingStrike) {
+                    if (skillStateManager.swoopingStrikeDuration < 0) {
+                        skillStateManager.swoopingStrike = false;
+                    }
+                    skillStateManager.swoopingStrikeDuration = skill.SwoopingStrike(m_Rigidbody2D, skillStateManager.swoopingStrikeDuration, Time.fixedDeltaTime, m_FacingRight, false);
+                }
                 if (input.altMoveDown) {
                     if(skillStateManager.secondJumpAvailable) {
-                        skillStateManager.airdashing = true;
-                        skillStateManager.secondJumpAvailable = false;
-                        skillStateManager.fastFallToggle = false;
+                        if(energyCost(Skill.airdashCost)) {
+                            skillStateManager.airdashing = true;
+                            skillStateManager.secondJumpAvailable = false;
+                            skillStateManager.fastFallToggle = false;
+                        }
                     }
                 }
                 else if (input.altMoveHold) {
@@ -588,27 +604,33 @@ namespace UnityStandardAssets._2D {
 							m_Anim.SetTrigger("SoarKickT"); //Start punching
 							m_Anim.SetBool("BasicPunch", true); //Set BasicPunch to true because we are punching
 							attacking = true; //Set attacking to true because we are attacking
+                            skillStateManager.swoopingStrikeDuration = skill.SwoopingStrike(m_Rigidbody2D, 0, Time.fixedDeltaTime, m_FacingRight, true);
+                            skillStateManager.swoopingStrike = true;
 						}
                     }
 					if (input.vUp) {
 						//Crescent Kick; currently an animation bug or something preventing it from being used
 						if (!m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Flip Kick") && !m_Anim.GetBool ("BasicPunch")) {
-							m_Anim.SetTrigger ("FlipKickT"); //Start punching
-							m_Anim.SetBool ("BasicPunch", true); //Set BasicPunch to true because we are punching
-							attacking = true; //Set attacking to true because we are attacking
+                            if(cooldownManager.flipKickTimer < 0) {
+                                cooldownManager.flipKickTimer = Skill.CooldownManager.flipKickCooldown;
+                                m_Anim.SetTrigger("FlipKickT"); //Start punching
+                                m_Anim.SetBool("BasicPunch", true); //Set BasicPunch to true because we are punching
+                                attacking = true; //Set attacking to true because we are attacking
+                            }
 						}
 					} else {
 						//Cyclone Kick
 						if (!m_Anim.GetCurrentAnimatorStateInfo (0).IsName ("Spin Kick") && !m_Anim.GetBool ("BasicPunch")) {
-							m_Anim.SetTrigger ("SpinKickT"); //Start punching
-							m_Anim.SetBool ("BasicPunch", true); //Set BasicPunch to true because we are punching
-                            if(cooldownManager.cycloneKickTornadoTimer < 0) {
-                                if(energyCost(Skill.cycloneKickTornadoCost)) {
-                                    cooldownManager.cycloneKickTornadoTimer = Skill.CooldownManager.cycloneKickTornadoCooldown;
-                                    skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Tornado, 1, 0, 6, 1, 1, 0);
+                            if (cooldownManager.cycloneKickTimer < 0) {
+                                m_Anim.SetTrigger ("SpinKickT"); //Start punching
+							    m_Anim.SetBool ("BasicPunch", true); //Set BasicPunch to true because we are punching
+                                attacking = true; //Set attacking to true because we are attacking
+
+                                if (energyCost(Skill.cycloneKickTornadoCost)) {
+                                    cooldownManager.cycloneKickTimer = Skill.CooldownManager.cycloneKickCooldown;
+                                    skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Tornado, 1f, 0f, 6f, 0f);
                                 }
                             }                            
-                            attacking = true; //Set attacking to true because we are attacking
                         }
                     }
                 }
@@ -619,7 +641,7 @@ namespace UnityStandardAssets._2D {
                     if(cooldownManager.airSharkTimer < 0) {
                         if(energyCost(Skill.airSharkCost)) {
                             cooldownManager.airSharkTimer = Skill.CooldownManager.airSharkCooldown;
-                            skill.StaticProjectile(m_Rigidbody2D, m_FacingRight, m_SharkAir, 0, -1);
+                            skill.Projectile(m_Rigidbody2D, m_FacingRight, m_SharkAir, 0f, -1f, 0f, 0f);
                         }
                     }                    
                 }
@@ -633,8 +655,10 @@ namespace UnityStandardAssets._2D {
                 }
                 else if (input.jumpHold) {
                     if (m_Rigidbody2D.velocity.y < 0) {
-                        skillStateManager.gliding = true;
-                        skillStateManager.fastFallToggle = false;
+                        if(energyCost(Skill.glideCostPerSecond * Time.fixedDeltaTime)) {
+                            skillStateManager.gliding = true;
+                            skillStateManager.fastFallToggle = false;
+                        }
                     }
                 }
                 else if(input.vDown) {
@@ -646,7 +670,7 @@ namespace UnityStandardAssets._2D {
                     skillStateManager.gliding = false;
                 }
 
-                if(true) {
+                if(!skillStateManager.swoopingStrike) {
                     //If gliding, cap fall speed
                     if(skillStateManager.gliding && m_Rigidbody2D.velocity.y < skill.GlideEffect()) {
                         m_Rigidbody2D.velocity = new Vector2(m_Rigidbody2D.velocity.x, skill.GlideEffect());

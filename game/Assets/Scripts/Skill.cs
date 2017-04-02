@@ -7,6 +7,16 @@ public class Skill {
     const int assumedFPS = 60;
 
     public class CooldownManager {
+        public const float slideKickCooldown = 0.55f;
+        public float slideKickTimer = 0f;
+
+        public const float cycloneKickCooldown = 0.55f;
+        public float cycloneKickTimer = 0f;
+
+        public const float flipKickCooldown = 0.55f;
+        public float flipKickTimer = 0f;
+
+
         public const float fireballCooldown = 1f;
         public const float fireballReducedCooldown = 0.3f;
         public float fireballTimer = 0f;
@@ -38,13 +48,14 @@ public class Skill {
         public const float onslaughtToggleCooldown = 0.3f;
         public float onslaughtToggleTimer = 0f;
 
-        public const float cycloneKickTornadoCooldown = 0.45f;
-        public float cycloneKickTornadoTimer = 0f;
-
         public const float airSharkCooldown = 0.5f;
         public float airSharkTimer = 0f;
 
         public void Tick(float amount) {
+            slideKickTimer -= amount;
+            cycloneKickTimer -= amount;
+            flipKickTimer -= amount;
+
             fireballTimer -= amount;
             waterDragonTimer -= amount;
             icebergTimer -= amount;
@@ -55,7 +66,6 @@ public class Skill {
             teleportSigilTimer -= amount;
             lesserSpiritboltTimer -= amount;
             onslaughtToggleTimer -= amount;
-            cycloneKickTornadoTimer -= amount;
             airSharkTimer -= amount;
         }
     }
@@ -72,6 +82,7 @@ public class Skill {
         public int fireballCounter = 0;
         public int punchCounter = 0;
         public int ironStrikesStacks = 0;
+        public float swoopingStrikeDuration = 0;
 
         //currently set to true by default since there's no keybind to toggle this manually
         public bool onslaughtToggle = false;
@@ -84,6 +95,7 @@ public class Skill {
         public bool sliding = false;
         public bool airdashing = false;
         public bool holdCasting = false;
+        public bool swoopingStrike = false;
 
         //Holds the teleport sigil
         public bool teleportSigilExists = false;
@@ -101,6 +113,7 @@ public class Skill {
             airdashSpeed = 0;
             gliding = false;
             fastFallToggle = false;
+            swoopingStrike = false;
         }
 
         public void land() {
@@ -109,8 +122,13 @@ public class Skill {
             gliding = false;
             fastFallToggle = false;
             secondJumpAvailable = true;
+            swoopingStrike = false;
         }
     }
+
+    public const float dashCost = 10f;
+    public const float airdashCost = 10f;
+    public const float glideCostPerSecond = 5f;
 
     public const float fireballCost = 15f;
     public const float waterDragonCost = 20f;
@@ -218,9 +236,9 @@ public class Skill {
 
     
 
-
-    //All-in-one method for different projectile types
-    public float Projectile(Rigidbody2D body, bool facingRight, GameObject projectilePrefab, float counter, float frequencyMultiplier, float speed, float startDistance, int numProjectiles, float spread) {
+    
+    //Method for projectiles with spread; mostly deprecated
+    public float SpreadProjectile(Rigidbody2D body, bool facingRight, GameObject projectilePrefab, float counter, float frequencyMultiplier, float speed, float startDistance, int numProjectiles, float spread) {
         //Counter and frequency multiplier are used for held-down skills (determines the number of times per second a new projectile is made while the key is held down)
         //Speed is projectile travel speed, startDistance is where the projectile starts in relation to the player (horizontal), numProjectiles is the number of projectiles fired by one call (affected by spread)
         //Spread is the maximum angle of projectile trajectory (above and below the horizontal)
@@ -261,14 +279,21 @@ public class Skill {
 
         return counter;
     }
-    public void StaticProjectile(Rigidbody2D body, bool facingRight, GameObject projectilePrefab, float startX, float startY) {
+
+    //All-in-one method for different projectile types
+    public void Projectile(Rigidbody2D body, bool facingRight, GameObject projectilePrefab, float startX, float startY, float xSpeed, float ySpeed) {
         Rigidbody2D projectile = projectilePrefab.GetComponent<Rigidbody2D>();
-        if(!facingRight) { startX *= -1; }
+        if(!facingRight) {
+            startX *= -1;
+            xSpeed *= -1;
+        }
 
         Rigidbody2D clone = Rigidbody2D.Instantiate(projectile, new Vector2(body.transform.position.x + startX, body.transform.position.y + startY), new Quaternion()) as Rigidbody2D;
         if (!facingRight) {
             clone.transform.localScale = new Vector2(clone.transform.localScale.x * -1, clone.transform.localScale.y);
         }
+
+        clone.velocity = new Vector2(xSpeed, ySpeed);
     }
 
     public GameObject TeleportSigil(Rigidbody2D body, bool facingRight, GameObject projectilePrefab) {
@@ -279,6 +304,35 @@ public class Skill {
     public void TeleportToSigil(Rigidbody2D body, GameObject sigil) {
         body.position = sigil.GetComponent<Rigidbody2D>().position;
         Object.Destroy(sigil);
+    }
+
+    public float SwoopingStrike (Rigidbody2D body, float duration, float countdown, bool facingRight, bool justActivated) {
+        float maxDuration = 1.5f;
+        float delay = 0f;
+
+        float xSpeed = 0f;
+        float ySpeed = 0f;
+
+
+        if (justActivated) {
+            duration = maxDuration;
+        }
+        if(duration > maxDuration - delay) {
+            xSpeed = 2f;
+            ySpeed = 2f;
+        }
+        else if(duration > 0) {
+            xSpeed = -15f;
+            ySpeed = -5f;
+        }
+
+        if(facingRight) {
+            xSpeed *= -1f;
+        }
+
+        body.velocity = new Vector2(xSpeed, ySpeed);
+
+        return duration - countdown;
     }
 
     public float Dash(Rigidbody2D body, bool dashing, float dashSpeed, bool facingRight) {
@@ -316,9 +370,9 @@ public class Skill {
 
 
     public float Slide(Rigidbody2D body, bool sliding, float slideSpeed, bool facingRight) {
-        float minSpeed = 6f;
-        float maxSpeed = 17f;
-        float decay = 1f;
+        float minSpeed = 12f;
+        float maxSpeed = 22f;
+        float decay = 1.5f;
 
         if (sliding) {
             if(slideSpeed == 0) {

@@ -38,6 +38,6 @@ public class RangedAttackState : EnemyState
         else
             m_FacingRight = true;
         enemy.animator.SetBool("Moving", false);
-        skill.Projectile(enemy.rb2D, m_FacingRight, enemy.m_fireball, 1, 0, 20, 2, 5, 20);
+        skill.SpreadProjectile(enemy.rb2D, m_FacingRight, enemy.m_fireball, 1, 0, 20, 2, 5, 20);
     }
 }

@@ -9,6 +9,7 @@ public class PlayerHitbox : MonoBehaviour {
     void Awake() { 
         parent = this.transform.parent.gameObject;
         playerScript = parent.GetComponent<UnityStandardAssets._2D.PlatformerCharacter2D>() as UnityStandardAssets._2D.PlatformerCharacter2D;
+        //Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Enemy"));
     }
 
     
