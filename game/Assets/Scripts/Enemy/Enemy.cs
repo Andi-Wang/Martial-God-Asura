@@ -30,7 +30,7 @@ public class Enemy : MonoBehaviour
     public PuzzlePatrolState puzzlePatrolState;
     public RangedAttackState rangedAttackState;
 
-    private float AttackRange = 1.2f;
+    public float AttackRange = 1.2f;
     private float RangeAttackRange = 12f;
 
     public float rangedAttackCD = 4f;
@@ -86,10 +86,13 @@ public class Enemy : MonoBehaviour
     private bool e_FacingRight = true;
     private Vector3 startingLoc;
 
+    private SpriteRenderer sr;
+
     public bool dashing;
 
     void Awake()
     {
+        sr = GetComponent<SpriteRenderer>();
         player = GameObject.FindGameObjectWithTag("Player");
         playerPos = player.transform.position;
         boxCollider = GetComponent<BoxCollider2D>();
@@ -105,7 +108,8 @@ public class Enemy : MonoBehaviour
         //This allows the GameManager to issue movement commands.
         GameManager.instance.AddEnemyToList(this);
 
-        currentHealth = startingHealth;
+        if(currentHealth == 0)
+            currentHealth = startingHealth;
 
         nextRangeTime = rangedAttackCD;
         nextMeleeTime = meleeAttackCD;
@@ -346,10 +350,14 @@ public class Enemy : MonoBehaviour
         }
 
         //boxCollider.isTrigger = true;
-        if (isBoss2 || isBoss3)
+        if (isBoss2)
         {
             rb2D.isKinematic = false;
             animator.SetBool("Dying", true);
+        }
+        else if (isBoss1)
+        {
+
         }
         else
             animator.SetTrigger("Dead");
