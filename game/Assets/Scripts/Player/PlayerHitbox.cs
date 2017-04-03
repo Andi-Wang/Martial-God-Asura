@@ -3,8 +3,8 @@ using System.Collections;
 
 public class PlayerHitbox : MonoBehaviour {
     
-    public GameObject parent;
-    public UnityStandardAssets._2D.PlatformerCharacter2D playerScript;
+    GameObject parent;
+    UnityStandardAssets._2D.PlatformerCharacter2D playerScript;
 
     void Awake() { 
         parent = this.transform.parent.gameObject;

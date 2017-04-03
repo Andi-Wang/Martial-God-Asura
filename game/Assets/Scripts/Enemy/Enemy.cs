@@ -61,6 +61,8 @@ public class Enemy : MonoBehaviour
 
     public bool cannotChase;
 
+    public int roomId;
+
     private bool knockedBack = false;
     private bool kbSourceFacingRight = false;
     private float knockbackDuration = 0f;
@@ -141,6 +143,8 @@ public class Enemy : MonoBehaviour
 
         if (isGhost)
             startingLoc = transform.position;
+
+        roomId = RoomManager.Instance.findRoomId(transform.position.x, transform.position.y);
     }
 
     void FixedUpdate()
@@ -158,6 +162,8 @@ public class Enemy : MonoBehaviour
         else if (enemyEntity.health > 0) {
             state.Execute();
         }
+
+        roomId = RoomManager.Instance.findRoomId(transform.position.x, transform.position.y);
     }
 
     public float Knockback(bool sourceFacingRight, float duration, float speed) {
@@ -323,8 +329,10 @@ public class Enemy : MonoBehaviour
     }
 
     void Death() {
-        rb2D.velocity = new Vector2(0f, rb2D.velocity.y);
         isDead = true;
+
+        rb2D.velocity = new Vector2(0f, rb2D.velocity.y);
+     
         foreach (Transform child in gameObject.transform) {
             if (child.name == "EnemyCanvas") child.gameObject.SetActive(false);
         }
@@ -338,8 +346,14 @@ public class Enemy : MonoBehaviour
         else
             animator.SetTrigger("Dead");
 
+        Invoke("killSelf", 2f);
        // enemyAudio.clip = deathClip;
         //enemyAudio.Play();
+    }
+
+    void killSelf()
+    {
+        Destroy(gameObject);
     }
 
     public void OnTriggerEnter2D(Collider2D other)
@@ -351,7 +365,10 @@ public class Enemy : MonoBehaviour
     {
         if (canMove)
         {
-            animator.SetBool("Moving", true);
+            // get rid of warning
+            if (animator.GetBool("Moving"))
+                animator.SetBool("Moving", true);
+
             transform.Translate(getDirection() * speed * Time.deltaTime, Space.World);
         }
     }
