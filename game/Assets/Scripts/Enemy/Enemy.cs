@@ -63,6 +63,7 @@ public class Enemy : MonoBehaviour
 
     public int roomId;
 
+    private int currentRoomId;
     private bool knockedBack = false;
     private bool kbSourceFacingRight = false;
     private float knockbackDuration = 0f;
@@ -141,10 +142,11 @@ public class Enemy : MonoBehaviour
         animator.SetBool("Moving", true);
         healthbar = transform.FindChild("EnemyCanvas").FindChild("Healthbar").FindChild("Health").GetComponent<Image>();
 
-        if (isGhost)
-            startingLoc = transform.position;
+        //if (isGhost)
+        startingLoc = transform.position;
 
         roomId = RoomManager.Instance.findRoomId(transform.position.x, transform.position.y);
+        currentRoomId = roomId;
     }
 
     void FixedUpdate()
@@ -163,7 +165,13 @@ public class Enemy : MonoBehaviour
             state.Execute();
         }
 
-        roomId = RoomManager.Instance.findRoomId(transform.position.x, transform.position.y);
+        currentRoomId = RoomManager.Instance.findRoomId(transform.position.x, transform.position.y);
+
+        // reset if not in current room
+        if (currentRoomId!= roomId)
+        {
+            transform.position = startingLoc;
+        }
     }
 
     public float Knockback(bool sourceFacingRight, float duration, float speed) {
@@ -306,7 +314,7 @@ public class Enemy : MonoBehaviour
 
     public virtual void TakeDamage(float amount)
     {
-        if (isDead)
+        if (isDead || cannotChase)
             return;
 
         if (canBeInterrupted)
@@ -324,7 +332,7 @@ public class Enemy : MonoBehaviour
             enemyEntity.health -= amount;
             healthbar.fillAmount = enemyEntity.health / enemyEntity.maxHealth;
         }
-
+        
         changeState(chaseState);
     }
 
