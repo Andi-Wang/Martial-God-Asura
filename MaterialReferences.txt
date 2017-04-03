@@ -1,8 +1,25 @@
-﻿Art:
+﻿Background Art:
 - Dojo background: http://roman-ss-squall.deviantart.com/art/Dojo-for-Abyss-Walker-177796022
 
+Main Character:
+- https://www.spriters-resource.com/game_boy_advance/groove/sheet/3343/
 
-Music:
+Enemies:
+- https://www.spriters-resource.com/
+
+Attack Sprites:
+- http://appinvasion.com/attachments/2-png.57477/
+- http://i32.photobucket.com/albums/d17/Psycho_Blaze/HiddenRaipreveiw3.png
+- http://chaosmugenteam.ucoz.com/_ph/1/680181120.png
+- http://orig02.deviantart.net/0742/f/2011/037/7/7/aeolus_model_h_attacks_by_xemcail-d38yghs.png
+- https://s-media-cache-ak0.pinimg.com/originals/af/df/68/afdf683d2710585e6d7e153b473b57be.jpg
+- http://orig14.deviantart.net/d17e/f/2008/240/4/a/black_mage_sprites___large_by_isaiahk9.jpg
+- http://spritedatabase.net/files/ds/1680/Sprite/ShadowBat.png
+- http://spritedatabase.net/files/ds/1680/Sprite/ShadowGhoul.png
+- https://s-media-cache-ak0.pinimg.com/originals/fd/d7/bb/fdd7bb37c9b3c1e07cf5548d4058078f.png
+- https://mrbubblewand.files.wordpress.com/2010/07/magic_007.png
+
+Background Music:
 - Title Screen: https://www.youtube.com/watch?v=vyuUcTewmBI
 - Temple Outside: https://www.youtube.com/watch?v=bl9MSkMIxa8
 - Temple Interior: https://www.youtube.com/watch?v=bl9MSkMIxa8
