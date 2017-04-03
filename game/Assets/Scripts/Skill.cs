@@ -17,11 +17,11 @@ public class Skill {
         public float flipKickTimer = 0f;
 
 
-        public const float fireballCooldown = 1f;
-        public const float fireballReducedCooldown = 0.3f;
+        public const float fireballCooldown = 2f;
+        public const float fireballReducedCooldown = 0.85f;
         public float fireballTimer = 0f;
 
-        public const float waterDragonCooldown = 0.5f;
+        public const float waterDragonCooldown = 0.85f;
         public float waterDragonTimer = 0f;
 
         public const float icebergCooldown = 2f;
@@ -45,10 +45,10 @@ public class Skill {
         public const float lesserSpiritboldCooldown = 1f;
         public float lesserSpiritboltTimer = 0f;
 
-        public const float onslaughtToggleCooldown = 0.3f;
+        public const float onslaughtToggleCooldown = 0.85f;
         public float onslaughtToggleTimer = 0f;
 
-        public const float airSharkCooldown = 0.5f;
+        public const float airSharkCooldown = 0.8f;
         public float airSharkTimer = 0f;
 
         public void Tick(float amount) {

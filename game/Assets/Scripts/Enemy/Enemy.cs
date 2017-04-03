@@ -61,6 +61,12 @@ public class Enemy : MonoBehaviour
 
     public bool cannotChase;
 
+    private bool knockedBack = false;
+    private bool kbSourceFacingRight = false;
+    private float knockbackDuration = 0f;
+    private float knockbackSpeed = 0f;
+    private float maxKnockbackSpeed = 0f;
+
     private bool hasMeleeAttacked = true;
     private bool hasRangedAttacked = true;
 
@@ -72,7 +78,7 @@ public class Enemy : MonoBehaviour
     private Vector3 playerPrevPos;
     private Image healthbar;
     public Animator animator;                          //Variable of type Animator to store a reference to the enemy's Animator component.
-    bool isDead;
+    public bool isDead { get; private set; }
     public Rigidbody2D rb2D;
     private bool e_FacingRight = true;
 
@@ -131,18 +137,50 @@ public class Enemy : MonoBehaviour
         healthbar = transform.FindChild("EnemyCanvas").FindChild("Healthbar").FindChild("Health").GetComponent<Image>();
     }
 
-    void Update()
+    void FixedUpdate()
     {
         if (isDead) return;
 
-        if (enemyEntity.health > 0 /*&& playerHealth.currentHealth > 0*/)
-        {
-            state.Execute();
-        }
-        else if (enemyEntity.health <= 0)
-        {
+        
+        if (enemyEntity.health <= 0) {
             Death();
         }
+        else if(knockedBack) {
+            knockbackSpeed = Knockback(kbSourceFacingRight, knockbackDuration, knockbackSpeed);
+
+        }
+        else if (enemyEntity.health > 0) {
+            state.Execute();
+        }
+    }
+
+    public float Knockback(bool sourceFacingRight, float duration, float speed) {
+        if(!knockedBack) {
+            maxKnockbackSpeed = speed;
+            knockbackSpeed = speed;
+            kbSourceFacingRight = sourceFacingRight;
+            knockbackDuration = duration;
+            knockedBack = true;
+        }
+        else if (speed > 0f) {
+            speed -= maxKnockbackSpeed / duration * Time.fixedDeltaTime;
+        }
+        else {
+            knockedBack = false;
+        }
+
+        Debug.Log(maxKnockbackSpeed);
+
+        if (true) {
+            if (sourceFacingRight) {
+                rb2D.velocity = new Vector2(speed, rb2D.velocity.y);
+            }
+            else {
+                rb2D.velocity = new Vector2(-speed, rb2D.velocity.y);
+            }
+        }        
+
+        return speed;
     }
 
     public void changeState(EnemyState newState)
@@ -275,19 +313,13 @@ public class Enemy : MonoBehaviour
             healthbar.fillAmount = enemyEntity.health / enemyEntity.maxHealth;
         }
 
-        if (enemyEntity.health <= 0)
-        {
-            Death();
-        }
-
         changeState(chaseState);
     }
 
-    void Death()
-    {
+    void Death() {
+        rb2D.velocity = new Vector2(0f, rb2D.velocity.y);
         isDead = true;
-
-        foreach(Transform child in gameObject.transform) {
+        foreach (Transform child in gameObject.transform) {
             if (child.name == "EnemyCanvas") child.gameObject.SetActive(false);
         }
 

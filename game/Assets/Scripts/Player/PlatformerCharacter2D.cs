@@ -45,6 +45,7 @@ namespace UnityStandardAssets._2D {
 
         bool isDead;
 		bool attacking = false; // used to detect if we are beginning an attack, in order to prevent input buffering
+        float attackingTimer = 0f;
 
         const float invincibilityDurationWhenHit = 1f;
         const float stunDurationWhenHit = 0.5f;
@@ -264,6 +265,7 @@ namespace UnityStandardAssets._2D {
             timeSinceLastStrike += Time.fixedDeltaTime;
             timeSinceLastEnergyUse += Time.fixedDeltaTime;
             cooldownManager.Tick(Time.fixedDeltaTime);
+            attackingTimer -= Time.fixedDeltaTime;
         }
 
 
@@ -368,6 +370,9 @@ namespace UnityStandardAssets._2D {
                 //Note that fire2Up is used instead of fire2Down
                 else if (input.fire2Up) {
                     skillStateManager.channelTimer = 0;
+                    if(m_Anim.GetBool("ShoutChannel")) {
+                        m_Anim.SetBool("ShoutChannel", false);
+                    }
                     if (skillStateManager.holdCasting) {
                         //Don't also cast this skill if a hold-cast skill was used
                         skillStateManager.holdCasting = false;
@@ -376,6 +381,7 @@ namespace UnityStandardAssets._2D {
                         //Water Dragon
                         if(cooldownManager.waterDragonTimer < 0) {
                             if(energyCost(Skill.waterDragonCost)) {
+                                Cast();
                                 cooldownManager.waterDragonTimer = Skill.CooldownManager.waterDragonCooldown;
                                 skill.Projectile(m_Rigidbody2D, m_FacingRight, m_WaterDragon, 2f, 0f, 2f, 0f);
                             }
@@ -390,6 +396,7 @@ namespace UnityStandardAssets._2D {
                         }
                         if(cooldownManager.fireballTimer < 0) {
                             if(energyCost(Skill.fireballCost)) {
+                                Cast();
                                 if (skillStateManager.fireballCounter++ > 1) {
                                     skillStateManager.fireballCounter = 0;
                                     cooldownManager.fireballTimer = Skill.CooldownManager.fireballCooldown;
@@ -407,15 +414,16 @@ namespace UnityStandardAssets._2D {
                     Channel();
 
                     float threshold = 0.8f;
+
                     skillStateManager.channelTimer += Time.fixedDeltaTime;
                     if(skillStateManager.channelTimer > threshold) {
                         if (input.vDown) {
                             //Iceberg
                             if(cooldownManager.icebergTimer < 0) {
                                 if(energyCost(Skill.icebergCost)) {
-                                    skillStateManager.holdCasting = true;
+                                    ChannelCast();
                                     cooldownManager.icebergTimer = Skill.CooldownManager.icebergCooldown;
-                                    skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Iceberg, 1.5f, 1.5f, 10f, 0f);
+                                    skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Iceberg, 1.5f, -0.8f, 0.01f, 3f);
                                 }
                             }
                         }
@@ -423,7 +431,7 @@ namespace UnityStandardAssets._2D {
                             //Call Lightning
                             if(cooldownManager.callLightningTimer < 0) {
                                 if(energyCost(Skill.callLightningCost)) {
-                                    skillStateManager.holdCasting = true;
+                                    ChannelCast();
                                     cooldownManager.callLightningTimer = Skill.CooldownManager.callLightningCooldown;
                                     skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Lightning, 3f, 2f, 0f, 0f);
                                 }
@@ -433,7 +441,7 @@ namespace UnityStandardAssets._2D {
                             //Meteor
                             if(cooldownManager.meteorTimer < 0) {
                                 if(energyCost(Skill.meteorCost)) {
-                                    skillStateManager.holdCasting = true;
+                                    ChannelCast();
                                     cooldownManager.meteorTimer = Skill.CooldownManager.meteorCooldown;
                                     skill.Projectile(m_Rigidbody2D, m_FacingRight, m_Meteor, -2f, 3f, 8f,-3.8f);
                                 }
@@ -444,6 +452,9 @@ namespace UnityStandardAssets._2D {
                 //Note that fire3Up is used instead of fire3Down
                 else if (input.fire3Up) {
                     skillStateManager.channelTimer = 0;
+                    if (m_Anim.GetBool("ShoutChannel")) {
+                        m_Anim.SetBool("ShoutChannel", false);
+                    }
                     if (skillStateManager.holdCasting) {
                         //Don't also cast this skill if a hold-cast skill was used
                         skillStateManager.holdCasting = false;
@@ -452,6 +463,7 @@ namespace UnityStandardAssets._2D {
                         //Barrier Sigil
                         if(cooldownManager.barrierSigilTimer < 0) {
                             if(energyCost(Skill.barrierSigilCost)) {
+                                Cast();
                                 cooldownManager.barrierSigilTimer = Skill.CooldownManager.barrierSigilCooldown;
                                 skill.Projectile(m_Rigidbody2D, m_FacingRight, m_BarrierSigil, 0f, 0f, 0f, 0f);
                             }
@@ -461,6 +473,7 @@ namespace UnityStandardAssets._2D {
                         //Draining Sigil
                         if(cooldownManager.drainingSigilTimer < 0) {
                             if(energyCost(Skill.drainingSigilCost)) {
+                                Cast();
                                 cooldownManager.drainingSigilTimer = Skill.CooldownManager.drainingSigilCooldown;
                                 skill.Projectile(m_Rigidbody2D, m_FacingRight, m_DrainingSigil, 0f, 0f, 0f, 0f);
                             }
@@ -470,6 +483,7 @@ namespace UnityStandardAssets._2D {
                         //Lesser Spirit Bolt
                         if(cooldownManager.lesserSpiritboltTimer < 0) {
                             if(energyCost(Skill.lesserSpiritboltCost)) {
+                                Cast();
                                 cooldownManager.lesserSpiritboltTimer = Skill.CooldownManager.lesserSpiritboldCooldown;
                                 skill.Projectile(m_Rigidbody2D, m_FacingRight, m_LesserSpiritbolt, -3f, 0f, 20f, 0f);
                             }
@@ -482,20 +496,20 @@ namespace UnityStandardAssets._2D {
 
                     float threshold = 0.8f;
                     skillStateManager.channelTimer += Time.fixedDeltaTime;
-                    if (skillStateManager.channelTimer > threshold) {
-                        skillStateManager.holdCasting = true;
-                        
+                    if (skillStateManager.channelTimer > threshold) {                        
                         if (input.vDown) {
                         }
                         else if (input.vUp) {
                             //Teleport Sigil (creation and reactivation)
                             if(skillStateManager.teleportSigilExists) {
+                                ChannelCast();
                                 if (m_FacingRight != skillStateManager.teleportFacingRight) { Flip(); }
                                 skill.TeleportToSigil(m_Rigidbody2D, skillStateManager.teleportSigil);
                                 skillStateManager.teleportSigilExists = false;
                             }
                             else if(cooldownManager.teleportSigilTimer < 0) {
                                 if(energyCost(Skill.teleportSigilCost)) {
+                                    ChannelCast();
                                     cooldownManager.teleportSigilTimer = Skill.CooldownManager.teleportSigilCooldown;
                                     skillStateManager.teleportSigil = skill.TeleportSigil(m_Rigidbody2D, m_FacingRight, m_TeleportSigil);
                                     skillStateManager.teleportFacingRight = m_FacingRight;
@@ -511,6 +525,9 @@ namespace UnityStandardAssets._2D {
                 }
                 else if (input.fire4Up) {
                     skillStateManager.channelTimer = 0;
+                    if (m_Anim.GetBool("ShoutChannel")) {
+                        m_Anim.SetBool("ShoutChannel", false);
+                    }
                     if (skillStateManager.holdCasting) {
                         //Don't also cast this skill if a hold-cast skill was used
                         skillStateManager.holdCasting = false;
@@ -520,6 +537,7 @@ namespace UnityStandardAssets._2D {
                     else if (input.vUp) {
                         //Onslaught
                         if(cooldownManager.onslaughtToggleTimer < 0) {
+                            Cast();
                             cooldownManager.onslaughtToggleTimer = Skill.CooldownManager.onslaughtToggleCooldown;
                             skillStateManager.onslaughtToggle = !skillStateManager.onslaughtToggle;
                         }
@@ -534,16 +552,17 @@ namespace UnityStandardAssets._2D {
                     float threshold = 0.8f;
                     skillStateManager.channelTimer += Time.fixedDeltaTime;
                     if (skillStateManager.channelTimer > threshold) {
-                        skillStateManager.holdCasting = true;
-                        
                         if (input.vDown) {
                             //Summon Skeletal Dragon
+                            ChannelCast();
                         }
                         else if (input.vUp) {
                             //Summon Shadow Bat/Ghoul
+                            ChannelCast();
                         }
                         else {
                             //Summon Spirit Wolf
+                            ChannelCast();
                         }
                     }
                 }
@@ -558,7 +577,7 @@ namespace UnityStandardAssets._2D {
                 else if (input.jumpHold) {
                 }
                 //Perform movement commands if we are not currently attacking
-                else if (!attacking) {
+                else if (!attacking && attackingTimer < 0) {
 					// Reduce the speed if crouching by the crouchSpeed multiplier
 					input.h = (input.vDown ? input.h * playerEntity.crouchSpeed : input.h);
 
@@ -703,6 +722,35 @@ namespace UnityStandardAssets._2D {
         //Stop horizontal movement and play an animation when channeling a skill
         private void Channel() {
             m_Rigidbody2D.velocity = new Vector2(0, m_Rigidbody2D.velocity.y);
+            m_Anim.SetFloat("Speed", 0f);
+
+            if (skillStateManager.channelTimer > 0.4f) {
+                if (!m_Anim.GetBool("ShoutChannel")) {
+                    if (!m_Anim.GetBool("Crouch")) {
+                        m_Anim.SetTrigger("ShoutT");
+                        m_Anim.SetBool("ShoutChannel", true);
+                    }
+                }
+            }
+        }
+        private void ChannelCast() {
+            skillStateManager.holdCasting = true;
+            if (!m_Anim.GetBool("Crouch")) {
+                m_Anim.SetBool("ShoutChannel", false);
+            }
+            attackingTimer = 0.4f;
+        }
+    
+        private void Cast() {
+            m_Rigidbody2D.velocity = new Vector2(0, m_Rigidbody2D.velocity.y);
+            m_Anim.SetFloat("Speed", 0f);
+
+            if (!m_Anim.GetBool("Crouch")) {
+                m_Anim.SetTrigger("ShoutT");
+                m_Anim.SetBool("ShoutChannel", false);
+            }
+
+            attackingTimer = 0.9f;
         }
 
         private void Flip() {
