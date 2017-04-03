@@ -215,7 +215,7 @@ public class GameManager : MonoBehaviour
         gs = null;
     }
 
-    public void SaveProgress()
+    public IEnumerator SaveProgress()
     {
         gs = new GameStatus();
 
@@ -228,8 +228,14 @@ public class GameManager : MonoBehaviour
         gs.subLevel = subLevel;
         gs.ladderUnlocked = ladderManager.GetUnlockedLadder();
         gs.skillTree = skillTree;
-        
+
+        yield return null;
+
         ProgressSL.save(gs);
+
+        yield return null;
+
+        displayNotification("Progress Saved");
     }
 
     public void LoadProgress()

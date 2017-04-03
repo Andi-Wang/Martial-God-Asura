@@ -49,7 +49,7 @@ public class SavePointTrigger : MonoBehaviour {
 
     void OKCallback()
     {
-        GameManager.instance.SaveProgress();
+        StartCoroutine(GameManager.instance.SaveProgress());
     }
     void CancelCallback() { }
 }
