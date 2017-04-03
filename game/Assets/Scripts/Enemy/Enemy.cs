@@ -76,8 +76,6 @@ public class Enemy : MonoBehaviour
 
     public bool dashing;
 
-    private bool temp = true;
-
     void Awake()
     {
         player = GameObject.FindGameObjectWithTag("Player");
