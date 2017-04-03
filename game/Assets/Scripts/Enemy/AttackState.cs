@@ -4,6 +4,7 @@ public class AttackState : EnemyState
 {
     private Enemy enemy;
     private bool attack;
+    private bool hit;
 
     public void Execute()
     {
@@ -48,26 +49,30 @@ public class AttackState : EnemyState
         else if (enemy.isBoss2)
         {
             if (enemy.boss2Timer < Time.time)
-                enemy.boss2Timer = Time.time + 6;
-
-            enemy.animator.SetBool("enemyAttack", true);
-
-            if (enemy.disToPlayer() >= 1.5f && Time.time < enemy.boss2Timer-3f)
             {
+                hit = false;
+                enemy.boss2Timer = Time.time + 6;
+            }
+
+            if (enemy.disToPlayer() >= 1.2f && Time.time < enemy.boss2Timer-4f && !hit)
+            {
+                enemy.animator.SetBool("enemyAttack", true);
                 enemy.speed = 6f;
                 enemy.ghostMove();
             }
-            else if (enemy.disToPlayer() <= 1.5 && Time.time  < enemy.boss2Timer - 3f)
+            else if (enemy.disToPlayer() <= 1.2f && Time.time  < enemy.boss2Timer - 4f && !hit)
             {
                 enemy.animator.SetBool("enemyAttack", false);
-                enemy.speed = 300f;
+                enemy.speed = 100f;
                 enemy.moveBackwards();
-                enemy.boss2Timer = enemy.boss2Timer - ((enemy.boss2Timer-3) - Time.time);
+                hit = true;
+                enemy.boss2Timer = enemy.boss2Timer - ((enemy.boss2Timer-4) - Time.time);
             }
             else if (Time.time < enemy.boss2Timer-2f)
             {
                 enemy.resetRotation();
                 enemy.animator.SetBool("enemyAttack", false);
+                enemy.isImmune = false;
                 enemy.rb2D.isKinematic = false;
             }
             else if (Time.time < enemy.boss2Timer)
