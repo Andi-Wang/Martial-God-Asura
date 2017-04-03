@@ -14,7 +14,7 @@ public class PatrolState : EnemyState {
         RaycastHit2D hit = Physics2D.Raycast(raycastStartPoint, enemy.getDirection());
         if ((hit.collider != null || dis < enemy.detectionRange) && !enemy.cannotChase)
         {
-            if (hit.collider.gameObject.tag == "Player" || dis < enemy.detectionRange)
+            if (hit.collider.gameObject.tag == "Player" && dis < enemy.detectionRange && GameManager.instance.currentRoom == RoomManager.Instance.findRoomId(enemy.transform.position.x, enemy.transform.position.y))
                 enemy.changeState(enemy.chaseState); 
             else if (hit.distance <= 2 && hit.collider.gameObject.tag != "Enemy")
                 enemy.Flip();

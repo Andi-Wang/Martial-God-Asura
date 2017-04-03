@@ -16,6 +16,7 @@ public class PuzzleEnemyController : Enemy {
         animator = GetComponent<Animator>();
         idleState = new IdleState();
         puzzlePatrolState = new PuzzlePatrolState();
+        rb2D = GetComponent<Rigidbody2D>();
     }
 
     // Use this for initialization

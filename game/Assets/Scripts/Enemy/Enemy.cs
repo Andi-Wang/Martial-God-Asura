@@ -132,7 +132,9 @@ public class Enemy : MonoBehaviour
             changeState(patrolState);
         }
         else
+        {
             changeState(chaseState);
+        }
 
         animator.SetBool("Moving", true);
         healthbar = transform.FindChild("EnemyCanvas").FindChild("Healthbar").FindChild("Health").GetComponent<Image>();
