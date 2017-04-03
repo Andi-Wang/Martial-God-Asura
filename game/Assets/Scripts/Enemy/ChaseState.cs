@@ -23,6 +23,7 @@ public class ChaseState : EnemyState {
         {
             enemy.changeState(enemy.patrolState);
         }
+        
         //If can melee, melee
         else if ((enemy.TargetInMeleeRange() && enemy.canMeleeAttack && canMelee) || enemy.isBoss2)
         {

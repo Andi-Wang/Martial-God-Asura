@@ -355,9 +355,9 @@ public class Enemy : MonoBehaviour
             rb2D.isKinematic = false;
             animator.SetBool("Dying", true);
         }
-        else if (isBoss1)
+        else if (isBoss1 || isGhost)
         {
-
+            StartCoroutine(FadeOut());
         }
         else
             animator.SetTrigger("Dead");
@@ -365,6 +365,17 @@ public class Enemy : MonoBehaviour
         Invoke("killSelf", 2f);
        // enemyAudio.clip = deathClip;
         //enemyAudio.Play();
+    }
+
+    IEnumerator FadeOut()
+    {
+        Color temp = sr.color;
+        for(float t = 0.0f; t < 1.0f; t += Time.deltaTime / 2.0f)
+        {
+            temp = new Color(1, 1, 1, Mathf.Lerp(temp.a, 0.0f, t));
+            sr.color = temp;
+            yield return null;
+        }
     }
 
     void killSelf()

@@ -35,14 +35,7 @@ public class AttackState : EnemyState
         attack = true;
         if (enemy.isBoss1)
         {
-            float timer = 0f;
-            //Animate hold punch
-            while (true)
-            {
-                timer += Time.deltaTime;
-                if (timer >= 1.5f)
-                    break;
-            }
+
             //Animate punch + damage
             enemy.animator.SetBool("enemyAttack", true);
         }
