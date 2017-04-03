@@ -315,7 +315,7 @@ public class Enemy : MonoBehaviour
 
     public virtual void TakeDamage(float amount)
     {
-        if (isDead)
+        if (isDead || cannotChase)
             return;
 
         if (canBeInterrupted)
