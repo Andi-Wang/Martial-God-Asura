@@ -168,7 +168,7 @@ public class Enemy : MonoBehaviour
         currentRoomId = RoomManager.Instance.findRoomId(transform.position.x, transform.position.y);
 
         // reset if not in current room
-        if (currentRoomId!= roomId)
+        if (currentRoomId!= roomId && !isGhost)
         {
             transform.position = startingLoc;
         }
