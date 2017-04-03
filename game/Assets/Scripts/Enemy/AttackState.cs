@@ -54,13 +54,13 @@ public class AttackState : EnemyState
                 enemy.boss2Timer = Time.time + 6;
             }
 
-            if (enemy.disToPlayer() >= 1.2f && Time.time < enemy.boss2Timer-4f && !hit)
+            if (enemy.disToPlayer() >= 1.6f && Time.time < enemy.boss2Timer-4f && !hit)
             {
                 enemy.animator.SetBool("enemyAttack", true);
                 enemy.speed = 6f;
                 enemy.ghostMove();
             }
-            else if (enemy.disToPlayer() <= 1.2f && Time.time  < enemy.boss2Timer - 4f && !hit)
+            else if (enemy.disToPlayer() <= 1.6f && Time.time  < enemy.boss2Timer - 4f && !hit)
             {
                 enemy.animator.SetBool("enemyAttack", false);
                 enemy.speed = 100f;
@@ -82,10 +82,6 @@ public class AttackState : EnemyState
                 enemy.isImmune = true;
                 enemy.transform.Translate(Vector3.up * enemy.speed * Time.deltaTime, Space.World);
             }
-        }
-        else if (enemy.isBoss3)
-        {
-
         }
         else if (!enemy.canMove)
         {
