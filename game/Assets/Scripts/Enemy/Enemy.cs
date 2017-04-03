@@ -42,12 +42,22 @@ public class Enemy : MonoBehaviour
     public bool canMeleeAttack = true;
 
     public bool isGhost = false;
+
     public bool isBoss = false;
+    public bool isBoss1 = false;
+    public bool isBoss2 = false;
+    public bool isBoss3 = false;
+
+    [HideInInspector]
+    public float boss2Timer = 0; 
+
     public bool canMove = true;
 
     public bool canBeInterrupted;
 
     public bool isImmune = false;
+
+    public bool cannotChase;
 
     private bool hasMeleeAttacked = true;
     private bool hasRangedAttacked = true;
@@ -65,6 +75,8 @@ public class Enemy : MonoBehaviour
     private bool e_FacingRight = true;
 
     public bool dashing;
+
+    private bool temp = true;
 
     void Awake()
     {
@@ -296,16 +308,69 @@ public class Enemy : MonoBehaviour
     {
         if (canMove)
         {
-            LookAtTarget();
             animator.SetBool("Moving", true);
             transform.Translate(getDirection() * speed * Time.deltaTime, Space.World);
+        }
+    }
+
+    public void moveBackwards()
+    {
+        if (canMove)
+        {
+            animator.SetBool("Moving", true);
+            e_FacingRight = !e_FacingRight;
+            transform.Translate(getDirection() * speed * Time.deltaTime, Space.World);
+            e_FacingRight = !e_FacingRight;
         }
     }
 
     public void ghostMove()
     {
         LookAtTarget();
-        transform.position = Vector3.MoveTowards(transform.position, player.transform.position, chaseSpeed * Time.deltaTime);
+        animator.SetBool("Moving", true);
+        transform.position = Vector3.MoveTowards(transform.position, player.transform.position, speed * 2 * Time.deltaTime);
+
+        //Flipping sprite
+        Vector3 vToPlay = player.transform.position - transform.position;
+        float angle = Mathf.Atan2(vToPlay.y, vToPlay.x) * Mathf.Rad2Deg;
+        transform.eulerAngles = new Vector3(0, 0, angle);
+
+        if(Vector3.Dot(transform.up, Vector3.down) > 0)
+        {
+            GetComponent<SpriteRenderer>().flipY = true;
+            GetComponent<SpriteRenderer>().flipX = true;
+        }
+        else
+        {
+            GetComponent<SpriteRenderer>().flipY = false;
+            GetComponent<SpriteRenderer>().flipX = false;
+        }
+    }
+
+    public void resetRotation()
+    {
+        transform.rotation = Quaternion.identity;
+        if (Vector3.Dot(transform.up, Vector3.down) > 0)
+        {
+            GetComponent<SpriteRenderer>().flipY = true;
+            GetComponent<SpriteRenderer>().flipX = true;
+        }
+        else
+        {
+            GetComponent<SpriteRenderer>().flipY = false;
+            GetComponent<SpriteRenderer>().flipX = false;
+        }
+    }
+
+    public void moveThough()
+    {
+        float xMT;
+        if (e_FacingRight)
+            xMT = transform.position.x + 1;
+        else
+            xMT = transform.position.x - 1;
+        Vector3 v3 = new Vector3(xMT,transform.position.y,transform.position.z);
+        transform.position = Vector3.MoveTowards(transform.position, v3, speed * Time.deltaTime);
     }
 
     public Vector2 getDirection()

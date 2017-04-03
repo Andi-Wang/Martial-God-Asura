@@ -24,7 +24,7 @@ public class ChaseState : EnemyState {
             enemy.changeState(enemy.patrolState);
         }
         //If can melee, melee
-        else if (enemy.TargetInMeleeRange() && enemy.canMeleeAttack && canMelee)
+        else if ((enemy.TargetInMeleeRange() && enemy.canMeleeAttack && canMelee) || enemy.isBoss2)
         {
             canMelee = false;
             enemy.changeState(enemy.attackState);
@@ -43,7 +43,10 @@ public class ChaseState : EnemyState {
         //If melee on CD but in melee range
         else if (enemy.TargetInMeleeRange() && !canMelee)
         {
-            enemy.animator.SetBool("Moving", false);
+            if (enemy.isGhost)
+                enemy.animator.SetBool("Moving", true);
+            else
+                enemy.animator.SetBool("Moving", false);
         }
         //If the unit is a ghost
         else if (enemy.isGhost)
@@ -56,6 +59,7 @@ public class ChaseState : EnemyState {
         //Look at player and move
         else
         {
+            enemy.LookAtTarget();
             enemy.Move();
         }
         //Check if player has gone up a floor

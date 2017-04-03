@@ -3,11 +3,15 @@
 public class AttackState : EnemyState
 {
     private Enemy enemy;
+    private bool attack;
 
     public void Execute()
     {
         Attack();
-        enemy.changeState(enemy.chaseState);
+        if (!attack)
+        {
+            enemy.changeState(enemy.chaseState);
+        }
     }
 
     public void Begin(Enemy enemy)
@@ -27,18 +31,56 @@ public class AttackState : EnemyState
 
     private void Attack()
     {
-        if (enemy.isBoss)
+        attack = true;
+        if (enemy.isBoss1)
         {
-            float holdTimer = 0f;
+            float timer = 0f;
             //Animate hold punch
             while (true)
             {
-                holdTimer += Time.deltaTime;
-                if (holdTimer >= 1.5f)
+                timer += Time.deltaTime;
+                if (timer >= 1.5f)
                     break;
             }
             //Animate punch + damage
             enemy.animator.SetBool("enemyAttack", true);
+        }
+        else if (enemy.isBoss2)
+        {
+            if (enemy.boss2Timer < Time.time)
+                enemy.boss2Timer = Time.time + 6;
+
+            enemy.animator.SetBool("enemyAttack", true);
+
+            if (enemy.disToPlayer() >= 1.5f && Time.time < enemy.boss2Timer-3f)
+            {
+                enemy.speed = 6f;
+                enemy.ghostMove();
+            }
+            else if (enemy.disToPlayer() <= 1.5 && Time.time  < enemy.boss2Timer - 3f)
+            {
+                enemy.animator.SetBool("enemyAttack", false);
+                enemy.speed = 300f;
+                enemy.moveBackwards();
+                enemy.boss2Timer = enemy.boss2Timer - ((enemy.boss2Timer-3) - Time.time);
+            }
+            else if (Time.time < enemy.boss2Timer-2f)
+            {
+                enemy.resetRotation();
+                enemy.animator.SetBool("enemyAttack", false);
+                enemy.rb2D.isKinematic = false;
+            }
+            else if (Time.time < enemy.boss2Timer)
+            {
+                enemy.rb2D.isKinematic = true;
+                enemy.animator.SetBool("enemyAttack", false);
+                enemy.isImmune = true;
+                enemy.transform.Translate(Vector3.up * enemy.speed * Time.deltaTime, Space.World);
+            }
+        }
+        else if (enemy.isBoss3)
+        {
+
         }
         else if (!enemy.canMove)
         {
@@ -49,5 +91,6 @@ public class AttackState : EnemyState
         {
             enemy.animator.SetBool("enemyAttack", true);
         }
+        attack = false;
     }
 }

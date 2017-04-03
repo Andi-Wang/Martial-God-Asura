@@ -12,17 +12,24 @@ public class PatrolState : EnemyState {
 
         Vector3 raycastStartPoint = enemy.transform.position + new Vector3(enemy.getDirection().x, 0);
         RaycastHit2D hit = Physics2D.Raycast(raycastStartPoint, enemy.getDirection());
-        if (hit.collider != null || dis < enemy.detectionRange)
+        if ((hit.collider != null || dis < enemy.detectionRange) && !enemy.cannotChase)
         {
             if (hit.collider.gameObject.tag == "Player" || dis < enemy.detectionRange)
                 enemy.changeState(enemy.chaseState); 
             else if (hit.distance <= 2)
                 enemy.Flip();
+            else
+                enemy.Move();
+        }
+        else if (enemy.cannotChase)
+        {
+            if (hit.collider.gameObject.tag != "Player" && hit.collider.gameObject.tag != "Enemy" && hit.distance <= 1)
+                enemy.Flip();
+            else
+                enemy.moveThough();
         }
         if (GameManager.instance.currentRoom == RoomManager.Instance.findRoomId(enemy.transform.position.x, enemy.transform.position.y) && (!enemy.canMove || enemy.isBoss))
             enemy.changeState(enemy.chaseState);
-
-        enemy.Move();
     }
     public void Begin(Enemy enemy)
     {
