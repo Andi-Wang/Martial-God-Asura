@@ -36,7 +36,7 @@ public class PlayerInteract : MonoBehaviour {
             }
             playerRigidbody2D.MovePosition(transform.position + destination);
         }
-        else if(otherObj.name == "ExitLevelDoor")
+        else if(otherObj.name == "ExitLevelDoor" && GameManager.instance.SubLevelComplete)
         {
             playerRigidbody2D.position = levelExit;
         }
