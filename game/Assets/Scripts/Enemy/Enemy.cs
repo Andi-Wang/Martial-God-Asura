@@ -30,7 +30,7 @@ public class Enemy : MonoBehaviour
     public PuzzlePatrolState puzzlePatrolState;
     public RangedAttackState rangedAttackState;
 
-    private float AttackRange = 1.5f;
+    private float AttackRange = 1.2f;
     private float RangeAttackRange = 12f;
 
     public float rangedAttackCD = 4f;
@@ -166,12 +166,6 @@ public class Enemy : MonoBehaviour
         }
 
         currentRoomId = RoomManager.Instance.findRoomId(transform.position.x, transform.position.y);
-
-        // reset if not in current room
-        if (currentRoomId!= roomId)
-        {
-            transform.position = startingLoc;
-        }
     }
 
     public float Knockback(bool sourceFacingRight, float duration, float speed) {
@@ -314,7 +308,7 @@ public class Enemy : MonoBehaviour
 
     public virtual void TakeDamage(float amount)
     {
-        if (isDead || cannotChase)
+        if (isDead)
             return;
 
         if (canBeInterrupted)
@@ -332,7 +326,6 @@ public class Enemy : MonoBehaviour
             enemyEntity.health -= amount;
             healthbar.fillAmount = enemyEntity.health / enemyEntity.maxHealth;
         }
-        
         changeState(chaseState);
     }
 
@@ -374,7 +367,7 @@ public class Enemy : MonoBehaviour
         if (canMove)
         {
             // get rid of warning
-            if (animator.GetBool("Moving"))
+            if (animator.GetBool("Moving") || !animator.GetBool("Moving"))
                 animator.SetBool("Moving", true);
 
             transform.Translate(getDirection() * speed * Time.deltaTime, Space.World);
