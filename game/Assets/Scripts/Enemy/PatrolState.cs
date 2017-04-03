@@ -16,7 +16,7 @@ public class PatrolState : EnemyState {
         {
             if (hit.collider.gameObject.tag == "Player" || dis < enemy.detectionRange)
                 enemy.changeState(enemy.chaseState); 
-            else if (hit.distance <= 2)
+            else if (hit.distance <= 2 && hit.collider.gameObject.tag != "Enemy")
                 enemy.Flip();
             else
                 enemy.Move();

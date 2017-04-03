@@ -51,10 +51,11 @@ public class ChaseState : EnemyState {
         //If the unit is a ghost
         else if (enemy.isGhost)
         {
-            if (enemy.disToPlayer() < 30f)
+            if (enemy.disToPlayer() < 15f)
                 enemy.ghostMove();
             else
-                enemy.changeState(enemy.patrolState);
+                if(enemy.ghostMoveHome())
+                    enemy.changeState(enemy.patrolState);
         }
         //Look at player and move
         else

@@ -81,6 +81,7 @@ public class Enemy : MonoBehaviour
     public bool isDead { get; private set; }
     public Rigidbody2D rb2D;
     private bool e_FacingRight = true;
+    private Vector3 startingLoc;
 
     public bool dashing;
 
@@ -135,6 +136,9 @@ public class Enemy : MonoBehaviour
 
         animator.SetBool("Moving", true);
         healthbar = transform.FindChild("EnemyCanvas").FindChild("Healthbar").FindChild("Health").GetComponent<Image>();
+
+        if (isGhost)
+            startingLoc = transform.position;
     }
 
     void FixedUpdate()
@@ -382,6 +386,15 @@ public class Enemy : MonoBehaviour
             GetComponent<SpriteRenderer>().flipY = false;
             GetComponent<SpriteRenderer>().flipX = false;
         }
+    }
+
+    public bool ghostMoveHome()
+    {
+        speed = 10f;
+        resetRotation();
+        animator.SetBool("Moving", true);
+        transform.position = Vector3.MoveTowards(transform.position, startingLoc, speed * 2 * Time.deltaTime);
+        return transform.position == startingLoc;
     }
 
     public void resetRotation()
