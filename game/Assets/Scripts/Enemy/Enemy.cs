@@ -49,7 +49,9 @@ public class Enemy : MonoBehaviour
     public bool isBoss3 = false;
 
     [HideInInspector]
-    public float boss2Timer = 0; 
+    public float boss2Timer = 0;
+    [HideInInspector]
+    public float boss3Timer = 0;
 
     public bool canMove = true;
 
@@ -290,8 +292,13 @@ public class Enemy : MonoBehaviour
         }
 
         //boxCollider.isTrigger = true;
-
-        animator.SetTrigger("Dead");
+        if (isBoss2 || isBoss3)
+        {
+            rb2D.isKinematic = false;
+            animator.SetBool("Dying", true);
+        }
+        else
+            animator.SetTrigger("Dead");
 
        // enemyAudio.clip = deathClip;
         //enemyAudio.Play();
