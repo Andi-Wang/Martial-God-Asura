@@ -488,7 +488,7 @@ public class Skill {
     }
     public float FastFallEffect(bool fastFallToggle) {
         float bonusGravity = 0;
-        if (fastFallToggle) bonusGravity = 6f;
+        if (fastFallToggle) bonusGravity = 5f;
         return bonusGravity;
     }
 }

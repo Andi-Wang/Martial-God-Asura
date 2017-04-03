@@ -27,7 +27,7 @@ namespace UnityStandardAssets._2D {
         public float flashSpeed = 2f;
 
         [SerializeField] private LayerMask m_WhatIsGround;                  // A mask determining what is ground to the character
-        [SerializeField] private Entity playerEntity = new Entity(100f, 100f, 0f, 25f, 0f, 0f, 700f, 10f, 1f, 0.00001f); //very small crouch speed so the player can turn around when crouched
+        [SerializeField] private Entity playerEntity = new Entity(100f, 100f, 0f, 25f, 0f, 0f, 700f, 10f, 2f, 0.00001f); //very small crouch speed so the player can turn around when crouched
         public Entity buffEntity = new Entity();
         private Skill skill;
         private Skill.SkillStateManager skillStateManager = new Skill.SkillStateManager();
@@ -42,6 +42,7 @@ namespace UnityStandardAssets._2D {
         private Rigidbody2D m_Rigidbody2D;
         private bool m_FacingRight = true;  // For determining which way the player is currently facing.
         const float airSpeedDecayTo = 0.993f;
+        const float maxFallSpeed = -25f;
 
         bool isDead;
 		bool attacking = false; // used to detect if we are beginning an attack, in order to prevent input buffering
@@ -110,26 +111,27 @@ namespace UnityStandardAssets._2D {
                 timeSinceLastStruck = 0;
                 stunned = stunDurationWhenHit;
 
-                bool fromRight = source.position.x > m_Rigidbody2D.position.x;
+                if(source) {
+                    bool fromRight = source.position.x > m_Rigidbody2D.position.x;
 
-                //Interrupt certain actions like sliding
-                skillStateManager.getHit();
+                    //Interrupt certain actions like sliding
+                    skillStateManager.getHit();
 
-                if(m_Grounded) {
-                    skillStateManager.backdashSpeed = skill.Backdash(m_Rigidbody2D, true, 0, fromRight);
-                    skillStateManager.backdashing = true;
-                }
-                else {
-                    m_Rigidbody2D.velocity = new Vector2(0, -airKnockdownVelocity);
-
-                    if (fromRight) {
-                        m_Rigidbody2D.AddForce(new Vector2(-knockbackForceWhenHit, 0));
+                    if (m_Grounded) {
+                        skillStateManager.backdashSpeed = skill.Backdash(m_Rigidbody2D, true, 0, fromRight);
+                        skillStateManager.backdashing = true;
                     }
                     else {
-                        m_Rigidbody2D.AddForce(new Vector2(knockbackForceWhenHit, 0));
+                        m_Rigidbody2D.velocity = new Vector2(0, -airKnockdownVelocity);
+
+                        if (fromRight) {
+                            m_Rigidbody2D.AddForce(new Vector2(-knockbackForceWhenHit, 0));
+                        }
+                        else {
+                            m_Rigidbody2D.AddForce(new Vector2(knockbackForceWhenHit, 0));
+                        }
                     }
                 }
-                
             }
 
             //TODO: player hurt sound,animation
@@ -693,7 +695,10 @@ namespace UnityStandardAssets._2D {
                     //If gliding, cap fall speed
                     if(skillStateManager.gliding && m_Rigidbody2D.velocity.y < skill.GlideEffect()) {
                         m_Rigidbody2D.velocity = new Vector2(m_Rigidbody2D.velocity.x, skill.GlideEffect());
-                    }                    
+                    }
+                    else if(m_Rigidbody2D.velocity.y < maxFallSpeed) {
+                        m_Rigidbody2D.velocity = new Vector2(m_Rigidbody2D.velocity.x, maxFallSpeed);
+                    }
                     
                     // The Speed animator parameter is set to the absolute value of the horizontal input.
                     m_Anim.SetFloat("Speed", Mathf.Abs(input.h));
