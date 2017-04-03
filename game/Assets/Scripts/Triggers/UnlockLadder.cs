@@ -5,6 +5,7 @@ public class UnlockLadder : MonoBehaviour {
 
     public GameObject ladder;
     public int ladderId;
+    public bool unlockable;
 
     bool entered;
     bool animating;
@@ -16,11 +17,12 @@ public class UnlockLadder : MonoBehaviour {
 
         entered = false;
         animating = false;
+        unlockable = true;
     }
 
     void Update()
     {
-        if (Input.GetButtonUp("Interact") && entered && !animating)
+        if (unlockable && Input.GetButtonUp("Interact") && entered && !animating)
         {
             anim.SetTrigger("LadderUnlock" + ladderId);
             animating = true;
