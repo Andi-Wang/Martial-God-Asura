@@ -129,6 +129,13 @@ public class Enemy : MonoBehaviour
                 chaseSpeed = speed + 1f;
         }
 
+        if(cannotChase)
+        {
+            speed = Random.Range(2, 7);
+            chaseSpeed = speed;
+            baseSpeed = speed;
+        }
+
         patrolState = new PatrolState();
         attackState = new AttackState();
         chaseState = new ChaseState();
