@@ -100,7 +100,8 @@ public class Enemy : MonoBehaviour
         playerPos = player.transform.position;
         boxCollider = GetComponent<BoxCollider2D>();
         rb2D = GetComponent<Rigidbody2D>();
-        enemyEntity = new Entity(startingHealth, 0f, 0f, 0f, 0f, 0f, 0f, 1f, 1f, 0f);
+        if(!cannotChase)
+            enemyEntity = new Entity(startingHealth, 0f, 0f, 0f, 0f, 0f, 0f, 1f, 1f, 0f);
         enemyAudio = GetComponent<AudioSource>();
     }
 
@@ -161,6 +162,7 @@ public class Enemy : MonoBehaviour
 
         roomId = RoomManager.Instance.findRoomId(transform.position.x, transform.position.y);
         currentRoomId = roomId;
+
     }
 
     void FixedUpdate()
@@ -430,7 +432,7 @@ public class Enemy : MonoBehaviour
         float angle = Mathf.Atan2(vToPlay.y, vToPlay.x) * Mathf.Rad2Deg;
         transform.eulerAngles = new Vector3(0, 0, angle);
 
-        if(Vector3.Dot(transform.up, Vector3.down) > 0)
+        if (Vector3.Dot(transform.up, Vector3.down) > 0)
         {
             GetComponent<SpriteRenderer>().flipY = true;
             GetComponent<SpriteRenderer>().flipX = true;

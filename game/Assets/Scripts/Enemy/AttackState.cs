@@ -34,7 +34,6 @@ public class AttackState : EnemyState
         attack = true;
         if (enemy.isBoss1)
         {
-
             //Animate punch + damage
             enemy.animator.SetBool("enemyAttack", true);
         }
@@ -85,5 +84,6 @@ public class AttackState : EnemyState
             enemy.animator.SetBool("enemyAttack", true);
         }
         attack = false;
+        enemy.animator.speed = 1f;
     }
 }
