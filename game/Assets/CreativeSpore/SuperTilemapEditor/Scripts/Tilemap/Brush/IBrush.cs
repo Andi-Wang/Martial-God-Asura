@@ -28,7 +28,7 @@ namespace CreativeSpore.SuperTilemapEditor
         /// <param name="chunkGx"></param>
         /// <param name="chunkGy"></param>
         /// <param name="tileData"></param>
-        void OnErase(TilemapChunk chunk, int chunkGx, int chunkGy, uint tileData);
+        void OnErase(TilemapChunk chunk, int chunkGx, int chunkGy, uint tileData, int brushId);
         /// <summary>
         /// This is called by the tilemap chunks when a tile needs to be refreshed. Return the updated tile data.
         /// </summary>
@@ -72,5 +72,14 @@ namespace CreativeSpore.SuperTilemapEditor
         /// <param name="tileData"></param>
         /// <returns></returns>    
         uint[] GetSubtiles(Tilemap tilemap, int gridX, int gridY, uint tileData);
+        /// <summary>
+        /// If the brush use subtiles, this will return the merged collider vectices in pairs (v0, v1) 
+        /// </summary>
+        /// <param name="tilemap"></param>
+        /// <param name="gridX"></param>
+        /// <param name="gridY"></param>
+        /// <param name="tileData"></param>
+        /// <returns></returns>
+        Vector2[] GetMergedSubtileColliderVertices(Tilemap tilemap, int gridX, int gridY, uint tileData);
     }
 }

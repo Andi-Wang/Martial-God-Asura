@@ -41,7 +41,8 @@ namespace CreativeSpore.SuperTilemapEditor
         {
             Parameters,
             Collider,
-            Prefab
+            Prefab,
+            Autotiling
         }
 
         public Tileset Tileset;
@@ -49,6 +50,7 @@ namespace CreativeSpore.SuperTilemapEditor
         [SerializeField]
         private eEditMode m_editMode;
 
+        private Vector2 m_scrollPos = Vector2.zero;
         public void Display()
         {
             if (Tileset == null)
@@ -70,6 +72,7 @@ namespace CreativeSpore.SuperTilemapEditor
             }
 
             EditorGUILayout.BeginVertical();
+            m_scrollPos = EditorGUILayout.BeginScrollView(m_scrollPos, GUILayout.Width(EditorGUIUtility.currentViewWidth));
             {
                 string[] editModeNames = System.Enum.GetNames(typeof(eEditMode));
                 m_editMode = (eEditMode)GUILayout.Toolbar((int)m_editMode, editModeNames);
@@ -78,9 +81,12 @@ namespace CreativeSpore.SuperTilemapEditor
                     case eEditMode.Collider: DisplayCollider(); break;
                     case eEditMode.Parameters: DisplayParameters(); break;
                     case eEditMode.Prefab: DisplayPrefab(); break;
+                    case eEditMode.Autotiling: DisplayAutotiling(); break;
                 }
             }
+            EditorGUILayout.EndScrollView();
             EditorGUILayout.EndVertical();
+
 
             if (GUI.changed)
             {
@@ -115,14 +121,21 @@ namespace CreativeSpore.SuperTilemapEditor
                 EditorGUIUtility.labelWidth = 80;
                 prefabData.offset = EditorGUILayout.Vector3Field("Offset", prefabData.offset);
                 prefabData.offsetMode = (TilePrefabData.eOffsetMode)EditorGUILayout.EnumPopup("Offset Mode", prefabData.offsetMode);
+                EditorGUI.BeginChangeCheck();
                 prefabData.prefab = (GameObject)EditorGUILayout.ObjectField("Prefab", prefabData.prefab, typeof(GameObject), false);
-                EditorGUIUtility.labelWidth = savedLabelWidth;
+                bool isPrefabChanged = EditorGUI.EndChangeCheck();
 
-                Texture2D prefabPreview = AssetPreview.GetAssetPreview(selectedTile.prefabData.prefab);
+                GUILayout.BeginHorizontal();
+                Texture2D prefabPreview = AssetPreview.GetAssetPreview(selectedTile.prefabData.prefab);                
                 GUILayout.Box(prefabPreview, prefabPreview != null? (GUIStyle)"Box" : GUIStyle.none);
+                GUILayout.EndHorizontal();
 
                 if( prefabData.prefab )
-                {
+                {                    
+                    EditorGUIUtility.labelWidth = 260;
+                    if (prefabPreview)
+                        prefabData.showPrefabPreviewInTilePalette = EditorGUILayout.Toggle("Display the prefab preview in the tile palette", prefabData.showPrefabPreviewInTilePalette);
+                    EditorGUIUtility.labelWidth = savedLabelWidth;
                     prefabData.showTileWithPrefab = EditorGUILayout.Toggle("Show Tile With Prefab", prefabData.showTileWithPrefab);
                 }
 
@@ -134,7 +147,10 @@ namespace CreativeSpore.SuperTilemapEditor
                         for (int i = 0; i < Tileset.TileSelection.selectionData.Count; ++i)
                         {
                             Tile tile = Tileset.Tiles[(int)(Tileset.TileSelection.selectionData[i] & Tileset.k_TileDataMask_TileId)];
+                            GameObject savedPrefab = tile.prefabData.prefab;
                             tile.prefabData = prefabData;
+                            if (!isPrefabChanged)
+                                tile.prefabData.prefab = savedPrefab;
                         }
                     }
                     else
@@ -143,6 +159,60 @@ namespace CreativeSpore.SuperTilemapEditor
                     }
                     EditorUtility.SetDirty(Tileset);
                 }                
+            }
+        }
+
+        private TilesetBrushEditor m_brushEditor;
+        private void DisplayAutotiling()
+        {
+            if (Tileset.SelectedBrushId != Tileset.k_BrushId_Default)
+            {
+                TilesetBrush brush = Tileset.FindBrush(Tileset.SelectedBrushId);
+                if(brush)
+                {
+                    EditorGUILayout.BeginHorizontal();
+                    GUILayoutUtility.GetRect(1, 1, GUILayout.Width(Tileset.VisualTileSize.x), GUILayout.Height(Tileset.VisualTileSize.y));
+                    TilesetEditor.DoGUIDrawTileFromTileData(GUILayoutUtility.GetLastRect(), brush.GetAnimTileData(), Tileset, brush.GetAnimUV());
+                    GUILayout.Label("("+brush.name+":"+brush.GetType().Name+")", EditorStyles.boldLabel);
+                    EditorGUILayout.EndHorizontal();
+
+                    if(!m_brushEditor || m_brushEditor.target != brush)
+                        m_brushEditor = TilesetBrushEditor.CreateEditor(brush) as TilesetBrushEditor;
+                    (m_brushEditor as TilesetBrushEditor).DoInspectorGUI();
+                }
+            }
+            else
+            {
+                bool isMultiselection = Tileset.TileSelection != null;
+                Tile selectedTile = isMultiselection ? Tileset.Tiles[(int)(Tileset.TileSelection.selectionData[0] & Tileset.k_TileDataMask_TileId)] : Tileset.SelectedTile;
+                GUILayoutUtility.GetRect(1, 1, GUILayout.Width(Tileset.VisualTileSize.x), GUILayout.Height(Tileset.VisualTileSize.y));
+                Rect tileUV = selectedTile.uv;
+                GUI.color = Tileset.BackgroundColor;
+                GUI.DrawTextureWithTexCoords(GUILayoutUtility.GetLastRect(), EditorGUIUtility.whiteTexture, tileUV, true);
+                GUI.color = Color.white;
+                GUI.DrawTextureWithTexCoords(GUILayoutUtility.GetLastRect(), Tileset.AtlasTexture, tileUV, true);
+
+                if (isMultiselection)
+                {
+                    EditorGUILayout.LabelField("* Multi-selection Edition", EditorStyles.boldLabel);
+                }
+                EditorGUI.BeginChangeCheck();
+
+                selectedTile.autilingGroup = TilesetEditor.DoGroupFieldLayout(Tileset, "Group", selectedTile.autilingGroup);
+
+                if (EditorGUI.EndChangeCheck())
+                {
+                    Undo.RecordObject(Tileset, "Tile Autotiling Data Changed");
+                    if (isMultiselection)
+                    {
+                        for (int i = 0; i < Tileset.TileSelection.selectionData.Count; ++i)
+                        {
+                            Tile tile = Tileset.Tiles[(int)(Tileset.TileSelection.selectionData[i] & Tileset.k_TileDataMask_TileId)];
+                            tile.autilingGroup = selectedTile.autilingGroup;
+                        }
+                    }
+                    EditorUtility.SetDirty(Tileset);
+                }
             }
         }
 

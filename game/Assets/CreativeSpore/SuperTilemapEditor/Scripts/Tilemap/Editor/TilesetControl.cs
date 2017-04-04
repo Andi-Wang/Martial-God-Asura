@@ -137,7 +137,15 @@ namespace CreativeSpore.SuperTilemapEditor
                 m_sharedData.tileViewList = TilesetEditor.CreateTileViewReorderableList(Tileset);
                 m_sharedData.tileViewList.onSelectCallback += (ReorderableList list) =>
                 {
-                    RemoveTileSelection();
+                    /* NOTE: this will select the tileview for the painting brush. Commented just in case.
+                    if(list.index >= 0)
+                    {
+                        TileSelection tileSelection = Tileset.TileViews[list.index].tileSelection.Clone();
+                        tileSelection.FlipVertical();
+                        Tileset.TileSelection = tileSelection;
+                    }
+                    else*/
+                        RemoveTileSelection();
                 };
                 m_sharedData.tileViewList.onRemoveCallback += (ReorderableList list) =>
                 {
@@ -194,7 +202,7 @@ namespace CreativeSpore.SuperTilemapEditor
             GUILayout.Label(EditorGUIUtility.FindTexture("ViewToolZoom"), GUILayout.Width(35f));
             float visualTileZoom = EditorGUILayout.Slider(Tileset.VisualTileSize.x / Tileset.TilePxSize.x, 0.25f, 4f);
             Tileset.VisualTileSize = visualTileZoom * Tileset.TilePxSize;
-            if (GUILayout.Button("Reset", GUILayout.Width(50f))) Tileset.VisualTileSize = new Vector2(32f, 32f);
+            if (GUILayout.Button("Reset", GUILayout.Width(50f))) Tileset.VisualTileSize = new Vector2(32f * Tileset.TilePxSize.x / Tileset.TilePxSize.y, 32f);
             EditorGUILayout.EndHorizontal();
             //---
 

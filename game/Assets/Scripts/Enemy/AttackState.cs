@@ -42,22 +42,22 @@ public class AttackState : EnemyState
         {
             if (enemy.boss2Timer < Time.time)
             {
-                enemy.boss2Timer = Time.time + 6;
+                enemy.boss2Timer = Time.time + 8;
             }
 
-            if (!enemy.hit && Time.time < enemy.boss2Timer-4f)
+            if (!enemy.hit && Time.time < enemy.boss2Timer-5f)
             {
                 enemy.animator.SetBool("enemyAttack", true);
-                enemy.speed = 11f;
+                enemy.speed = 10f;
                 enemy.ghostMove();
             }
-            else if (enemy.hit && Time.time  < enemy.boss2Timer - 4f)
+            else if (enemy.hit && Time.time  < enemy.boss2Timer - 5f)
             {
                 enemy.animator.SetBool("enemyAttack", false);
                 enemy.speed = 100f;
                 enemy.moveBackwards();
                 enemy.hit = false;
-                enemy.boss2Timer = enemy.boss2Timer - ((enemy.boss2Timer-4) - Time.time);
+                enemy.boss2Timer = enemy.boss2Timer - ((enemy.boss2Timer-5) - Time.time);
             }
             else if (Time.time < enemy.boss2Timer-2f)
             {

@@ -71,6 +71,8 @@ namespace CreativeSpore.SuperTilemapEditor
 
             uint otherTileData = tilemap.GetTileData(gridX, gridY);
             if ((AutotilingMode & eAutotilingMode.EmptyCells) != 0 && otherTileData == Tileset.k_TileData_Empty) return true;
+            Tile tile = tilemap.Tileset.GetTile((int)(otherTileData & Tileset.k_TileDataMask_TileId));
+            if (tile != null && Tileset.GetGroupAutotiling(Group, tile.autilingGroup)) return true;
 
             int otherBrushId = (int)((uint)(otherTileData & Tileset.k_TileDataMask_BrushId) >> 16);
             return AutotileWith(selfBrushId, otherBrushId);
@@ -86,8 +88,31 @@ namespace CreativeSpore.SuperTilemapEditor
             if (brush)
             {
                 s_refreshingLinkedBrush = true;
-                tileData = brush.Refresh(tilemap, gridX, gridY, tileData);
+                tileData = ApplyAndMergeTileFlags(brush.Refresh(tilemap, gridX, gridY, tileData), tileData);
                 s_refreshingLinkedBrush = false;
+            }
+            return tileData;
+        }
+
+        /// <summary>
+        /// Merge flags and keeps rotation coherence
+        /// </summary>
+        /// <returns></returns>
+        public static uint ApplyAndMergeTileFlags(uint tileData, uint tileDataFlags)
+        {
+            tileDataFlags &= Tileset.k_TileDataMask_Flags;
+            if ((tileData & Tileset.k_TileFlag_Rot90) != 0)
+            {
+                if ((tileDataFlags & Tileset.k_TileFlag_FlipH) != 0) tileData ^= Tileset.k_TileFlag_FlipV;
+                if ((tileDataFlags & Tileset.k_TileFlag_FlipV) != 0) tileData ^= Tileset.k_TileFlag_FlipH;
+                if ((tileDataFlags & Tileset.k_TileFlag_Rot90) != 0)
+                {
+                    tileData ^= 0xE0000000;
+                }
+            }
+            else
+            {
+                tileData ^= tileDataFlags;
             }
             return tileData;
         }
@@ -104,7 +129,7 @@ namespace CreativeSpore.SuperTilemapEditor
             return tileData;
         }
 
-        public virtual void OnErase(TilemapChunk chunk, int chunkGx, int chunkGy, uint tileData)
+        public virtual void OnErase(TilemapChunk chunk, int chunkGx, int chunkGy, uint tileData, int brushId)
         {
             ;
         }
@@ -192,6 +217,11 @@ namespace CreativeSpore.SuperTilemapEditor
             return null;
         }
 
-        #endregion
+        public virtual Vector2[] GetMergedSubtileColliderVertices(Tilemap tilemap, int gridX, int gridY, uint tileData)
+        {
+            return null;
+        }
+
+        #endregion        
     }
 }

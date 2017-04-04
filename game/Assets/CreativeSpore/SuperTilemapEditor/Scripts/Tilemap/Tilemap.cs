@@ -119,13 +119,13 @@ namespace CreativeSpore.SuperTilemapEditor
         /// <summary>
         /// The size, in pixels, the tile UV will be stretched. Use this to fix pixel precision artifacts when tiles have no padding border in the atlas.
         /// </summary>
-        public float InnerPadding = 0.1f;
+        public float InnerPadding = 0f;
         /// <summary>
         /// The depth size of the collider. You need to call Refresh(false, true) after changing this value to refresh the collider.
         /// </summary>
         public float ColliderDepth = 0.1f;
         /// <summary>
-        /// Set the colliders for this tilemap
+        /// Set the colliders for this tilemap. You need to call the Refresh method to update all the tilemap chunks after changing this parameter.
         /// </summary>
         public eColliderType ColliderType = eColliderType.None;
         /// <summary>
@@ -197,6 +197,10 @@ namespace CreativeSpore.SuperTilemapEditor
         /// Returns the parent tilemap group the tilemap is children of
         /// </summary>
         public TilemapGroup ParentTilemapGroup { get { return m_parentTilemapGroup; } }
+        /// <summary>
+        /// Sets/Gets the parallax factor applied to the tilemap when it's rendered by a camera
+        /// </summary>
+        public Vector2 ParallaxFactor { get { return m_parallaxFactor; } set { m_parallaxFactor = value; } }
         public bool IsUndoEnabled = false;
 
 
@@ -242,8 +246,10 @@ namespace CreativeSpore.SuperTilemapEditor
 
         public void RefreshChunksSortingAttributes()
         {
-            foreach(TilemapChunk chunk in m_dicChunkCache.Values)
+            var valueIter = m_dicChunkCache.Values.GetEnumerator(); 
+            while (valueIter.MoveNext())
             {
+                TilemapChunk chunk = valueIter.Current;
                 if (chunk)
                 {
                     chunk.SortingLayerID = m_sortingLayer;
@@ -321,9 +327,13 @@ namespace CreativeSpore.SuperTilemapEditor
         private int m_maxGridY;
         [SerializeField]
         private TilemapGroup m_parentTilemapGroup;
+        [SerializeField]
+        private Vector2 m_parallaxFactor = Vector2.one;
 
         private bool m_markForUpdateMesh = false;
+#if UNITY_EDITOR
         private bool m_markSceneDirtyOnNextUpdateMesh = false;
+#endif
         #endregion
 
         #region Monobehaviour Methods
@@ -331,8 +341,12 @@ namespace CreativeSpore.SuperTilemapEditor
         void Awake()
         {
             BuildTilechunkDictionary();
-            foreach (TilemapChunk tilemapChunk in m_dicChunkCache.Values)
-                tilemapChunk.gameObject.hideFlags |= HideFlags.HideInHierarchy;
+            var valueIter = m_dicChunkCache.Values.GetEnumerator();
+            while (valueIter.MoveNext())
+            {
+                TilemapChunk chunk = valueIter.Current;
+                chunk.gameObject.hideFlags |= HideFlags.HideInHierarchy;
+            }
         }
 
         private bool m_applyContactsEmptyFix = false;
@@ -341,11 +355,13 @@ namespace CreativeSpore.SuperTilemapEditor
             if (Application.isPlaying && m_applyContactsEmptyFix)
             {
                 m_applyContactsEmptyFix = false;
-                foreach(TilemapChunk tilemapChunk in m_dicChunkCache.Values)
+                var valueIter = m_dicChunkCache.Values.GetEnumerator(); 
+                while (valueIter.MoveNext())
                 {
-                    if (tilemapChunk)
+                    TilemapChunk chunk = valueIter.Current;
+                    if (chunk)
                     {
-                        tilemapChunk.ApplyContactsEmptyFix();
+                        chunk.ApplyContactsEmptyFix();
                     }
                 }
             }
@@ -357,6 +373,37 @@ namespace CreativeSpore.SuperTilemapEditor
                 UpdateMeshImmediate();
             }
 
+        }
+
+        void OnEnable()
+        {
+            Camera.onPreCull += _OnPreCull;
+            Camera.onPostRender += _OnPostRender;
+        }
+
+        void OnDisable()
+        {
+            Camera.onPreCull -= _OnPreCull;
+            Camera.onPostRender -= _OnPostRender;
+        }
+
+        bool m_preRenderPosSet = false;
+        Vector3 m_preRenderPos;
+        //NOTE: _OnPreCull could be called more than one time, without calling _OnPostRender. For example by selecting a Canvas Text object clicking in the Scene
+        private void _OnPreCull(Camera cam)
+        {
+            if (!m_preRenderPosSet)
+            {
+                m_preRenderPosSet = true;
+                m_preRenderPos = transform.position;
+            }
+            transform.position = m_preRenderPos + (Vector3)(Vector2.Scale(cam.transform.position, (Vector2.one - m_parallaxFactor)));
+        }
+
+        private void _OnPostRender(Camera cam)
+        {
+            transform.position = m_preRenderPos;
+            m_preRenderPosSet = false;
         }
 
         // NOTE: OnDestroy is not called in editor without [ExecuteInEditMode]
@@ -427,6 +474,8 @@ namespace CreativeSpore.SuperTilemapEditor
 
         void DoDrawGizmos()
         {
+            Vector3 savedPos = transform.position;
+            transform.position += (Vector3)(Vector2.Scale(Camera.current.transform.position, (Vector2.one - m_parallaxFactor))); //apply parallax
             Rect rBound = new Rect(MapBounds.min, MapBounds.size);
             HandlesEx.DrawRectWithOutline(transform, rBound, new Color(0, 0, 0, 0), new Color(1, 1, 1, 0.5f));
 
@@ -464,8 +513,10 @@ namespace CreativeSpore.SuperTilemapEditor
             }
 
             //Draw Chunk Colliders
-            foreach (TilemapChunk chunk in m_dicChunkCache.Values)
+            var valueIter = m_dicChunkCache.Values.GetEnumerator();
+            while (valueIter.MoveNext())
             {
+                TilemapChunk chunk = valueIter.Current;
                 if (chunk)
                 {
                     string[] asChunkCoords = chunk.name.Split(new char[] { '_' }, System.StringSplitOptions.RemoveEmptyEntries);
@@ -477,7 +528,7 @@ namespace CreativeSpore.SuperTilemapEditor
                 }
             }
             //
-
+            transform.position = savedPos; // restore position
         }
 #endif
         #endregion
@@ -492,8 +543,10 @@ namespace CreativeSpore.SuperTilemapEditor
         public void Refresh(bool refreshMesh = true, bool refreshMeshCollider = true, bool refreshTileObjects = false, bool invalidateBrushes = false)
         {
             BuildTilechunkDictionary();
-            foreach (TilemapChunk chunk in m_dicChunkCache.Values)
+            var valueIter = m_dicChunkCache.Values.GetEnumerator();
+            while (valueIter.MoveNext())
             {
+                TilemapChunk chunk = valueIter.Current;
                 if (chunk)
                 {
                     if (refreshMesh) chunk.InvalidateMesh();
@@ -513,8 +566,10 @@ namespace CreativeSpore.SuperTilemapEditor
             Bounds mapBounds = new Bounds();
             Vector2 halfCellSize = CellSize / 2f; // used to avoid precission errors
             m_maxGridX = m_maxGridY = m_minGridX = m_minGridY = 0;
-            foreach (TilemapChunk chunk in m_dicChunkCache.Values)
+            var valueIter = m_dicChunkCache.Values.GetEnumerator();
+            while (valueIter.MoveNext())
             {
+                TilemapChunk chunk = valueIter.Current;
                 if (chunk)
                 {
                     Bounds tilechunkBounds = chunk.GetBounds();
@@ -557,6 +612,80 @@ namespace CreativeSpore.SuperTilemapEditor
         }
 
         /// <summary>
+        /// Clear color channel from all tilemap chunks
+        /// </summary>
+        public void ClearColorChannel()
+        {
+            var valueIter = m_dicChunkCache.Values.GetEnumerator();
+            while (valueIter.MoveNext())
+            {
+                TilemapChunk chunk = valueIter.Current;
+                if (chunk)
+                {
+                    chunk.ClearColorChannel();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Set a tile color using a tilemap local position
+        /// </summary>
+        /// <param name="vLocalPos"></param>
+        /// <param name="color"></param>
+        public void SetTileColor(Vector2 vLocalPos, Color32 color)
+        {
+            SetTileColor(vLocalPos, color, color, color, color);
+        }
+
+        /// <summary>
+        /// Set a tile color in the grid position
+        /// </summary>
+        /// <param name="gridX"></param>
+        /// <param name="gridY"></param>
+        /// <param name="color"></param>
+        public void SetTileColor( int gridX, int gridY, Color32 color)
+        {
+            SetTileColor(gridX, gridY, color, color, color, color);
+        }
+
+        /// <summary>
+        /// Set a tile color using a tilemap local position
+        /// </summary>
+        /// <param name="vLocalPos"></param>
+        /// <param name="c0">Bottom left corner</param>
+        /// <param name="c1">Bottom right corner</param>
+        /// <param name="c2">Top left corner</param>
+        /// <param name="c3">Top right corner</param>
+        public void SetTileColor(Vector2 vLocalPos, Color32 c0, Color32 c1, Color32 c2, Color32 c3)
+        {
+            int gridX = BrushUtil.GetGridX(vLocalPos, CellSize);
+            int gridY = BrushUtil.GetGridY(vLocalPos, CellSize);
+            SetTileColor(gridX, gridY, c0, c1, c2, c3);
+        }
+
+        /// <summary>
+        /// Set a tile color in the grid position
+        /// </summary>
+        /// <param name="gridX"></param>
+        /// <param name="gridY"></param>
+        /// <param name="c0">Bottom left corner</param>
+        /// <param name="c1">Bottom right corner</param>
+        /// <param name="c2">Top left corner</param>
+        /// <param name="c3">Top right corner</param>
+        public void SetTileColor( int gridX, int gridY, Color32 c0, Color32 c1, Color32 c2, Color32 c3)
+        {
+            TilemapChunk chunk = GetOrCreateTileChunk(gridX, gridY, true);
+            int chunkGridX = (gridX < 0 ? -gridX - 1 : gridX) % k_chunkSize;
+            int chunkGridY = (gridY < 0 ? -gridY - 1 : gridY) % k_chunkSize;
+            if (gridX < 0) chunkGridX = k_chunkSize - 1 - chunkGridX;
+            if (gridY < 0) chunkGridY = k_chunkSize - 1 - chunkGridY;
+            if (m_allowPaintingOutOfBounds || (gridX >= m_minGridX && gridX <= m_maxGridX && gridY >= m_minGridY && gridY <= m_maxGridY))
+            {
+                chunk.SetTileColor(chunkGridX, chunkGridY, c0, c1, c2, c3);
+            }
+        }
+
+        /// <summary>
         /// Set a tile data using a tilemap local position
         /// </summary>
         /// <param name="vLocalPos"></param>
@@ -584,7 +713,9 @@ namespace CreativeSpore.SuperTilemapEditor
             if (m_allowPaintingOutOfBounds || (gridX >= m_minGridX && gridX <= m_maxGridX && gridY >= m_minGridY && gridY <= m_maxGridY))
             {
                 chunk.SetTileData(chunkGridX, chunkGridY, tileData);
+#if UNITY_EDITOR
                 m_markSceneDirtyOnNextUpdateMesh = true;
+#endif
                 // Update map bounds
                 //if (tileData != Tileset.k_TileData_Empty) // commented to update the brush bounds when copying empty tiles
                 {
@@ -597,6 +728,13 @@ namespace CreativeSpore.SuperTilemapEditor
             }
         }
 
+        /// <summary>
+        /// Set a tile data at the local position
+        /// </summary>
+        /// <param name="vLocalPos"></param>
+        /// <param name="tileId"></param>
+        /// <param name="brushId"></param>
+        /// <param name="flags"></param>
         public void SetTileData(Vector2 vLocalPos, int tileId, int brushId = Tileset.k_BrushId_Default, eTileFlags flags = eTileFlags.None)
         {
             int gridX = BrushUtil.GetGridX(vLocalPos, CellSize);
@@ -604,17 +742,34 @@ namespace CreativeSpore.SuperTilemapEditor
             SetTileData(gridX, gridY, tileId, brushId, flags);
         }
 
+        /// <summary>
+        /// Set a tile data at the grid position
+        /// </summary>
+        /// <param name="gridX"></param>
+        /// <param name="gridY"></param>
+        /// <param name="tileId"></param>
+        /// <param name="brushId"></param>
+        /// <param name="flags"></param>
         public void SetTileData(int gridX, int gridY, int tileId, int brushId = Tileset.k_BrushId_Default, eTileFlags flags = eTileFlags.None)
         {
             uint tileData = ((uint)flags << 28) | (((uint)brushId << 16) & Tileset.k_TileDataMask_BrushId) | ((uint)tileId & Tileset.k_TileDataMask_TileId);
             SetTileData(gridX, gridY, tileData);
         }
 
+        /// <summary>
+        /// Erase the tile placed at the local position
+        /// </summary>
+        /// <param name="vLocalPos"></param>
         public void Erase(Vector2 vLocalPos)
         {
             SetTileData( vLocalPos, Tileset.k_TileData_Empty );
         }
 
+        /// <summary>
+        /// Erase the tile placed at the grid position
+        /// </summary>
+        /// <param name="gridX"></param>
+        /// <param name="gridY"></param>
         public void Erase(int gridX, int gridY)
         {
             SetTileData(gridX, gridY, Tileset.k_TileData_Empty);
@@ -688,6 +843,7 @@ namespace CreativeSpore.SuperTilemapEditor
             m_markForUpdateMesh = true;
         }
 
+        static List<TilemapChunk> s_chunkList = new List<TilemapChunk>(50);
         /// <summary>
         /// Update the render mesh and mesh collider of all tile chunks. This should be called once after making all modifications to the tilemap with SetTileData.
         /// </summary>
@@ -707,9 +863,11 @@ namespace CreativeSpore.SuperTilemapEditor
 
             RecalculateMapBounds();
 
-            List<TilemapChunk> chunkList = new List<TilemapChunk>(m_dicChunkCache.Values.Count);
-            foreach (TilemapChunk chunk in m_dicChunkCache.Values)
+            s_chunkList.Clear();
+            var valueIter = m_dicChunkCache.Values.GetEnumerator();
+            while (valueIter.MoveNext())
             {
+                TilemapChunk chunk = valueIter.Current;
                 if (chunk)
                 {
                     if (!chunk.UpdateMesh())
@@ -730,7 +888,7 @@ namespace CreativeSpore.SuperTilemapEditor
                     else
                     {
                         //chunk.UpdateColliderMesh();
-                        chunkList.Add(chunk);
+                        s_chunkList.Add(chunk);
                     }
                 }
             }
@@ -740,9 +898,9 @@ namespace CreativeSpore.SuperTilemapEditor
 
             // UpdateColliderMesh is called after calling UpdateMesh of all tilechunks, because UpdateColliderMesh needs the tileId to be updated 
             // ( remember a brush sets neighbours tile id to empty, so UpdateColliderMesh won't be able to know the collider type )
-            for (int i = 0; i < chunkList.Count; ++i)
+            for (int i = 0; i < s_chunkList.Count; ++i)
             {
-                chunkList[i].UpdateColliders();
+                s_chunkList[i].UpdateColliders();
             }
 
             if (OnMeshUpdated != null) OnMeshUpdated(this);
@@ -769,8 +927,10 @@ namespace CreativeSpore.SuperTilemapEditor
             m_mapBounds.Encapsulate(maxTilePos + CellSize);
             if (savedSize != m_mapBounds.size)
             {
-                foreach (TilemapChunk chunk in m_dicChunkCache.Values)
+                var valueIter = m_dicChunkCache.Values.GetEnumerator();
+                while (valueIter.MoveNext())
                 {
+                    TilemapChunk chunk = valueIter.Current;
                     if (chunk)
                     {
                         chunk.InvalidateBrushes();
@@ -807,7 +967,7 @@ namespace CreativeSpore.SuperTilemapEditor
                         && (flippedTileData & Tileset.k_TileDataMask_BrushId) == 0 // don't activate flip flags on brushes
                         )
                     {
-                        flippedTileData ^= Tileset.k_TileFlag_FlipV;
+                        flippedTileData = TilesetBrush.ApplyAndMergeTileFlags(flippedTileData, Tileset.k_TileFlag_FlipV);
                     }
                     SetTileData(gx, gy, flippedTileData);
                 }
@@ -842,7 +1002,7 @@ namespace CreativeSpore.SuperTilemapEditor
                         && (flippedTileData & Tileset.k_TileDataMask_BrushId) == 0 // don't activate flip flags on brushes
                         )
                     {
-                        flippedTileData ^= Tileset.k_TileFlag_FlipH;
+                        flippedTileData = TilesetBrush.ApplyAndMergeTileFlags(flippedTileData, Tileset.k_TileFlag_FlipH);
                     }
                     SetTileData(gx, gy, flippedTileData);
                 }
@@ -882,17 +1042,7 @@ namespace CreativeSpore.SuperTilemapEditor
                         && (flippedTileData & Tileset.k_TileDataMask_BrushId) == 0 // don't activate flip flags on brushes
                         )
                     {
-                        bool rot90 = (flippedTileData & Tileset.k_TileFlag_Rot90) != 0;
-                        if (!rot90)
-                        {
-                            flippedTileData ^= Tileset.k_TileFlag_Rot90;
-                        }
-                        else
-                        {
-                            flippedTileData ^= Tileset.k_TileFlag_Rot90;
-                            flippedTileData ^= Tileset.k_TileFlag_FlipH;
-                            flippedTileData ^= Tileset.k_TileFlag_FlipV;
-                        }
+                        flippedTileData = TilesetBrush.ApplyAndMergeTileFlags(flippedTileData, Tileset.k_TileFlag_Rot90);
                     }
                     SetTileData(gx, gy, flippedTileData);
                 }

@@ -429,6 +429,8 @@ namespace CreativeSpore.SuperTilemapEditor
             }
             tilemap.IsUndoEnabled = IsUndoEnabled;
             int dstGy = BrushUtil.GetGridY(localPos, tilemap.CellSize);
+            bool doPaintEmpty = m_brushTilemap.GridWidth == 1 && m_brushTilemap.GridHeight == 1 // don't copy empty tiles
+                        || m_brushPattern != null && m_brushPattern.GetLength(0) == 1 && m_brushPattern.GetLength(1) == 1;// unless the brush size is one
             for (int gridY = minGridY; gridY <= maxGridY; ++gridY, ++dstGy)
             {
                 int dstGx = BrushUtil.GetGridX(localPos, tilemap.CellSize);
@@ -436,8 +438,8 @@ namespace CreativeSpore.SuperTilemapEditor
                 {
                     uint tileData = m_brushTilemap.GetTileData(gridX, gridY);
                     if (
-                        tileData != Tileset.k_TileData_Empty // don't copy empty tiles
-                        || m_brushTilemap.GridWidth == 1 && m_brushTilemap.GridHeight == 1 // unless the brush size is one
+                        doPaintEmpty ||
+                        tileData != Tileset.k_TileData_Empty
                         )
                     {
                         tilemap.SetTileData(dstGx, dstGy, tileData);

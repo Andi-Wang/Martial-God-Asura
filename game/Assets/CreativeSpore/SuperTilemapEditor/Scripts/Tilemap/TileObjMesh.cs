@@ -59,15 +59,16 @@ namespace CreativeSpore.SuperTilemapEditor
             }
         }
 
-        protected virtual void OnTilePrefabCreation(TilemapChunk.OnTilePrefabCreationData data)
+        public bool SetRenderTile(Tilemap tilemap, uint tileData)
         {
-            Tile tile = data.ParentTilemap.GetTile(data.GridX, data.GridY);
+            m_parentTilemap = tilemap;
+            Tile tile = tilemap.Tileset.GetTile(Tileset.GetTileIdFromTileData(tileData));
             if (tile != null)
             {
-                m_meshRenderer.material = data.ParentTilemap.Material;
-                m_meshRenderer.sortingLayerID = data.ParentTilemap.SortingLayerID;
-                m_meshRenderer.sortingOrder = data.ParentTilemap.OrderInLayer;
-                Vector2 cellSizeDiv2 = data.ParentTilemap.CellSize / 2f;
+                m_meshRenderer.material = tilemap.Material;
+                m_meshRenderer.sortingLayerID = tilemap.SortingLayerID;
+                m_meshRenderer.sortingOrder = tilemap.OrderInLayer;
+                Vector2 cellSizeDiv2 = tilemap.CellSize / 2f;
                 Vector3[] vertices = new Vector3[4]
                 {
                     new Vector3(-cellSizeDiv2.x, -cellSizeDiv2.y, 0),
@@ -75,7 +76,7 @@ namespace CreativeSpore.SuperTilemapEditor
                     new Vector3(-cellSizeDiv2.x, cellSizeDiv2.y, 0),
                     new Vector3(cellSizeDiv2.x, cellSizeDiv2.y, 0),
                 };
-                int[] triangles = new int[]{3,0,2,0,3,1};
+                int[] triangles = new int[] { 3, 0, 2, 0, 3, 1 };
                 Vector2[] uvs = new Vector2[]
                 {
                     new Vector2(tile.uv.xMin, tile.uv.yMin),
@@ -92,7 +93,14 @@ namespace CreativeSpore.SuperTilemapEditor
                 mesh.triangles = triangles;
                 mesh.uv = uvs;
                 mesh.RecalculateNormals();
+                return true;
             }
+            return false;
+        }
+
+        protected virtual void OnTilePrefabCreation(TilemapChunk.OnTilePrefabCreationData data)
+        {
+            SetRenderTile(data.ParentTilemap, data.ParentTilemap.GetTileData(data.GridX, data.GridY));
         }
 
         Material FindDefaultSpriteMaterial()

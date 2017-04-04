@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿// This is causing some errors with 2D colliders, enable it under your own responsibility
+//#define ENABLE_MERGED_SUBTILE_COLLIDERS
+
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,8 +37,8 @@ namespace CreativeSpore.SuperTilemapEditor
             {
                 ParentTilemap = transform.parent.GetComponent<Tilemap>();
             }
-            gameObject.layer = ParentTilemap.gameObject.layer;
-
+            if (gameObject.layer != ParentTilemap.gameObject.layer)
+                gameObject.layer = ParentTilemap.gameObject.layer;
 
             //+++ Free unused resources
             if (ParentTilemap.ColliderType != eColliderType._3D)
@@ -50,6 +53,7 @@ namespace CreativeSpore.SuperTilemapEditor
             }
 
             //if (ParentTilemap.ColliderType != eColliderType._2D)
+            if(m_needsRebuildColliders)
             {
                 if (m_has2DColliders)
                 {
@@ -183,105 +187,121 @@ namespace CreativeSpore.SuperTilemapEditor
                         Tile tile = Tileset.GetTile(tileId);
                         if (tile != null)
                         {
+#if ENABLE_MERGED_SUBTILE_COLLIDERS
+                            TilesetBrush brush = ParentTilemap.Tileset.FindBrush(Tileset.GetBrushIdFromTileData(tileData));
+                            Vector2[] subTileMergedColliderVertices = brush ? brush.GetMergedSubtileColliderVertices(ParentTilemap, GridPosX + tx, GridPosY + ty, tileData) : null;
+#else
+                            Vector2[] subTileMergedColliderVertices = null;
+#endif
+                            bool hasMergedColliders = subTileMergedColliderVertices != null;
+
                             TileColliderData tileCollData = tile.collData;
-                            if (tileCollData.type != eTileCollider.None)
+                            if (tileCollData.type != eTileCollider.None || hasMergedColliders)
                             {
-                                if ((tileData & (Tileset.k_TileFlag_FlipH | Tileset.k_TileFlag_FlipV | Tileset.k_TileFlag_Rot90)) != 0)
-                                {
-                                    tileCollData = tileCollData.Clone();
-                                    tileCollData.ApplyFlippingFlags(tileData);                                    
-                                }
                                 isEmpty = false;
                                 int neighborCollFlags = 0; // don't remove, even using neighborTileCollData, neighborTileCollData is not filled if tile is empty
                                 bool isSurroundedByFullColliders = true;
-                                System.Array.Clear(s_neighborSegmentMinMax, 0, s_neighborSegmentMinMax.Length);
-                                System.Array.Clear(neighborTileCollData, 0, neighborTileCollData.Length);
-                                for (int i = 0; i < 4; ++i)
+                                for (int i = 0; i < s_neighborSegmentMinMax.Length; ++i)
                                 {
-                                    uint neighborTileData;
-                                    bool isTriggerOrPolygon = ParentTilemap.IsTrigger || 
-                                        ParentTilemap.ColliderType == eColliderType._2D && 
-                                        ParentTilemap.Collider2DType == e2DColliderType.PolygonCollider2D;
-                                    switch (i)
+                                    s_neighborSegmentMinMax[i].x = float.MaxValue;
+                                    s_neighborSegmentMinMax[i].y = float.MinValue;
+                                }
+                                System.Array.Clear(neighborTileCollData, 0, neighborTileCollData.Length);
+
+                                if (!hasMergedColliders)
+                                {
+                                    if ((tileData & (Tileset.k_TileFlag_FlipH | Tileset.k_TileFlag_FlipV | Tileset.k_TileFlag_Rot90)) != 0)
                                     {
-                                        case 0:  // Up Tile
-                                            neighborTileData = (tileIdx + m_width) < m_tileDataList.Count ? 
-                                            m_tileDataList[tileIdx + m_width]
-                                            :
-                                            isTriggerOrPolygon? Tileset.k_TileData_Empty : ParentTilemap.GetTileData( GridPosX + tx, GridPosY + ty + 1); break;
-                                        case 1: // Right Tile
-                                            neighborTileData = (tileIdx + 1) % m_width != 0 ? //(tileIdx + 1) < m_tileDataList.Count ? 
-                                            m_tileDataList[tileIdx + 1]
-                                            :
-                                            isTriggerOrPolygon? Tileset.k_TileData_Empty : ParentTilemap.GetTileData(GridPosX + tx + 1, GridPosY + ty); break;
-                                        case 2: // Down Tile
-                                            neighborTileData = tileIdx >= m_width ? 
-                                            m_tileDataList[tileIdx - m_width]
-                                            :
-                                            isTriggerOrPolygon? Tileset.k_TileData_Empty : ParentTilemap.GetTileData(GridPosX + tx, GridPosY + ty - 1); break;  
-                                        case 3: // Left Tile
-                                            neighborTileData = tileIdx % m_width != 0 ? //neighborTileId = tileIdx >= 1 ? 
-                                            m_tileDataList[tileIdx - 1]
-                                            :
-                                            isTriggerOrPolygon? Tileset.k_TileData_Empty : ParentTilemap.GetTileData(GridPosX + tx - 1, GridPosY + ty); break;
-                                        default: neighborTileData = Tileset.k_TileData_Empty; break;
+                                        tileCollData = tileCollData.Clone();
+                                        tileCollData.ApplyFlippingFlags(tileData);
                                     }
-
-                                    int neighborTileId = (int)(neighborTileData & Tileset.k_TileDataMask_TileId);
-                                    if (neighborTileId != Tileset.k_TileId_Empty)
+                                    for (int i = 0; i < 4; ++i)
                                     {
-                                        Vector2 segmentMinMax;
-                                        TileColliderData neighborTileCollider;
-                                        neighborTileCollider = Tileset.Tiles[neighborTileId].collData;
-                                        if ((neighborTileData & (Tileset.k_TileFlag_FlipH | Tileset.k_TileFlag_FlipV | Tileset.k_TileFlag_Rot90)) != 0)
+                                        uint neighborTileData;
+                                        bool isTriggerOrPolygon = ParentTilemap.IsTrigger ||
+                                            ParentTilemap.ColliderType == eColliderType._2D &&
+                                            ParentTilemap.Collider2DType == e2DColliderType.PolygonCollider2D;
+                                        switch (i)
                                         {
-                                            neighborTileCollider = neighborTileCollider.Clone();
-                                            if ((neighborTileData & Tileset.k_TileFlag_FlipH) != 0) neighborTileCollider.FlipH();
-                                            if ((neighborTileData & Tileset.k_TileFlag_FlipV) != 0) neighborTileCollider.FlipV();
-                                            if ((neighborTileData & Tileset.k_TileFlag_Rot90) != 0) neighborTileCollider.Rot90();
+                                            case 0:  // Up Tile
+                                                neighborTileData = (tileIdx + m_width) < m_tileDataList.Count ?
+                                                m_tileDataList[tileIdx + m_width]
+                                                :
+                                                isTriggerOrPolygon ? Tileset.k_TileData_Empty : ParentTilemap.GetTileData(GridPosX + tx, GridPosY + ty + 1); break;
+                                            case 1: // Right Tile
+                                                neighborTileData = (tileIdx + 1) % m_width != 0 ? //(tileIdx + 1) < m_tileDataList.Count ? 
+                                                m_tileDataList[tileIdx + 1]
+                                                :
+                                                isTriggerOrPolygon ? Tileset.k_TileData_Empty : ParentTilemap.GetTileData(GridPosX + tx + 1, GridPosY + ty); break;
+                                            case 2: // Down Tile
+                                                neighborTileData = tileIdx >= m_width ?
+                                                m_tileDataList[tileIdx - m_width]
+                                                :
+                                                isTriggerOrPolygon ? Tileset.k_TileData_Empty : ParentTilemap.GetTileData(GridPosX + tx, GridPosY + ty - 1); break;
+                                            case 3: // Left Tile
+                                                neighborTileData = tileIdx % m_width != 0 ? //neighborTileId = tileIdx >= 1 ? 
+                                                m_tileDataList[tileIdx - 1]
+                                                :
+                                                isTriggerOrPolygon ? Tileset.k_TileData_Empty : ParentTilemap.GetTileData(GridPosX + tx - 1, GridPosY + ty); break;
+                                            default: neighborTileData = Tileset.k_TileData_Empty; break;
                                         }
-                                        neighborTileCollData[i] = neighborTileCollider;
-                                        isSurroundedByFullColliders &= (neighborTileCollider.type == eTileCollider.Full);
 
-                                        if (neighborTileCollider.type == eTileCollider.None)
+                                        int neighborTileId = (int)(neighborTileData & Tileset.k_TileDataMask_TileId);
+                                        if (neighborTileId != Tileset.k_TileId_Empty)
                                         {
-                                            segmentMinMax = new Vector2(float.MaxValue, float.MinValue); //NOTE: x will be min, y will be max
-                                        }
-                                        else if (neighborTileCollider.type == eTileCollider.Full)
-                                        {
-                                            segmentMinMax = new Vector2(0f, 1f); //NOTE: x will be min, y will be max
-                                            neighborCollFlags |= (1 << i);
-                                        }
-                                        else
-                                        {
-                                            segmentMinMax = new Vector2(float.MaxValue, float.MinValue); //NOTE: x will be min, y will be max
-                                            neighborCollFlags |= (1 << i);
-                                            for (int j = 0; j < neighborTileCollider.vertices.Length; ++j)
+                                            Vector2 segmentMinMax;
+                                            TileColliderData neighborTileCollider;
+                                            neighborTileCollider = Tileset.Tiles[neighborTileId].collData;
+                                            if ((neighborTileData & (Tileset.k_TileFlag_FlipH | Tileset.k_TileFlag_FlipV | Tileset.k_TileFlag_Rot90)) != 0)
                                             {
-                                                Vector2 v = neighborTileCollider.vertices[j];
+                                                neighborTileCollider = neighborTileCollider.Clone();
+                                                if ((neighborTileData & Tileset.k_TileFlag_FlipH) != 0) neighborTileCollider.FlipH();
+                                                if ((neighborTileData & Tileset.k_TileFlag_FlipV) != 0) neighborTileCollider.FlipV();
+                                                if ((neighborTileData & Tileset.k_TileFlag_Rot90) != 0) neighborTileCollider.Rot90();
+                                            }
+                                            neighborTileCollData[i] = neighborTileCollider;
+                                            isSurroundedByFullColliders &= (neighborTileCollider.type == eTileCollider.Full);
+
+                                            if (neighborTileCollider.type == eTileCollider.None)
+                                            {
+                                                segmentMinMax = new Vector2(float.MaxValue, float.MinValue); //NOTE: x will be min, y will be max
+                                            }
+                                            else if (neighborTileCollider.type == eTileCollider.Full)
+                                            {
+                                                segmentMinMax = new Vector2(0f, 1f); //NOTE: x will be min, y will be max
+                                                neighborCollFlags |= (1 << i);
+                                            }
+                                            else
+                                            {
+                                                segmentMinMax = new Vector2(float.MaxValue, float.MinValue); //NOTE: x will be min, y will be max
+                                                neighborCollFlags |= (1 << i);
+                                                for (int j = 0; j < neighborTileCollider.vertices.Length; ++j)
                                                 {
-                                                    if (i == 0 && v.y == 0 || i == 2 && v.y == 1) //Top || Bottom
+                                                    Vector2 v = neighborTileCollider.vertices[j];
                                                     {
-                                                        if (v.x < segmentMinMax.x) segmentMinMax.x = v.x;
-                                                        if (v.x > segmentMinMax.y) segmentMinMax.y = v.x;
-                                                    }
-                                                    else if (i == 1 && v.x == 0 || i == 3 && v.x == 1) //Right || Left
-                                                    {
-                                                        if (v.y < segmentMinMax.x) segmentMinMax.x = v.y;
-                                                        if (v.y > segmentMinMax.y) segmentMinMax.y = v.y;
+                                                        if (i == 0 && v.y == 0 || i == 2 && v.y == 1) //Top || Bottom
+                                                        {
+                                                            if (v.x < segmentMinMax.x) segmentMinMax.x = v.x;
+                                                            if (v.x > segmentMinMax.y) segmentMinMax.y = v.x;
+                                                        }
+                                                        else if (i == 1 && v.x == 0 || i == 3 && v.x == 1) //Right || Left
+                                                        {
+                                                            if (v.y < segmentMinMax.x) segmentMinMax.x = v.y;
+                                                            if (v.y > segmentMinMax.y) segmentMinMax.y = v.y;
+                                                        }
                                                     }
                                                 }
                                             }
+                                            s_neighborSegmentMinMax[i] = segmentMinMax;
                                         }
-                                        s_neighborSegmentMinMax[i] = segmentMinMax;
-                                    }
-                                    else
-                                    {
-                                        isSurroundedByFullColliders = false;
+                                        else
+                                        {
+                                            isSurroundedByFullColliders = false;
+                                        }
                                     }
                                 }
                                 // Create Mesh Colliders
-                                if (isSurroundedByFullColliders)
+                                if (isSurroundedByFullColliders && !hasMergedColliders)
                                 {
                                     //Debug.Log(" Surrounded! " + tileIdx);
                                 }
@@ -289,11 +309,15 @@ namespace CreativeSpore.SuperTilemapEditor
                                 {                                    
                                     float px0 = tx * CellSize.x;
                                     float py0 = ty * CellSize.y;
-                                    Vector2[] collVertices = tileCollData.type == eTileCollider.Full ? s_fullCollTileVertices : tileCollData.vertices;
+                                    Vector2[] collVertices = subTileMergedColliderVertices;                                    
+                                    if (!hasMergedColliders)
+                                        collVertices = tileCollData.type == eTileCollider.Full ? s_fullCollTileVertices : tileCollData.vertices;
+                                                                       
                                     for (int i = 0; i < collVertices.Length; ++i)
                                     {
                                         Vector2 s0 = collVertices[i];
                                         Vector2 s1 = collVertices[i == (collVertices.Length - 1) ? 0 : i + 1];
+                                        if (hasMergedColliders) ++i; // add ++i; in this case to go 2 by 2 because the collVertices for merged colliders will have the segments in pairs
 
                                         // full collider optimization
                                         if ((tileCollData.type == eTileCollider.Full) &&
@@ -437,12 +461,15 @@ namespace CreativeSpore.SuperTilemapEditor
                                                     {
                                                         LinkedList<Vector2> segmentToMerge = s_openEdges[segmentIdxToMerge];
                                                         if (s0 == segmentToMerge.First.Value)
+                                                        {
                                                             for (LinkedListNode<Vector2> node = segmentToMerge.First.Next; node != null; node = node.Next)
                                                                 edgeSegments.AddLast(node.Value);
+                                                            s_openEdges.RemoveAt(segmentIdxToMerge);
+                                                        }
+                                                        /* Cannot join head with head or tail with tail, it will change the segment normal
                                                         else
                                                             for (LinkedListNode<Vector2> node = segmentToMerge.Last.Previous; node != null; node = node.Previous)
-                                                                edgeSegments.AddLast(node.Value);
-                                                        s_openEdges.RemoveAt(segmentIdxToMerge);
+                                                                edgeSegments.AddLast(node.Value);*/
                                                     }
                                                     else
                                                     {
@@ -451,59 +478,25 @@ namespace CreativeSpore.SuperTilemapEditor
                                                     }
                                                     ++linkedSegments;
                                                 }
-                                                else if( edgeSegments.Last.Value == s1 )
-                                                {
-                                                    if (segmentIdxToMerge >= 0)
-                                                    {
-                                                        LinkedList<Vector2> segmentToMerge = s_openEdges[segmentIdxToMerge];
-                                                        if (s1 == segmentToMerge.First.Value)
-                                                            for (LinkedListNode<Vector2> node = segmentToMerge.First.Next; node != null; node = node.Next)
-                                                                edgeSegments.AddLast(node.Value);
-                                                        else
-                                                            for (LinkedListNode<Vector2> node = segmentToMerge.Last.Previous; node != null; node = node.Previous)
-                                                                edgeSegments.AddLast(node.Value);
-                                                        s_openEdges.RemoveAt(segmentIdxToMerge);
-                                                    }
-                                                    else
-                                                    {
-                                                        segmentIdxToMerge = edgeIdx;
-                                                        edgeSegments.AddLast(s0);
-                                                    }
-                                                    ++linkedSegments;
-                                                }
-                                                else if (edgeSegments.First.Value == s0)
-                                                {
-                                                    if (segmentIdxToMerge >= 0)
-                                                    {
-                                                        LinkedList<Vector2> segmentToMerge = s_openEdges[segmentIdxToMerge];
-                                                        if (s0 == segmentToMerge.Last.Value)
-                                                            for (LinkedListNode<Vector2> node = edgeSegments.First.Next; node != null; node = node.Next)
-                                                                segmentToMerge.AddLast(node.Value);
-                                                        else
-                                                            for (LinkedListNode<Vector2> node = edgeSegments.Last.Previous; node != null; node = node.Previous)
-                                                                segmentToMerge.AddLast(node.Value);
-                                                        s_openEdges.RemoveAt(edgeIdx);
-                                                    }
-                                                    else
-                                                    {
-                                                        segmentIdxToMerge = edgeIdx;
-                                                        edgeSegments.AddFirst(s1);
-                                                    }
-                                                    ++linkedSegments;
-                                                }
+                                                /* Cannot join head with head or tail with tail, it will change the segment normal
+                                                else if( edgeSegments.Last.Value == s1 )                                                
+                                                else if (edgeSegments.First.Value == s0)*/                                                
                                                 else if (edgeSegments.First.Value == s1)
                                                 {
                                                     if (segmentIdxToMerge >= 0)
                                                     {
                                                         LinkedList<Vector2> segmentToMerge = s_openEdges[segmentIdxToMerge];
                                                         if (s1 == segmentToMerge.Last.Value)
+                                                        { 
                                                             for (LinkedListNode<Vector2> node = edgeSegments.First.Next; node != null; node = node.Next)
                                                                 segmentToMerge.AddLast(node.Value);
+                                                            s_openEdges.RemoveAt(edgeIdx);
+                                                        }
+                                                        /* Cannot join head with head or tail with tail, it will change the segment normal
                                                         else
-                                                            for (LinkedListNode<Vector2> node = edgeSegments.Last.Previous; node != null; node = node.Previous)
-                                                                segmentToMerge.AddLast(node.Value);
-                                                        s_openEdges.RemoveAt(edgeIdx);
-                                                    }
+                                                            for (LinkedListNode<Vector2> node = edgeSegments.First.Next; node != null; node = node.Next)
+                                                                segmentToMerge.AddFirst(node.Value);*/
+                                            }
                                                     else
                                                     {
                                                         segmentIdxToMerge = edgeIdx;
