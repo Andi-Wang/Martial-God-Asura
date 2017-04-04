@@ -19,26 +19,13 @@ public class UnlockLadder : MonoBehaviour {
         animating = false;
         unlockable = true;
     }
-
-    void Update()
-    {
-        if (unlockable && Input.GetButtonUp("Interact") && entered && !animating)
-        {
-            anim.SetTrigger("LadderUnlock" + ladderId);
-            animating = true;
-        }
-    }
-
-    // Update is called once per frame
-    void OnTriggerEnter2D (Collider2D other) {
-	    if (other.tag == "Player" && !ladder.activeInHierarchy)
-        {
-            entered = true;
-        }
-	}
     
-    void OnTriggerExit2D(Collider2D other)
+    void OnTriggerStay2D(Collider2D other)
     {
-        entered = false;
+        if (unlockable && other.tag == "Player" && Input.GetButtonDown("Interact"))
+        {
+            animating = true;
+            anim.SetTrigger("LadderUnlock" + ladderId);
+        }
     }
 }
