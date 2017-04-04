@@ -81,7 +81,7 @@ public class Enemy : MonoBehaviour
     private Vector3 playerPrevPos;
     private Image healthbar;
     public Animator animator;                          //Variable of type Animator to store a reference to the enemy's Animator component.
-    public bool isDead { get; private set; }
+    public bool isDead { get; protected set; }
     public Rigidbody2D rb2D;
     private bool e_FacingRight = true;
     private Vector3 startingLoc;
@@ -154,7 +154,8 @@ public class Enemy : MonoBehaviour
             changeState(chaseState);
         }
 
-        animator.SetBool("Moving", true);
+        if (animator.GetBool("Moving"))
+            animator.SetBool("Moving", true);
         healthbar = transform.FindChild("EnemyCanvas").FindChild("Healthbar").FindChild("Health").GetComponent<Image>();
 
         //if (isGhost)
@@ -371,7 +372,7 @@ public class Enemy : MonoBehaviour
         }
         else
             animator.SetTrigger("Dead");
-
+        Debug.Log("isdead" + gameObject.name);
         Invoke("killSelf", 2f);
        // enemyAudio.clip = deathClip;
         //enemyAudio.Play();

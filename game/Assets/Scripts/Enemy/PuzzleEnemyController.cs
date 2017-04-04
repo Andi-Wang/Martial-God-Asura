@@ -2,17 +2,18 @@
 using System.Collections;
 
 public class PuzzleEnemyController : Enemy {
-
-    public int puzzleRoom = 9;  // room ID for top floor
+    
     //private bool e_FacingRight = true;
 
     private bool caughtPlayer;
-
     
 
     void Awake()
     {
+        roomId = 9;  // room ID for top floor
+        enemyEntity = new Entity(startingHealth, 0f, 0f, 0f, 0f, 0f, 0f, 1f, 1f, 0f);
         caughtPlayer = false;
+        isDead = false;
         animator = GetComponent<Animator>();
         idleState = new IdleState();
         puzzlePatrolState = new PuzzlePatrolState();
@@ -29,7 +30,7 @@ public class PuzzleEnemyController : Enemy {
     void Update()
     {
         state.Execute();
-        if (GameManager.instance.currentRoom == puzzleRoom && !caughtPlayer)
+        if (GameManager.instance.currentRoom == roomId && !caughtPlayer)
         {
             changeState(puzzlePatrolState);
             
@@ -58,7 +59,7 @@ public class PuzzleEnemyController : Enemy {
             changeState(idleState);
             animator.SetBool("Moving", false);
 
-            GameManager.instance.ResetPuzzle(puzzleRoom);
+            GameManager.instance.ResetPuzzle(roomId);
 
             caughtPlayer = false;
         }
