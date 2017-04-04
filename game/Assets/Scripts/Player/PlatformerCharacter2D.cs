@@ -163,6 +163,7 @@ namespace UnityStandardAssets._2D {
 
         void Death()
         {
+            Flip();
             // Set the death flag so this function won't be called again.
             isDead = true;
 
