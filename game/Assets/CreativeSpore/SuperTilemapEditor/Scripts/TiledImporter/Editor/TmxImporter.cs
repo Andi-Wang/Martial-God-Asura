@@ -47,7 +47,8 @@ namespace CreativeSpore.TiledImporter
 
             //NOTE: calling this after PackTextures will make the atlasTexture to be null sometimes
             Tileset tilesetAsset = ScriptableObject.CreateInstance<Tileset>();
-            AssetDatabase.CreateAsset(tilesetAsset, Path.Combine(dstPath, tmxFileName + "Tileset.asset"));
+            string tilesetAssetPath = Path.Combine(dstPath, tmxFileName + "Tileset.asset");
+            AssetDatabase.CreateAsset(tilesetAsset, tilesetAssetPath);
             Texture2D atlasTexture;
             Rect[] tilesetRects;
             if (tilemap.DicTilesetTex2D.Values.Count == 1)
@@ -58,14 +59,16 @@ namespace CreativeSpore.TiledImporter
             else
             {
                 atlasTexture = new Texture2D(8192, 8192, TextureFormat.ARGB32, false, false);
-                tilesetRects = atlasTexture.PackTextures(tilemap.DicTilesetTex2D.Values.ToArray(), 0);
+                tilesetRects = atlasTexture.PackTextures(tilemap.DicTilesetTex2D.Values.ToArray(), 0, 8192);
             }
             string atlasPath = Path.GetDirectoryName(AssetDatabase.GetAssetPath(tilesetAsset)) + "/" + tmxFileName + "Atlas.png";
             AssetDatabase.CreateAsset(atlasTexture, atlasPath);
-            File.WriteAllBytes(atlasPath, atlasTexture.EncodeToPNG());            
+            File.WriteAllBytes(atlasPath, atlasTexture.EncodeToPNG());
             ImportTexture(atlasPath);
-            AssetDatabase.Refresh();            
-
+            AssetDatabase.Refresh();
+            
+            //NOTE: tilesetAsset is sometimes nulled after calling Refresh
+            tilesetAsset = AssetDatabase.LoadAssetAtPath<Tileset>(tilesetAssetPath);
             // Link Atlas with asset to be able to save it in the prefab
             tilesetAsset.AtlasTexture = (Texture2D)AssetDatabase.LoadAssetAtPath(atlasPath, typeof(Texture2D));
 
@@ -92,7 +95,27 @@ namespace CreativeSpore.TiledImporter
                 tilesetAsset.TileViews.Add(new TileView(tilesetTexture.name, tilesetSelection));
             }
             tilesetAsset.SetTiles(tileList);
+            //NOTE: sometimes, the asset is not saved, this makes sure tilesetAsset is saved with the new data
+            CreateOrReplaceAsset<Tileset>(tilesetAsset, tilesetAssetPath);
             return tilesetAsset;
+        }
+
+        // From: http://answers.unity3d.com/questions/24929/assetdatabase-replacing-an-asset-but-leaving-refer.html
+        public static T CreateOrReplaceAsset<T>(T asset, string path) where T : UnityEngine.Object
+        {
+            T existingAsset = (T)AssetDatabase.LoadAssetAtPath(path, typeof(T));
+
+            if (existingAsset == null)
+            {
+                AssetDatabase.CreateAsset(asset, path);
+                existingAsset = asset;
+            }
+            else
+            {
+                EditorUtility.CopySerialized(asset, existingAsset);
+            }
+
+            return existingAsset;
         }
 
         public static void ImportTmxIntoTheScene(Tileset tileset)
@@ -232,7 +255,7 @@ namespace CreativeSpore.TiledImporter
 #endif
                     textureImporter.textureType = TextureImporterType.Sprite;
 					textureImporter.maxTextureSize = 8192;                    
-					AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate); 
+					AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceSynchronousImport); 
 				}
 				return true;
 			}

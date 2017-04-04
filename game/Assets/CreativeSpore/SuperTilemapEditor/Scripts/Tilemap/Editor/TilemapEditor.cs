@@ -270,6 +270,8 @@ namespace CreativeSpore.SuperTilemapEditor
                 return;
             }
 
+            Vector3 savedPos = m_tilemap.transform.position;
+            m_tilemap.transform.position += (Vector3)(Vector2.Scale(Camera.current.transform.position, (Vector2.one - m_tilemap.ParallaxFactor))); //apply parallax
             m_brushVisible = s_editMode == eEditMode.Paint;
             if (s_editMode == eEditMode.Paint)
             {
@@ -296,6 +298,7 @@ namespace CreativeSpore.SuperTilemapEditor
                 DoColliderSceneGUI();
             }
             BrushBehaviour.SetVisible(m_brushVisible);
+            m_tilemap.transform.position = savedPos; // restore position
         }
 
         #endregion
@@ -503,6 +506,7 @@ namespace CreativeSpore.SuperTilemapEditor
             //---
 
             EditorGUILayout.PropertyField(serializedObject.FindProperty("m_tintColor"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("m_parallaxFactor"));
 
             //Pixel Snap
             if (m_tilemap.Material.HasProperty("PixelSnap"))
@@ -769,7 +773,7 @@ namespace CreativeSpore.SuperTilemapEditor
                                             int tileId = Tileset.GetTileIdFromTileData(tileData);
 
                                             // Select the copied tile in the tileset
-                                            if (brushId > 0 && !e.alt) //NOTE: if Alt is hold, the tile is selected instead
+                                            if (brushId > 0 && !e.alt) //NOTE: if Alt is held, the tile is selected instead
                                             {
                                                 m_tilemap.Tileset.SelectedBrushId = brushId;
                                             }
@@ -1152,8 +1156,8 @@ namespace CreativeSpore.SuperTilemapEditor
                 " - <b>Fill:</b>\t Double Click\n\n" +
                 " - <b>Copy</b> tiles by dragging and holding right mouse button\n\n" +
                 " - <b>Cut</b> copy while holding Shift key\n\n" +
-                " - <b>Select</b> a tile or brush by right clicking over the tile.\n    If ALT key is hold, the tile will be selected instead of the brush\n" +
-                " - <b>Select + " + sCtrl + "</b> to select the first tile not empty found\n in a tilemap group from bottom to top in the tilemap list.\n\n" +
+                " - <b>Select</b> a tile or brush by right clicking over the tile.\n    If ALT key is held, the tile will be selected instead of the brush\n" +
+                " - <b>Select + " + sCtrl + "</b> to select the first not empty tile found\n in a tilemap group from bottom to top of the tilemap list.\n\n" +
                 " - <b>Rotating and flipping:</b>\n" +
                 "   * <b>Rotate</b> ±90º by using <b>comma ','</b> and <b>period '.'</b>\n" +
                 "   * <b>Vertical Flip</b> by pressing X\n" +

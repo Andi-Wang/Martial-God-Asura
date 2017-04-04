@@ -1,3 +1,34 @@
+--- v1.4.3.2 ---
+- Added tile color channel (only by code to change the tile vertex color through the tilemap class using methods SetTileColor)
+- Fixed when changing the prefab data for a tile in the tile property window with a selection of tiles, the prefab is not set for all the tiles unless it was the modified property
+- Fixed bug with Animated and Random brush when changing the tiles in the list
+
+--- v1.4.3.1 ---
+- Fixed issues when using a bumped shader and directional light
+- Fixed importing sprites as tiles from a texture with multiple sprites
+- Fixed flags issue using Carpet and Road Brushes
+- Fixed Z position locked in tilemaps
+- Fixed some code errors when removing a brush
+- Fixed rotating tiles properly while painting a selection
+
+--- v1.4.3 ---
+- Added Autotiling section in Tile Property Window to change the tile autotiling group
+- Added Parallax Factor to tilemaps in Render section (Pixel Platform Demo has been updated to use this feature)
+- Added ChangeSpriteOnly attribute to TileObjectBehaviour to only change the sprite but not the layer and sorting layer
+- Added index accessor to ParameterContainer
+- Added an option in Tile Prefab section to display the prefab preview when there is a prefab attached.
+- Atlas Editor now saves an extra pixel when creating the final texture
+- Improved performance when calling UpdateMesh in a tilemap with 2D colliders
+- Removed some GC Allocations in Tilemap and TilemapChunk
+- Disabled merged subtile colliders by default. Uncomment the define ENABLE_MERGED_SUBTILE_COLLIDERS to enable it.
+- Default Inner Padding for new tilemaps is now 0 instead of 0.1 (use AtlasEditorWindow to extrude tiles to fix line artifacts)
+- Fixed bug when changing the atlas texture of a tileset for a texture set in multiple sprite mode with less than 2 sprites
+- Fixed m_markSceneDirtyOnNextUpdateMesh warning
+- Fixed Random Flags in RandomBrush ( Horizontal and Vertical Flip were swapped)
+- Fixed combine tile flags when a brush is using another brush to draw one of its tiles
+- Fixed some bugs related to collider 2D generation in tilemaps
+- Fixed issue when creating a tileset from a tmx file when the final atlas was bigger than 2048
+
 --- v1.4.2 ---
 - Added support for UNITY 5.5
 - Improved performance and reduced memory allocation when updating the tilemap

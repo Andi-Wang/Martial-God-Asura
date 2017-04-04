@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CreativeSpore.SuperTilemapEditor
 {
@@ -33,6 +34,47 @@ namespace CreativeSpore.SuperTilemapEditor
             m_needsRebuildMesh = true;
         }
 
+        public void ClearColorChannel()
+        {
+            m_tileColorList = null;
+        }
+
+        public void SetTileColor(Vector2 vLocalPos, Color32 c0, Color32 c1, Color32 c2, Color32 c3)
+        {
+            SetTileColor((int)(vLocalPos.x / CellSize.x), (int)(vLocalPos.y / CellSize.y), c0, c1, c2, c3);
+        }
+
+        public void SetTileColor(int locGridX, int locGridY, Color32 c0, Color32 c1, Color32 c2, Color32 c3)
+        {
+            if (locGridX >= 0 && locGridX < m_width && locGridY >= 0 && locGridY < m_height)
+            {
+                int tileIdx = locGridY * m_width + locGridX;
+                if (m_tileColorList == null || m_tileColorList.Count == 0)
+                {
+                    m_tileColorList = Enumerable.Repeat(new TileColor32(new Color32(0xff, 0xff, 0xff, 0xff)), m_tileDataList.Count).ToList();
+                }
+                m_tileColorList[tileIdx] = new TileColor32(c0, c1, c2, c3);
+            }
+        }
+
+        public void SetTileColor(Vector2 vLocalPos, Color32 color)
+        {
+            SetTileColor((int)(vLocalPos.x / CellSize.x), (int)(vLocalPos.y / CellSize.y), color);
+        }
+
+        public void SetTileColor(int locGridX, int locGridY, Color32 color)
+        {
+            if (locGridX >= 0 && locGridX < m_width && locGridY >= 0 && locGridY < m_height)
+            {
+                int tileIdx = locGridY * m_width + locGridX;
+                if (m_tileColorList == null || m_tileColorList.Count == 0)
+                {
+                    m_tileColorList = Enumerable.Repeat(new TileColor32(new Color32(0xff, 0xff, 0xff, 0xff)), m_tileDataList.Count).ToList();
+                }
+                m_tileColorList[tileIdx] = new TileColor32(color);
+            }
+        }
+
         private bool m_needsRebuildMesh = false;
         private bool m_invalidateBrushes = false;
         /// <summary>
@@ -46,7 +88,8 @@ namespace CreativeSpore.SuperTilemapEditor
                 if (transform.parent == null) gameObject.hideFlags = HideFlags.None; //Unhide orphan tilechunks. This shouldn't happen
                 ParentTilemap = transform.parent.GetComponent<Tilemap>();
             }
-            gameObject.layer = ParentTilemap.gameObject.layer;
+            if(gameObject.layer != ParentTilemap.gameObject.layer)
+                gameObject.layer = ParentTilemap.gameObject.layer;
             transform.localPosition = new Vector2(GridPosX * CellSize.x, GridPosY * CellSize.y);
 
             if (m_meshFilter.sharedMesh == null)
@@ -90,12 +133,21 @@ namespace CreativeSpore.SuperTilemapEditor
                     mesh.vertices = s_vertices.ToArray();
                     mesh.triangles = s_triangles.ToArray();
                     mesh.uv = m_uv.ToArray();
+                    if (s_colors32 != null && s_colors32.Count != 0)
+                        mesh.colors32 = s_colors32.ToArray();
+                    else
+                        mesh.colors32 = null;
 #else
                     mesh.SetVertices(s_vertices);
                     mesh.SetTriangles(s_triangles, 0);
                     mesh.SetUVs(0, m_uv);
+                    if (s_colors32 != null && s_colors32.Count != 0)
+                        mesh.SetColors(s_colors32);
+                    else
+                        mesh.colors32 = null;
 #endif
                     mesh.RecalculateNormals(); //NOTE: allow directional lights to work properly
+                    TangentSolver(mesh); //NOTE: allow bumped shaders to work with directional lights
                 }
                 else
                 {
@@ -104,6 +156,24 @@ namespace CreativeSpore.SuperTilemapEditor
             }
             return true;
         }
+
+        //ref: https://github.com/danielbuechele/SumoVizUnity/blob/master/Assets/Helper/TangentSolver.cs
+        // This script has been simplified to be used with tiles were the tangent is always (1, 0, 0, -1)
+        private void TangentSolver(Mesh mesh)
+	    {
+		    int vertexCount = mesh.vertexCount;
+		    Vector4[] tangents = new Vector4[vertexCount];
+            //ref: https://github.com/danielbuechele/SumoVizUnity/blob/master/Assets/Helper/TangentSolver.cs
+            //NOTE: fix issues when using a bumped shader
+		    for (int i = 0; i < (vertexCount); i++)
+		    {		
+			    tangents[i].x = 1f;
+			    //tangents[i].y = 0f;
+			    //tangents[i].z = 0f;
+			    tangents[i].w = -1f;
+		    }
+		    mesh.tangents = tangents;
+	    }
 
         private void DestroyMeshIfNeeded()
         {
@@ -120,10 +190,13 @@ namespace CreativeSpore.SuperTilemapEditor
         static int s_currUVVertex;
         public static void RegisterAnimatedBrush(IBrush brush, int subTileIdx = -1)
         {
-            if (subTileIdx >= 0)
-                s_currUpdatedTilechunk.m_animatedTiles.Add(new AnimTileData() { VertexIdx = s_currUVVertex + (subTileIdx << 2), Brush = brush, SubTileIdx = subTileIdx });
-            else
-                s_currUpdatedTilechunk.m_animatedTiles.Add(new AnimTileData() { VertexIdx = s_currUVVertex, Brush = brush, SubTileIdx = subTileIdx });
+            if (s_currUpdatedTilechunk)
+            {
+                if (subTileIdx >= 0)
+                    s_currUpdatedTilechunk.m_animatedTiles.Add(new AnimTileData() { VertexIdx = s_currUVVertex + (subTileIdx << 2), Brush = brush, SubTileIdx = subTileIdx });
+                else
+                    s_currUpdatedTilechunk.m_animatedTiles.Add(new AnimTileData() { VertexIdx = s_currUVVertex, Brush = brush, SubTileIdx = subTileIdx });
+            }
         }
 
         /// <summary>
@@ -137,27 +210,18 @@ namespace CreativeSpore.SuperTilemapEditor
             {
                 return false;
             }
+            s_currUpdatedTilechunk = this;
 
             int totalTiles = m_width * m_height;
             if (s_vertices == null) s_vertices = new List<Vector3>(totalTiles * 4);
             else s_vertices.Clear();
             if (s_triangles == null) s_triangles = new List<int>(totalTiles * 6);
             else s_triangles.Clear();
+            if (s_colors32 == null) s_colors32 = new List<Color32>(totalTiles * 4);
+            else s_colors32.Clear();
             if (m_uv == null) m_uv = new List<Vector2>(totalTiles * 4);
             else m_uv.Clear();
 
-            //+++ MeshCollider
-            if (s_meshCollVertices == null)
-            {
-                s_meshCollVertices = new List<Vector3>(totalTiles * 4);
-                s_meshCollTriangles = new List<int>(totalTiles * 6);
-            }
-            else
-            {
-                s_meshCollVertices.Clear();
-                s_meshCollTriangles.Clear();
-            }
-            //---
             Vector2[] subTileOffset = new Vector2[]
             {
                 new Vector2( 0f, 0f ),
@@ -224,8 +288,7 @@ namespace CreativeSpore.SuperTilemapEditor
                         {
                             m_animatedTiles.Add(new AnimTileData() { VertexIdx = s_vertices.Count, Brush = tileBrush, SubTileIdx = -1 });
                         }
-
-                        s_currUpdatedTilechunk = this;
+                        
                         s_currUVVertex = s_vertices.Count;
                         Rect tileUV;
                         uint[] subtileData = tileBrush != null ? tileBrush.GetSubtiles(ParentTilemap, GridPosX + tx, GridPosY + ty, tileData) : null;
@@ -238,6 +301,14 @@ namespace CreativeSpore.SuperTilemapEditor
                                 {
                                     tileUV = tile.uv;
                                     _AddTileToMesh(tileUV, tx, ty, tileData, Vector2.zero, CellSize);
+                                    if (m_tileColorList != null && m_tileColorList.Count > tileIdx)
+                                    {
+                                        TileColor32 tileColor32 = m_tileColorList[tileIdx];
+                                        s_colors32.Add(tileColor32.c0);
+                                        s_colors32.Add(tileColor32.c1);
+                                        s_colors32.Add(tileColor32.c2);
+                                        s_colors32.Add(tileColor32.c3);
+                                    }
                                 }
                             }
                         }
@@ -252,6 +323,43 @@ namespace CreativeSpore.SuperTilemapEditor
                                 //if (tileUV != default(Rect)) //NOTE: if this is uncommented, there won't be coherence with geometry ( 16 vertices per tiles with subtiles ). But it means also, the tile shouldn't be null.
                                 {
                                     _AddTileToMesh(tileUV, tx, ty, subTileData, subTileOffset[i], subTileSize, i);
+                                    if (m_tileColorList != null && m_tileColorList.Count > tileIdx)
+                                    {
+                                        TileColor32 tileColor32 = m_tileColorList[tileIdx];
+                                        Color32 middleColor = new Color32(
+                                            System.Convert.ToByte((tileColor32.c0.r + tileColor32.c1.r + tileColor32.c2.r + tileColor32.c3.r) >> 2),
+                                            System.Convert.ToByte((tileColor32.c0.g + tileColor32.c1.g + tileColor32.c2.g + tileColor32.c3.g) >> 2),
+                                            System.Convert.ToByte((tileColor32.c0.b + tileColor32.c1.b + tileColor32.c2.b + tileColor32.c3.b) >> 2),
+                                            System.Convert.ToByte((tileColor32.c0.a + tileColor32.c1.a + tileColor32.c2.a + tileColor32.c3.a) >> 2)
+                                            );
+                                        switch(i)
+                                        {
+                                            case 0:
+                                                s_colors32.Add(tileColor32.c0);
+                                                s_colors32.Add(Color32.Lerp(tileColor32.c1, tileColor32.c0, .5f));
+                                                s_colors32.Add(Color32.Lerp(tileColor32.c2, tileColor32.c0, .5f));
+                                                s_colors32.Add(middleColor);
+                                                break;
+                                            case 1:
+                                                s_colors32.Add(Color32.Lerp(tileColor32.c0, tileColor32.c1, .5f));
+                                                s_colors32.Add(tileColor32.c1);
+                                                s_colors32.Add(middleColor);
+                                                s_colors32.Add(Color32.Lerp(tileColor32.c3, tileColor32.c1, .5f));
+                                                break;
+                                            case 2:
+                                                s_colors32.Add(Color32.Lerp(tileColor32.c0, tileColor32.c2, .5f));
+                                                s_colors32.Add(middleColor);
+                                                s_colors32.Add(tileColor32.c2);
+                                                s_colors32.Add(Color32.Lerp(tileColor32.c3, tileColor32.c2, .5f));
+                                                break;
+                                            case 3:
+                                                s_colors32.Add(middleColor);
+                                                s_colors32.Add(Color32.Lerp(tileColor32.c1, tileColor32.c3, .5f));
+                                                s_colors32.Add(Color32.Lerp(tileColor32.c2, tileColor32.c3, .5f));
+                                                s_colors32.Add(tileColor32.c3);
+                                                break;
+                                        }                                        
+                                    }
                                 }
                             }
                         }
@@ -265,7 +373,7 @@ namespace CreativeSpore.SuperTilemapEditor
                 DestroyTileObject(m_tileObjToBeRemoved[i]);
             }
             m_tileObjToBeRemoved.Clear();
-
+            s_currUpdatedTilechunk = null;
             return !isEmpty;
         }
 

@@ -154,8 +154,8 @@ namespace CreativeSpore.SuperTilemapEditor
         enum eRandomFlags
         {
             Rot90,
-            FlipVertical,
             FlipHorizontal,
+            FlipVertical,
         }
 
         public override void OnInspectorGUI()
@@ -164,6 +164,11 @@ namespace CreativeSpore.SuperTilemapEditor
 
             if (m_prevTileset != m_brush.Tileset)
             {
+                if (m_prevTileset)
+                {
+                    m_prevTileset.OnBrushSelected -= OnBrushSelected;
+                    m_prevTileset.OnTileSelected -= OnTileSelected;
+                }
                 OnDisable();
                 OnEnable();
             }

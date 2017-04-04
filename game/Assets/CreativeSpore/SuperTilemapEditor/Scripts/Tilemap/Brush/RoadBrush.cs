@@ -36,9 +36,6 @@ namespace CreativeSpore.SuperTilemapEditor
             if (autotiling_W) idx |= 8;
 
             uint brushTileData = RefreshLinkedBrush(tilemap, gridX, gridY, TileIds[idx]);
-            // overwrite flags
-            brushTileData &= ~Tileset.k_TileDataMask_Flags;
-            brushTileData |= TileIds[idx] & Tileset.k_TileDataMask_Flags;
             // overwrite brush id
             brushTileData &= ~Tileset.k_TileDataMask_BrushId;
             brushTileData |= tileData & Tileset.k_TileDataMask_BrushId;

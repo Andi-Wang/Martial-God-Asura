@@ -112,6 +112,10 @@ namespace CreativeSpore.SuperTilemapEditor
 
             if (m_prevTileset != m_brush.Tileset)
             {
+                if (m_prevTileset)
+                {
+                    m_prevTileset.OnTileSelected -= OnTileSelected;
+                }
                 OnDisable();
                 OnEnable();
             }

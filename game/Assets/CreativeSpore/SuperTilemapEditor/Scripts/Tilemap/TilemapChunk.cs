@@ -69,13 +69,33 @@ namespace CreativeSpore.SuperTilemapEditor
         [SerializeField, HideInInspector]
         private int m_height = -1;
         [SerializeField, HideInInspector]
-        private List<uint> m_tileDataList = new List<uint>();        
+        private List<uint> m_tileDataList = new List<uint>();
+        [System.Serializable]
+        public struct TileColor32
+        {
+            public TileColor32(Color32 color)
+            {
+                c0 = c1 = c2 = c3 = color;
+            }
+            public TileColor32(Color32 c0, Color32 c1, Color32 c2, Color32 c3)
+            {
+                this.c0 = c0;
+                this.c1 = c1;
+                this.c2 = c2;
+                this.c3 = c3;
+            }
+            public Color32 c0;
+            public Color32 c1;
+            public Color32 c2;
+            public Color32 c3;
+        }
+        [SerializeField, HideInInspector]
+        private List<TileColor32> m_tileColorList = null;
 
         private static List<Vector3> s_vertices;
         private List<Vector2> m_uv; //NOTE: this is the only one not static because it's needed to update the animated tiles
         private static List<int> s_triangles;
-
-        // private List<Color32> m_colors; TODO: add color vertex support
+        private static List<Color32> s_colors32 = null;        
 
         struct AnimTileData
         {
@@ -421,51 +441,43 @@ namespace CreativeSpore.SuperTilemapEditor
 
                 if (brushId != prevBrushId)
                 {
-                    TilesetBrush brush = ParentTilemap.Tileset.FindBrush(brushId);
-                    TilesetBrush prevBrush = ParentTilemap.Tileset.FindBrush(prevBrushId);
-                    if (prevBrush != null)
-                    {
-                        prevBrush.OnErase(this, locGridX, locGridY, tileData);
-                    }
-                    if (brush != null)
-                    {
-                        tileData = brush.OnPaint(this, locGridX, locGridY, tileData);
-                    }
-
-                    // Refresh Neighbors ( and itself if needed )
-                    for (int yf = -1; yf <= 1; ++yf)
-                    {
-                        for (int xf = -1; xf <= 1; ++xf)
+                    if (!s_currUpdatedTilechunk) // avoid this is chunks is being Updated from FillMeshData
+                    { 
+                        // Refresh Neighbors ( and itself if needed )
+                        for (int yf = -1; yf <= 1; ++yf)
                         {
-                            if ((xf | yf) == 0 )
+                            for (int xf = -1; xf <= 1; ++xf)
                             {
-                                if (brushId > 0)
+                                if ((xf | yf) == 0)
                                 {
-                                    // Refresh itself
-                                    tileData = (tileData & ~Tileset.k_TileFlag_Updated);
-                                }
-                            }
-                            else
-                            {
-                                int gx = (locGridX + xf);
-                                int gy = (locGridY + yf);
-                                int idx = gy * m_width + gx;
-                                bool isInsideChunk = (gx >= 0 && gx < m_width && gy >= 0 && gy < m_height);
-                                uint neighborTileData = isInsideChunk ? m_tileDataList[idx] : ParentTilemap.GetTileData(GridPosX + locGridX + xf, GridPosY + locGridY + yf);
-                                int neighborBrushId = (int)((neighborTileData & Tileset.k_TileDataMask_BrushId) >> 16);
-                                TilesetBrush neighborBrush = ParentTilemap.Tileset.FindBrush(neighborBrushId);
-                                //if (brush != null && brush.AutotileWith(brushId, neighborBrushId) || prevBrush != null && prevBrush.AutotileWith(prevBrushId, neighborBrushId))
-                                if (neighborBrush != null && 
-                                    (neighborBrush.AutotileWith(neighborBrushId, brushId) || neighborBrush.AutotileWith(neighborBrushId, prevBrushId)))
-                                {
-                                    neighborTileData = (neighborTileData & ~Tileset.k_TileFlag_Updated); // force a refresh
-                                    if (isInsideChunk)
+                                    if (brushId > 0)
                                     {
-                                        m_tileDataList[idx] = neighborTileData;
+                                        // Refresh itself
+                                        tileData = (tileData & ~Tileset.k_TileFlag_Updated);
                                     }
-                                    else
+                                }
+                                else
+                                {
+                                    int gx = (locGridX + xf);
+                                    int gy = (locGridY + yf);
+                                    int idx = gy * m_width + gx;
+                                    bool isInsideChunk = (gx >= 0 && gx < m_width && gy >= 0 && gy < m_height);
+                                    uint neighborTileData = isInsideChunk ? m_tileDataList[idx] : ParentTilemap.GetTileData(GridPosX + locGridX + xf, GridPosY + locGridY + yf);
+                                    int neighborBrushId = (int)((neighborTileData & Tileset.k_TileDataMask_BrushId) >> 16);
+                                    TilesetBrush neighborBrush = ParentTilemap.Tileset.FindBrush(neighborBrushId);
+                                    //if (brush != null && brush.AutotileWith(brushId, neighborBrushId) || prevBrush != null && prevBrush.AutotileWith(prevBrushId, neighborBrushId))
+                                    if (neighborBrush != null &&
+                                        (neighborBrush.AutotileWith(neighborBrushId, brushId) || neighborBrush.AutotileWith(neighborBrushId, prevBrushId)))
                                     {
-                                        ParentTilemap.SetTileData(GridPosX + gx, GridPosY + gy, neighborTileData);
+                                        neighborTileData = (neighborTileData & ~Tileset.k_TileFlag_Updated); // force a refresh
+                                        if (isInsideChunk)
+                                        {
+                                            m_tileDataList[idx] = neighborTileData;
+                                        }
+                                        else
+                                        {
+                                            ParentTilemap.SetTileData(GridPosX + gx, GridPosY + gy, neighborTileData);
+                                        }
                                     }
                                 }
                             }
@@ -517,6 +529,20 @@ namespace CreativeSpore.SuperTilemapEditor
                         CreateTileObject(tileIdx, tile.prefabData);
                     else
                         DestroyTileObject(tileIdx);
+                }
+
+                TilesetBrush brush = ParentTilemap.Tileset.FindBrush(brushId);
+                if (brushId != prevBrushId)
+                {
+                    TilesetBrush prevBrush = ParentTilemap.Tileset.FindBrush(prevBrushId);
+                    if (prevBrush != null)
+                    {
+                        prevBrush.OnErase(this, locGridX, locGridY, tileData, prevBrushId);
+                    }
+                }
+                if (brush != null)
+                {
+                    tileData = brush.OnPaint(this, locGridX, locGridY, tileData);
                 }
             }
         }

@@ -10,6 +10,7 @@ namespace CreativeSpore.SuperTilemapEditor
     [ExecuteInEditMode] //fix ShouldRunBehaviour warning when using OnTilePrefabCreation
     public class TileObjectBehaviour : MonoBehaviour 
     {
+        public bool ChangeSpriteOnly = false;
         void OnTilePrefabCreation(TilemapChunk.OnTilePrefabCreationData data)
         {
             Tile tile = data.ParentTilemap.GetTile(data.GridX, data.GridY);
@@ -20,8 +21,11 @@ namespace CreativeSpore.SuperTilemapEditor
                 Rect spriteUV = new Rect( Vector2.Scale(tile.uv.position, atlasSize), Vector2.Scale(tile.uv.size, atlasSize));
                 SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
                 spriteRenderer.sprite = Sprite.Create(data.ParentTilemap.Tileset.AtlasTexture, spriteUV, new Vector2(.5f, .5f), pixelsPerUnit);
-                spriteRenderer.sortingLayerID = data.ParentTilemap.SortingLayerID;
-                spriteRenderer.sortingOrder = data.ParentTilemap.OrderInLayer;
+                if (!ChangeSpriteOnly)
+                {
+                    spriteRenderer.sortingLayerID = data.ParentTilemap.SortingLayerID;
+                    spriteRenderer.sortingOrder = data.ParentTilemap.OrderInLayer;
+                }
             }
         }
     }

@@ -305,21 +305,28 @@ namespace CreativeSpore.SuperTilemapEditor
             brushRList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
             {
                 Tileset.BrushContainer brushContainer = tileset.Brushes[index];
-                Rect rToggle = new Rect(rect.x, rect.y, 16f, EditorGUIUtility.singleLineHeight);
-                Rect rTile = new Rect(rect.x + 16f, rect.y, tileset.VisualTileSize.x, tileset.VisualTileSize.y);
-                Rect rTileId = rTile;
-                rTileId.x += rTile.width + 20; rTileId.width = rect.width - rTileId.x;
-                rTileId.height = rect.height / 2;
-
-                Rect tileUV = brushContainer.BrushAsset.GetAnimUV();
-                if (tileUV != default(Rect))
+                if (brushContainer.BrushAsset)
                 {
-                    GUI.Box(new Rect(rTile.position - Vector2.one, rTile.size + 2 * Vector2.one), "");
-                    GUI.DrawTextureWithTexCoords(rTile, tileset.AtlasTexture, tileUV, true);
-                }
+                    Rect rToggle = new Rect(rect.x, rect.y, 16f, EditorGUIUtility.singleLineHeight);
+                    Rect rTile = new Rect(rect.x + 16f, rect.y, tileset.VisualTileSize.x, tileset.VisualTileSize.y);
+                    Rect rTileId = rTile;
+                    rTileId.x += rTile.width + 20; rTileId.width = rect.width - rTileId.x;
+                    rTileId.height = rect.height / 2;
 
-                brushContainer.BrushAsset.ShowInPalette = EditorGUI.Toggle(rToggle, GUIContent.none, brushContainer.BrushAsset.ShowInPalette, STEditorStyles.Instance.visibleToggleStyle);
-                GUI.Label(rTileId, "Id(" + brushContainer.Id + ") " + brushContainer.BrushAsset.name);
+                    Rect tileUV = brushContainer.BrushAsset.GetAnimUV();
+                    if (tileUV != default(Rect))
+                    {
+                        GUI.Box(new Rect(rTile.position - Vector2.one, rTile.size + 2 * Vector2.one), "");
+                        GUI.DrawTextureWithTexCoords(rTile, tileset.AtlasTexture, tileUV, true);
+                    }
+
+                    brushContainer.BrushAsset.ShowInPalette = EditorGUI.Toggle(rToggle, GUIContent.none, brushContainer.BrushAsset.ShowInPalette, STEditorStyles.Instance.visibleToggleStyle);
+                    GUI.Label(rTileId, "Id(" + brushContainer.Id + ") " + brushContainer.BrushAsset.name);
+                }
+                else
+                {
+                    tileset.RemoveInvalidBrushes();
+                }
             };
 
             return brushRList;
@@ -334,7 +341,7 @@ namespace CreativeSpore.SuperTilemapEditor
                 if ((tileData & Tileset.k_TileFlag_FlipV) != 0) GUIUtility.ScaleAroundPivot(new Vector2(1f, -1f), dstRect.center);
                 if ((tileData & Tileset.k_TileFlag_FlipH) != 0) GUIUtility.ScaleAroundPivot(new Vector2(-1f, 1f), dstRect.center);
                 if ((tileData & Tileset.k_TileFlag_Rot90) != 0) GUIUtility.RotateAroundPivot(90f, dstRect.center);
-                if (tile != null && tile.prefabData.prefab)
+                if (tile != null && tile.prefabData.prefab && tile.prefabData.showPrefabPreviewInTilePalette)
                 {
                     Texture2D assetPreview = AssetPreview.GetAssetPreview(tile.prefabData.prefab);
                     if (assetPreview)

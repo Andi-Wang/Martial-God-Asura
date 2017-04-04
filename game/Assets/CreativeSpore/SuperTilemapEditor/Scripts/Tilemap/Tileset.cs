@@ -17,6 +17,9 @@ namespace CreativeSpore.SuperTilemapEditor
     [Serializable]
     public struct TileColliderData
     {
+        /// <summary>
+        /// The collider vertex array. Only valid for type eTileCollider.Polygon, for other types use GetVertices method.
+        /// </summary>
         public Vector2[] vertices;
         public eTileCollider type;
         public TileColliderData Clone()
@@ -26,6 +29,24 @@ namespace CreativeSpore.SuperTilemapEditor
             vertices.CopyTo(clonedVertices, 0);
 
             return new TileColliderData { vertices = clonedVertices, type = type };
+        }
+
+        private static Vector2[] s_fullCollTileVertices = new Vector2[] { new Vector2(0, 0), new Vector2(0, 1), new Vector2(1, 1), new Vector2(1, 0) };
+        /// <summary>
+        /// Gets the collider vertex array if type is not eTileCollider.None. 
+        /// The difference with vertices property is, this will always return a valid array event if the type is eTileCollider.Full.
+        /// vertices is only valid when type is eTileCollider.Polygon
+        /// </summary>
+        /// <returns></returns>
+        public Vector2[] GetVertices()
+        {
+            switch(type)
+            {
+                case eTileCollider.None: return null;
+                case eTileCollider.Full: return s_fullCollTileVertices;
+                case eTileCollider.Polygon: return vertices;
+                default: return null;
+            }
         }
 
         public static Vector2 SnapVertex(Vector2 vertex, Tileset tileset)
@@ -117,6 +138,7 @@ namespace CreativeSpore.SuperTilemapEditor
         /// If the tile should be hidden or not if the prefab is attached
         /// </summary>
         public bool showTileWithPrefab;
+        public bool showPrefabPreviewInTilePalette;
 
         public override bool Equals(object obj)
         {
@@ -139,6 +161,7 @@ namespace CreativeSpore.SuperTilemapEditor
         public TileColliderData collData;
         public ParameterContainer paramContainer = new ParameterContainer();
         public TilePrefabData prefabData;
+        public int autilingGroup = 0;
     }
 
     [Serializable]
@@ -216,21 +239,7 @@ namespace CreativeSpore.SuperTilemapEditor
         public const uint k_TileFlag_Updated = 0x10000000; // used by brushes to check when a tile should be updated or not
 
         public static int GetBrushIdFromTileData(uint tileData) { return tileData != k_TileData_Empty ? (int)((tileData & k_TileDataMask_BrushId) >> 16) : -1; }
-        public static int GetTileIdFromTileData(uint tileData) { return (int)(tileData & k_TileDataMask_TileId); }
-        /// <summary>
-        /// Merge flags and keeps rotation coherence
-        /// </summary>
-        /// <returns></returns>
-        public static uint GetMergedTileFlags(uint tileData, uint tileDataFlags)
-        {
-            tileDataFlags &= k_TileDataMask_Flags;
-            tileData ^= tileDataFlags;
-            if((tileData & k_TileFlag_Rot90) != 0)
-            {
-                tileData ^= (k_TileFlag_FlipH | k_TileFlag_FlipV);
-            }
-            return tileData;
-        }
+        public static int GetTileIdFromTileData(uint tileData) { return (int)(tileData & k_TileDataMask_TileId); }        
 
         #region Public Events
         public delegate void OnTileSelectedDelegate(Tileset source, int prevTileId, int newTileId);
@@ -616,51 +625,50 @@ namespace CreativeSpore.SuperTilemapEditor
                                     SliceOffset = spr0.rect.position; SliceOffset.y = AtlasTexture.height - spr0.rect.y - spr0.rect.height;
                                     SlicePadding.x = spr1.rect.x - spr0.rect.xMax;
                                 }
-                                //+++Ask before importing tiles
-                                if (textureImporter.spritesheet.Length >= 2 && m_tiles.Count > 0)
+                                if (textureImporter.spritesheet.Length >= 2)
                                 {
-                                    if (!UnityEditor.EditorUtility.DisplayDialog("Import Sprite Sheet?", "This texture atlas contain sliced sprites. Do you want to overwrite current tiles with these ones?", "Yes", "No"))
+                                    //+++Ask before importing tiles
+                                    if (m_tiles.Count == 0 || !UnityEditor.EditorUtility.DisplayDialog("Import Sprite Sheet?", "This texture atlas contains sliced sprites. Do you want to overwrite current tiles with these ones?", "Yes", "No"))
+                                    //---
                                     {
-                                        return;
-                                    }
-                                }
-                                //---
-                                m_tilesetHeight = 0;
-                                foreach (UnityEditor.SpriteMetaData spriteData in textureImporter.spritesheet)
-                                {
-                                    Rect rUV = new Rect(Vector2.Scale(spriteData.rect.position, AtlasTexture.texelSize), Vector2.Scale(spriteData.rect.size, AtlasTexture.texelSize));
-                                    tiles.Add(new Tile() { uv = rUV });
-                                    if (tiles.Count >= 2)
-                                    {
-                                        if (tiles[tiles.Count - 2].uv.y != tiles[tiles.Count - 1].uv.y)
+                                        m_tilesetHeight = 0;
+                                        foreach (UnityEditor.SpriteMetaData spriteData in textureImporter.spritesheet)
                                         {
-                                            if (m_tilesetHeight == 1)
+                                            Rect rUV = new Rect(Vector2.Scale(spriteData.rect.position, AtlasTexture.texelSize), Vector2.Scale(spriteData.rect.size, AtlasTexture.texelSize));
+                                            tiles.Add(new Tile() { uv = rUV });
+                                            if (tiles.Count >= 2)
                                             {
-                                                m_tilesetWidth = tiles.Count - 1;
-                                                SlicePadding.y = textureImporter.spritesheet[tiles.Count - 2].rect.y - textureImporter.spritesheet[tiles.Count - 1].rect.yMax;
+                                                if (tiles[tiles.Count - 2].uv.y != tiles[tiles.Count - 1].uv.y)
+                                                {
+                                                    if (m_tilesetHeight == 1)
+                                                    {
+                                                        m_tilesetWidth = tiles.Count - 1;
+                                                        SlicePadding.y = textureImporter.spritesheet[tiles.Count - 2].rect.y - textureImporter.spritesheet[tiles.Count - 1].rect.yMax;
+                                                    }
+                                                    ++m_tilesetHeight;
+                                                }
                                             }
-                                            ++m_tilesetHeight;
+                                            else
+                                            {
+                                                ++m_tilesetHeight;
+                                            }
                                         }
-                                    }
-                                    else
-                                    {
-                                        ++m_tilesetHeight;
-                                    }
-                                }
-                                TileRowLength = m_tilesetWidth;
-                                //Copy data from previous tiles
+                                        TileRowLength = m_tilesetWidth;
+                                        //Copy data from previous tiles
 #if UNITY_EDITOR
-                                if (m_tiles != null && m_tiles.Count > 0 && UnityEditor.EditorUtility.DisplayDialog("Keep previous tile properties?", "Keeping previous tile properties will copy the collider and paramters of previous tiles", "Yes", "No"))
+                                        if (m_tiles != null && m_tiles.Count > 0 && UnityEditor.EditorUtility.DisplayDialog("Keep previous tile properties?", "Keeping previous tile properties will copy the collider and paramters of previous tiles", "Yes", "No"))
 #endif
-                                {
-                                    for (int i = 0; i < m_tiles.Count && i < tiles.Count; ++i)
-                                    {
-                                        tiles[i].collData = m_tiles[i].collData;
-                                        tiles[i].paramContainer = m_tiles[i].paramContainer;
-                                        tiles[i].prefabData = m_tiles[i].prefabData;
+                                        {
+                                            for (int i = 0; i < m_tiles.Count && i < tiles.Count; ++i)
+                                            {
+                                                tiles[i].collData = m_tiles[i].collData;
+                                                tiles[i].paramContainer = m_tiles[i].paramContainer;
+                                                tiles[i].prefabData = m_tiles[i].prefabData;
+                                            }
+                                        }
+                                        m_tiles = tiles;
                                     }
                                 }
-                                m_tiles = tiles;
                             }
                         }
                     }
