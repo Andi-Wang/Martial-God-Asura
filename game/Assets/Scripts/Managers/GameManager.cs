@@ -251,7 +251,7 @@ public class GameManager : MonoBehaviour
             startFromLoad = true;
             if (gs.sceneNumber != SceneManager.GetActiveScene().buildIndex)
             {
-                SceneManager.LoadScene(gs.sceneNumber);
+                StartCoroutine(loadLvAsync(gs.sceneNumber));
             }
             else
             {
@@ -307,7 +307,21 @@ public class GameManager : MonoBehaviour
 
     public void gotoNextLevel()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        StartCoroutine(loadLvAsync(SceneManager.GetActiveScene().buildIndex + 1));
+    }
+
+    public IEnumerator loadLvAsync(int idx)
+    {
+        displayNotification("Loading...");
+
+        yield return null;
+
+        AsyncOperation async = SceneManager.LoadSceneAsync(idx);
+
+        if (!async.isDone)
+        {
+            yield return null;
+        }
     }
 
     public bool SubLevelComplete

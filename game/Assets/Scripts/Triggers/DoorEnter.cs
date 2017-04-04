@@ -42,7 +42,7 @@ public class DoorEnter : MonoBehaviour {
 
     public void NextLevel(int levelNumber)
     {
-        SceneManager.LoadScene(levelNumber);
+        StartCoroutine(GameManager.instance.loadLvAsync(levelNumber));
     }
 
 }

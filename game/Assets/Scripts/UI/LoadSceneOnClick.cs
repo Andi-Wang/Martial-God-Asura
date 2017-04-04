@@ -6,6 +6,6 @@ public class LoadSceneOnClick : MonoBehaviour {
 
 	public void loadByIndex(int sceneIndex)
 	{
-		SceneManager.LoadScene(sceneIndex);
+        StartCoroutine(GameManager.instance.loadLvAsync(sceneIndex));
 	}
 }
