@@ -27,6 +27,6 @@ public class GameoverManager : MonoBehaviour {
 
     public void BackToMain()
     {
-        SceneManager.LoadScene(0);
+        StartCoroutine(GameManager.instance.loadLvAsync(0));
     }
 }
