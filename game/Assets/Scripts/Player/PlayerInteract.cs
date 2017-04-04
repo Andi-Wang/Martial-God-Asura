@@ -11,7 +11,7 @@ public class PlayerInteract : MonoBehaviour {
     
     void Awake () {
 	    playerRigidbody2D = GetComponent<Rigidbody2D>();
-        levelExit = new Vector3(69, 4);
+        levelExit = new Vector3(65, 4);
     }
 
     void OnTriggerEnter2D(Collider2D other)
