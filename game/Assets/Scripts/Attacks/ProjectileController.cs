@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using CreativeSpore.SuperTilemapEditor;
+using UnityEngine;
 
 namespace UnityStandardAssets._2D {
     public class ProjectileController : MonoBehaviour {
@@ -28,6 +29,10 @@ namespace UnityStandardAssets._2D {
                 if (enemyScript) {
                     effects(enemyScript);
                 }
+            }
+            if (other.GetComponent<TilemapChunk>() != null && other.GetComponentInParent<Tilemap>().tag == "Wall")
+            {
+                Destroy(gameObject);
             }
         }
 
