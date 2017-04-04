@@ -23,12 +23,12 @@ public class SkillButtonMouseover : MonoBehaviour {
 	
 	}
 
-    void OnMouseEnter() {
+    public void SetDesc() {
         descriptionPanelScript.text = description;
         Debug.Log(descriptionPanelScript.text);
     }
 
-    void OnMouseExit() {
+    public void ResetDesc() {
         descriptionPanelScript.text = "";
     }
 }

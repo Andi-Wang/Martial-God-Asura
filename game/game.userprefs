@@ -1,6 +1,6 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Player\PlatformerCharacter2D.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\UI\SkillButtonMouseover.cs">
     <Files>
       <File FileName="Assets\Scripts\Managers\GameManager.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\UI\SkillTreeUI.cs" Line="1" Column="1" />
@@ -9,7 +9,8 @@
       <File FileName="Assets\Scripts\Player\Platformer2DUserControl.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\Enemy\Enemy.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\Enemy\AttackState.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\Player\PlatformerCharacter2D.cs" Line="534" Column="67" />
+      <File FileName="Assets\Scripts\Player\PlatformerCharacter2D.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\UI\SkillButtonMouseover.cs" Line="16" Column="3" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
