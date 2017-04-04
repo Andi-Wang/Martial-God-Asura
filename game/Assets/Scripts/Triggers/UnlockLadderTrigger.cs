@@ -7,9 +7,9 @@ public class UnlockLadderTrigger : MonoBehaviour {
     UnlockLadder ladder;
 	// Use this for initialization
 	void Start () {
-        ladder.unlockable = false;
         ladder = GetComponent<UnlockLadder>();
-	}
+        ladder.unlockable = false;
+    }
 	
 	// Update is called once per frame
 	void Update () {
