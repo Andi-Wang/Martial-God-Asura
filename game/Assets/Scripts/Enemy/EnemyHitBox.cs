@@ -8,6 +8,7 @@ namespace UnityStandardAssets._2D {
             GameObject target = other.gameObject;
             if (target.tag == "Player" && enemy.tag == "Enemy") {
                 Enemy enemyReal = enemy.GetComponent<Enemy>();
+                enemyReal.hit = true;
                 GameObject.Find("MainCharacter").GetComponent<PlatformerCharacter2D>().TakeDamage(transform.GetComponentInParent<Rigidbody2D>(), enemyReal.playerDamage);
             }
         }

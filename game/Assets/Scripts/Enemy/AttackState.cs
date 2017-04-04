@@ -4,7 +4,6 @@ public class AttackState : EnemyState
 {
     private Enemy enemy;
     private bool attack;
-    private bool hit;
 
     public void Execute()
     {
@@ -43,22 +42,21 @@ public class AttackState : EnemyState
         {
             if (enemy.boss2Timer < Time.time)
             {
-                hit = false;
                 enemy.boss2Timer = Time.time + 6;
             }
 
-            if (enemy.disToPlayer() >= 1.6f && Time.time < enemy.boss2Timer-4f && !hit)
+            if (!enemy.hit && Time.time < enemy.boss2Timer-4f)
             {
                 enemy.animator.SetBool("enemyAttack", true);
-                enemy.speed = 6f;
+                enemy.speed = 11f;
                 enemy.ghostMove();
             }
-            else if (enemy.disToPlayer() <= 1.6f && Time.time  < enemy.boss2Timer - 4f && !hit)
+            else if (enemy.hit && Time.time  < enemy.boss2Timer - 4f)
             {
                 enemy.animator.SetBool("enemyAttack", false);
                 enemy.speed = 100f;
                 enemy.moveBackwards();
-                hit = true;
+                enemy.hit = false;
                 enemy.boss2Timer = enemy.boss2Timer - ((enemy.boss2Timer-4) - Time.time);
             }
             else if (Time.time < enemy.boss2Timer-2f)
@@ -66,6 +64,7 @@ public class AttackState : EnemyState
                 enemy.resetRotation();
                 enemy.animator.SetBool("enemyAttack", false);
                 enemy.isImmune = false;
+                enemy.hit = false;
                 enemy.rb2D.isKinematic = false;
             }
             else if (Time.time < enemy.boss2Timer)

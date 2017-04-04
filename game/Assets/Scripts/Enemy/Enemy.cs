@@ -88,6 +88,9 @@ public class Enemy : MonoBehaviour
 
     private SpriteRenderer sr;
 
+    [HideInInspector]
+    public bool hit;
+
     public bool dashing;
 
     void Awake()
@@ -409,7 +412,8 @@ public class Enemy : MonoBehaviour
     {
         if (canMove)
         {
-            animator.SetBool("Moving", true);
+            if (animator.GetBool("Moving") || !animator.GetBool("Moving"))
+                animator.SetBool("Moving", true);
             e_FacingRight = !e_FacingRight;
             transform.Translate(getDirection() * speed * Time.deltaTime, Space.World);
             e_FacingRight = !e_FacingRight;
@@ -419,7 +423,8 @@ public class Enemy : MonoBehaviour
     public void ghostMove()
     {
         LookAtTarget();
-        animator.SetBool("Moving", true);
+        if (animator.GetBool("Moving") || !animator.GetBool("Moving"))
+            animator.SetBool("Moving", true);
         transform.position = Vector3.MoveTowards(transform.position, player.transform.position, speed * 2 * Time.deltaTime);
 
         //Flipping sprite
@@ -443,7 +448,8 @@ public class Enemy : MonoBehaviour
     {
         speed = 10f;
         resetRotation();
-        animator.SetBool("Moving", true);
+        if (animator.GetBool("Moving") || !animator.GetBool("Moving"))
+            animator.SetBool("Moving", true);
         transform.position = Vector3.MoveTowards(transform.position, startingLoc, speed * 2 * Time.deltaTime);
         return transform.position == startingLoc;
     }
