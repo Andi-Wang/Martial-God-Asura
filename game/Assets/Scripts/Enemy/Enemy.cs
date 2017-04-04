@@ -194,8 +194,6 @@ public class Enemy : MonoBehaviour
             knockedBack = false;
         }
 
-        Debug.Log(maxKnockbackSpeed);
-
         if (true) {
             if (sourceFacingRight) {
                 rb2D.velocity = new Vector2(speed, rb2D.velocity.y);
